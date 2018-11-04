@@ -24,8 +24,6 @@ func NewUserService(name, dbUrl string) micro.Service {
 
 	oldiezDB, err := db.NewDB(dbUrl)
 
-	// TODO read secret from env var
-	//dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -40,7 +38,7 @@ func NewUserService(name, dbUrl string) micro.Service {
 
 func main() {
 	dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
-	srv := NewUserService("fomo.users", dbUrl)
+	srv := NewUserService("oldiez.users", dbUrl)
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
