@@ -1,5 +1,5 @@
 # Creates a network layer
-resource "google_compute_network" "fomo-network" {
+resource "google_compute_network" "oldiez-network" {
   name = "${var.platform-name}"
 }
 
@@ -7,7 +7,7 @@ resource "google_compute_network" "fomo-network" {
 # This is ssh, http and https.
 resource "google_compute_firewall" "ssh" {
   name    = "${var.platform-name}-ssh"
-  network = "${google_compute_network.fomo-network.name}"
+  network = "${google_compute_network.oldiez-network.name}"
 
   allow {
     protocol = "icmp"
@@ -22,34 +22,34 @@ resource "google_compute_firewall" "ssh" {
 }
 
 # Creates a new DNS zone
-resource "google_dns_managed_zone" "fomo-dns" {
-  name        = "fomo-stage"
-  dns_name    = "stage.fomo.com."
+resource "google_dns_managed_zone" "oldiez-dns" {
+  name        = "oldiez-stage"
+  dns_name    = "stage.oldiez.com."
   description = "stage.hooli.com DNS zone"
 }
 
 # Creates a new subnet for our platform within our selected region
-resource "google_compute_subnetwork" "fomo-subnet" {
+resource "google_compute_subnetwork" "oldiez-subnet" {
   name          = "dev-${var.platform-name}-${var.gcloud-region}"
   ip_cidr_range = "10.1.2.0/24"
-  network       = "${google_compute_network.fomo-network.self_link}"
+  network       = "${google_compute_network.oldiez-network.self_link}"
   region        = "${var.gcloud-region}"
 }
 
-# Creates a container cluster called 'fomo-freight-cluster'
+# Creates a container cluster called 'oldiez-freight-cluster'
 # Attaches new cluster to our network and our subnet,
 # Ensures at least one instance is running
-resource "google_container_cluster" "fomo-cluster" {
-  name       = "fomo-cluster"
-  network    = "${google_compute_network.fomo-network.name}"
-  subnetwork = "${google_compute_subnetwork.fomo-subnet.name}"
+resource "google_container_cluster" "oldiez-cluster" {
+  name       = "oldiez-cluster"
+  network    = "${google_compute_network.oldiez-network.name}"
+  subnetwork = "${google_compute_subnetwork.oldiez-subnet.name}"
   zone       = "${var.gcloud-zone}"
 
   initial_node_count = 1
 
   master_auth {
     username = "flowy"
-    password = "kubernetes cluster for project fomo"
+    password = "kubernetes cluster for project oldiez"
   }
 
   node_config {
@@ -70,12 +70,12 @@ resource "google_container_cluster" "fomo-cluster" {
 }
 
 # Creates a new DNS range for cluster
-resource "google_dns_record_set" "dev-k8s-endpoint-fomo" {
-  name = "k8s.dev.${google_dns_managed_zone.fomo-dns.dns_name}"
+resource "google_dns_record_set" "dev-k8s-endpoint-oldiez" {
+  name = "k8s.dev.${google_dns_managed_zone.oldiez-dns.dns_name}"
   type = "A"
   ttl  = 300
 
-  managed_zone = "${google_dns_managed_zone.fomo-dns.name}"
+  managed_zone = "${google_dns_managed_zone.oldiez-dns.name}"
 
-  rrdatas = ["${google_container_cluster.fomo-cluster.endpoint}"]
+  rrdatas = ["${google_container_cluster.oldiez-cluster.endpoint}"]
 }

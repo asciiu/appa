@@ -39,7 +39,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/gomo/common/db"
+	"github.com/asciiu/oldiez/common/db"
 	_ "github.com/lib/pq"
 )
 
@@ -52,11 +52,11 @@ func checkErr(err error) {
 
 func main() {
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
-	gomoDB, err := db.NewDB(dbURL)
+	oldiezDB, err := db.NewDB(dbURL)
 	checkErr(err)
-	defer gomoDB.Close()
+	defer oldiezDB.Close()
 
-	router := NewRouter(gomoDB)
+	router := NewRouter(oldiezDB)
 
 	// HTTPs server
 	router.Logger.Fatal(router.StartAutoTLS(":443"))

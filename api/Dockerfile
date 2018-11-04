@@ -1,6 +1,6 @@
 FROM golang:1.10.2 as builder
 
-WORKDIR /go/src/github.com/asciiu/gomo/api
+WORKDIR /go/src/github.com/asciiu/oldiez/api
 
 # add key so we can pull from private repo 
 ADD id_rsa /root/.ssh/id_rsa
@@ -8,8 +8,8 @@ RUN chmod 700 /root/.ssh/id_rsa
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
-ADD api /go/src/github.com/asciiu/gomo/api
-CMD cd /go/src/github.com/asciiu/gomo/api && go get github.com/asciiu/gomo && go build -o /gomo
+ADD api /go/src/github.com/asciiu/oldiez/api
+CMD cd /go/src/github.com/asciiu/oldiez/api && go get github.com/asciiu/oldiez && go build -o /oldiez
 
 
 RUN go get -u github.com/golang/dep/cmd/dep
@@ -23,7 +23,7 @@ RUN apk --no-cache add ca-certificates
 
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/gomo/api .
+COPY --from=builder /go/src/github.com/asciiu/oldiez/api .
 
 EXPOSE 5000
 

@@ -1,9 +1,9 @@
 build:
-	dep ensure -update github.com/asciiu/gomo
+	dep ensure -update github.com/asciiu/oldiez
 	docker build --no-cache -t us.gcr.io/fomo-204904/api:dev -f ../api/Dockerfile ..
 
 update: 
-	dep ensure -update github.com/asciiu/gomo
+	dep ensure -update github.com/asciiu/oldiez
 
 stage:
 	docker push us.gcr.io/fomo-204904/api:dev

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	constRes "github.com/asciiu/gomo/common/constants/response"
-	repoUser "github.com/asciiu/gomo/user-service/db/sql"
-	"github.com/asciiu/gomo/user-service/models"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	constRes "github.com/asciiu/oldiez/common/constants/response"
+	repoUser "github.com/asciiu/oldiez/user-service/db/sql"
+	"github.com/asciiu/oldiez/user-service/models"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 	"golang.org/x/crypto/bcrypt"
 )
 

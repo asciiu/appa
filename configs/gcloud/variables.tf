@@ -7,9 +7,9 @@ variable "gcloud-zone" {
 }
 
 variable "gcloud-project" {
-  default = "fomo-204904"
+  default = "oldiez-204904"
 }
 
 variable "platform-name" {
-  default = "fomo-platform"
+  default = "oldiez-platform"
 }

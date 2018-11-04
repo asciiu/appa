@@ -1,17 +1,14 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/asciiu/gomo/api/controllers"
-	repoToken "github.com/asciiu/gomo/api/db/sql"
-	"github.com/asciiu/gomo/api/middlewares"
-	constMessage "github.com/asciiu/gomo/common/constants/message"
-	constEvt "github.com/asciiu/gomo/common/proto/events"
+	"github.com/asciiu/oldiez/api/controllers"
+	repoToken "github.com/asciiu/oldiez/api/db/sql"
+	"github.com/asciiu/oldiez/api/middlewares"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
@@ -53,18 +50,10 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	service.Init()
 
 	// controllers
-	accountController := controllers.NewAccountController(db, service)
 	authController := controllers.NewAuthController(db, service)
-	deviceController := controllers.NewDeviceController(db, service)
-	activityController := controllers.NewActivityController(service)
 	sessionController := controllers.NewSessionController(db, service)
 	userController := controllers.NewUserController(db, service)
-	socketController := controllers.NewWebsocketController()
-	searchController := controllers.NewSearchController(db, service)
-	planController := controllers.NewPlanController(db, service)
 
-	// websocket ticker
-	e.GET("/ticker", socketController.Connect)
 	// required for health checks
 	e.GET("/index.html", health)
 	e.GET("/", health)
@@ -85,44 +74,10 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	protectedApi.GET("/session", sessionController.HandleSession)
 	protectedApi.GET("/logout", authController.HandleLogout)
 
-	// account endpoints
-	protectedApi.POST("/accounts", accountController.HandlePostAccount)
-	protectedApi.GET("/accounts", accountController.HandleListAccounts)
-	protectedApi.GET("/accounts/:accountID", accountController.HandleGetAccount)
-	protectedApi.PUT("/accounts/:accountID", accountController.HandleUpdateAccount)
-	protectedApi.DELETE("/accounts/:accountID", accountController.HandleDeleteAccount)
-
 	// user manangement endpoints
 	protectedApi.PUT("/users/:userID/changepassword", userController.HandleChangePassword)
 	protectedApi.PUT("/users/:userID", userController.HandleUpdateUser)
 
-	// device manage endpoints
-	protectedApi.GET("/devices", deviceController.HandleListDevices)
-	protectedApi.POST("/devices", deviceController.HandlePostDevice)
-	protectedApi.GET("/devices/:deviceID", deviceController.HandleGetDevice)
-	protectedApi.PUT("/devices/:deviceID", deviceController.HandleUpdateDevice)
-	protectedApi.DELETE("/devices/:deviceID", deviceController.HandleDeleteDevice)
-
-	// activity bulletin
-	protectedApi.GET("/activity", activityController.HandleListActivity)
-	protectedApi.PUT("/activity/:activityID", activityController.HandleUpdateActivity)
-
-	// plan management endpoints
-	protectedApi.GET("/plans", planController.HandleListPlans)
-	protectedApi.POST("/plans", planController.HandlePostPlan)
-	protectedApi.GET("/plans/:planID", planController.HandleGetPlan)
-	protectedApi.PUT("/plans/:planID", planController.HandleUpdatePlan)
-	protectedApi.DELETE("/plans/:planID", planController.HandleDeletePlan)
-
-	// search endpoint
-	protectedApi.GET("/search", searchController.Search)
-
-	micro.RegisterSubscriber(constMessage.TopicAggTrade, service.Server(), func(ctx context.Context, tradeEvents *constEvt.TradeEvents) error {
-		socketController.CacheEvents(tradeEvents)
-		return nil
-	})
-
-	go socketController.Ticker()
 	go func() {
 		if err := service.Run(); err != nil {
 			log.Println("nope! ", err)

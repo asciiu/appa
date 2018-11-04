@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/asciiu/gomo/common/db"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	"github.com/asciiu/oldiez/common/db"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 )
 
 func setupService() *UserService {
-	dbUrl := "postgres://postgres@localhost:5432/gomo_dev?&sslmode=disable"
+	dbUrl := "postgres://postgres@localhost:5432/oldiez_test?&sslmode=disable"
 	db, _ := db.NewDB(dbUrl)
 	service := UserService{db}
 	return &service

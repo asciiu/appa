@@ -4,7 +4,7 @@
 FROM golang:1.10.0 as builder
 
 # Set our workdir to our current service in the gopath
-WORKDIR /go/src/github.com/asciiu/gomo/user-service
+WORKDIR /go/src/github.com/asciiu/oldiez/user-service
 
 # Copy the current code into our workdir
 COPY . .
@@ -39,7 +39,7 @@ WORKDIR /app
 # we pull the binary from the container named `builder`, within
 # this build context. This reaches into our previous image, finds
 # the binary we built, and pulls it into this container. Amazing!
-COPY --from=builder /go/src/github.com/asciiu/gomo/user-service/user-service .
+COPY --from=builder /go/src/github.com/asciiu/oldiez/user-service/user-service .
 
 # Run the binary as per usual! This time with a binary build in a
 # separate container, with all of the correct dependencies and

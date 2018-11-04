@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/gomo/common/db"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	"github.com/asciiu/oldiez/common/db"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
 )
@@ -22,7 +22,7 @@ func NewUserService(name, dbUrl string) micro.Service {
 	// Init will parse the command line flags.
 	srv.Init()
 
-	gomoDB, err := db.NewDB(dbUrl)
+	oldiezDB, err := db.NewDB(dbUrl)
 
 	// TODO read secret from env var
 	//dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
@@ -33,7 +33,7 @@ func NewUserService(name, dbUrl string) micro.Service {
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	protoUser.RegisterUserServiceHandler(srv.Server(), &UserService{gomoDB})
+	protoUser.RegisterUserServiceHandler(srv.Server(), &UserService{oldiezDB})
 
 	return srv
 }

@@ -24,12 +24,12 @@ spec:
           volumeMounts:
             - name: postgres-persistent-storage
               mountPath: /var/lib/postgresql/data
-              subPath: fomo_stage 
+              subPath: oldiez_stage 
   volumeClaimTemplates:
   - metadata:
       name: postgres-persistent-storage
       annotations:
-        volume.beta.kubernetes.io/storage-class: "fomo-disk"
+        volume.beta.kubernetes.io/storage-class: "oldiez-disk"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
