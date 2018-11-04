@@ -1,13 +1,13 @@
 build:
 	dep ensure -update github.com/asciiu/oldiez
 	protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/asciiu/oldiez/user-service proto/user/user.proto
-	docker build -t us.gcr.io/fomo-204904/user-service:dev .
+	docker build -t dockerowy/oldiez-user-service:dev .
+
+push:
+	docker push dockerowy/oldiez-user-service:dev 
 
 update:
 	dep ensure -update github.com/asciiu/oldiez
-
-stage:
-	docker push us.gcr.io/fomo-204904/user-service:dev
 
 run:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
