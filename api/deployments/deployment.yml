@@ -15,7 +15,7 @@ spec:
     spec:
         containers:
         - name: api 
-          image: dockerowy/oldiez-user-service:dev 
+          image: dockerowy/oldiez-api:dev 
           imagePullPolicy: Always 
           command: [
             "./api",
@@ -26,16 +26,9 @@ spec:
               name: oldiez-config
           env:
           - name: UPDATED_AT
-            value: "Sun Nov  4 19:30:50 MST 2018"
+            value: "Sun Nov  4 19:39:43 MST 2018"
           ports:
-          - containerPort:  443 
+          - containerPort: 443 
             name: https-port
-          - containerPort:  80 
+          - containerPort: 1848
             name: http-port
-          volumeMounts:
-          - mountPath: /mnt/oldiez
-            name: api-data
-        volumes:
-        - name: api-data
-          persistentVolumeClaim:
-            claimName: oldiez-stage-api-vol 
