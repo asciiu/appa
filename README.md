@@ -45,7 +45,11 @@ $ goose postgres "user=postgres dbname=oldiez_dev sslmode=disable" down-to 0
 ### Apply the local-config map to your local kubernetes cluster. 
 Apply dev environment variables for DB_URL:
 ```
-kubectl create -f local-config-map.yaml
+kubectl create -f configs/local-config-map.yaml
+```
+Create cluster role to minikube:
+```
+kubectl create -f configs/cluster-role-admin.yaml
 ```
 
 **Edit your pg_hba.conf file to trust kubernetes connections if necessary. 
