@@ -1,12 +1,12 @@
 build:
 	dep ensure -update github.com/asciiu/oldiez
-	docker build --no-cache -t us.gcr.io/fomo-204904/api:dev -f ../api/Dockerfile ..
+	docker build --no-cache -t dockerowy/oldiez-api:dev -f ../api/Dockerfile ..
 
 update: 
 	dep ensure -update github.com/asciiu/oldiez
 
-stage:
-	docker push us.gcr.io/fomo-204904/api:dev
+push:
+	docker push dockerowy/oldiez-api:dev 
 
 run:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml

@@ -59,5 +59,6 @@ func main() {
 	router := NewRouter(oldiezDB)
 
 	// HTTPs server
-	router.Logger.Fatal(router.StartAutoTLS(":443"))
+	//router.Logger.Fatal(router.StartAutoTLS(":443"))
+	router.Logger.Fatal(router.Start(":1848"))
 }

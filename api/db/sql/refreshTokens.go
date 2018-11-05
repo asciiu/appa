@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/asciiu/gomo/api/models"
+	"github.com/asciiu/oldiez/api/models"
 )
 
 func FindRefreshToken(db *sql.DB, selector string) (*models.RefreshToken, error) {

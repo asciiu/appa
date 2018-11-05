@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/asciiu/gomo/api/models"
+	"github.com/asciiu/oldiez/api/models"
 )
 
 func GetCurrencyNames(db *sql.DB) ([]*models.Currency, error) {

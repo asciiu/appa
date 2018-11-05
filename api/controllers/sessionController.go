@@ -4,9 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 
-	protoAccount "github.com/asciiu/gomo/account-service/proto/account"
-	constRes "github.com/asciiu/gomo/common/constants/response"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	constRes "github.com/asciiu/oldiez/common/constants/response"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
@@ -14,9 +13,8 @@ import (
 )
 
 type SessionController struct {
-	DB            *sql.DB
-	UserClient    protoUser.UserServiceClient
-	AccountClient protoAccount.AccountServiceClient
+	DB         *sql.DB
+	UserClient protoUser.UserServiceClient
 }
 
 type UserMetaData struct {
@@ -24,11 +22,10 @@ type UserMetaData struct {
 }
 
 type UserMeta struct {
-	UserID   string     `json:"userID"`
-	First    string     `json:"first"`
-	Last     string     `json:"last"`
-	Email    string     `json:"email"`
-	Accounts []*Account `json:"accounts"`
+	UserID string `json:"userID"`
+	First  string `json:"first"`
+	Last   string `json:"last"`
+	Email  string `json:"email"`
 }
 
 type KeyMeta struct {
@@ -47,9 +44,8 @@ type ResponseSessionSuccess struct {
 
 func NewSessionController(db *sql.DB, service micro.Service) *SessionController {
 	controller := SessionController{
-		DB:            db,
-		UserClient:    protoUser.NewUserServiceClient("users", service.Client()),
-		AccountClient: protoAccount.NewAccountServiceClient("accounts", service.Client()),
+		DB:         db,
+		UserClient: protoUser.NewUserServiceClient("users", service.Client()),
 	}
 	return &controller
 }
@@ -89,51 +85,14 @@ func (controller *SessionController) HandleSession(c echo.Context) error {
 		}
 	}
 
-	requestAccounts := protoAccount.AccountsRequest{UserID: userID}
-	responseAccounts, _ := controller.AccountClient.ResyncAccounts(context.Background(), &requestAccounts)
-	accounts := make([]*Account, 0)
-	for _, a := range responseAccounts.Data.Accounts {
-
-		balances := make([]*Balance, 0)
-		for _, b := range a.Balances {
-			balance := Balance{
-				CurrencySymbol:    b.CurrencySymbol,
-				Available:         b.Available,
-				Locked:            b.Locked,
-				ExchangeTotal:     b.ExchangeTotal,
-				ExchangeLocked:    b.ExchangeLocked,
-				ExchangeAvailable: b.ExchangeAvailable,
-				CreatedOn:         b.CreatedOn,
-				UpdatedOn:         b.UpdatedOn,
-			}
-			balances = append(balances, &balance)
-		}
-
-		account := Account{
-			AccountID:   a.AccountID,
-			AccountType: a.AccountType,
-			Exchange:    a.Exchange,
-			KeyPublic:   a.KeyPublic,
-			Title:       a.Title,
-			Description: a.Description,
-			CreatedOn:   a.CreatedOn,
-			UpdatedOn:   a.UpdatedOn,
-			Status:      a.Status,
-			Balances:    balances,
-		}
-
-		accounts = append(accounts, &account)
-	}
-
 	response := &ResponseSessionSuccess{
 		Status: constRes.Success,
 		Data: &UserMetaData{
 			UserMeta: &UserMeta{
-				UserID:   r.Data.User.UserID,
-				First:    r.Data.User.First,
-				Last:     r.Data.User.Last,
-				Email:    r.Data.User.Email,
-				Accounts: accounts,
+				UserID: r.Data.User.UserID,
+				First:  r.Data.User.First,
+				Last:   r.Data.User.Last,
+				Email:  r.Data.User.Email,
 			},
 		},
 	}

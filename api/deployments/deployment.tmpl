@@ -15,7 +15,7 @@ spec:
     spec:
         containers:
         - name: api 
-          image: us.gcr.io/fomo-204904/api:dev
+          image: dockerowy/oldiez-user-service:dev 
           imagePullPolicy: Always 
           command: [
             "./api",
@@ -23,7 +23,7 @@ spec:
           ]
           envFrom:
           - configMapRef:
-              name: fomo-config
+              name: oldiez-config
           env:
           - name: UPDATED_AT
             value: "{{ UPDATED_AT }}"
@@ -33,9 +33,9 @@ spec:
           - containerPort:  80 
             name: http-port
           volumeMounts:
-          - mountPath: /mnt/fomo
+          - mountPath: /mnt/oldiez
             name: api-data
         volumes:
         - name: api-data
           persistentVolumeClaim:
-            claimName: fomo-stage-api-vol 
+            claimName: oldiez-stage-api-vol 

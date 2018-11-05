@@ -11,15 +11,14 @@ import (
 	"strings"
 	"time"
 
-	asql "github.com/asciiu/gomo/api/db/sql"
-	constRes "github.com/asciiu/gomo/common/constants/response"
-	protoDevice "github.com/asciiu/gomo/device-service/proto/device"
-	repoUser "github.com/asciiu/gomo/user-service/db/sql"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	asql "github.com/asciiu/oldiez/api/db/sql"
+	constRes "github.com/asciiu/oldiez/common/constants/response"
+	repoUser "github.com/asciiu/oldiez/user-service/db/sql"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 	micro "github.com/micro/go-micro"
 
-	apiModels "github.com/asciiu/gomo/api/models"
-	models "github.com/asciiu/gomo/user-service/models"
+	apiModels "github.com/asciiu/oldiez/api/models"
+	models "github.com/asciiu/oldiez/user-service/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"
@@ -33,9 +32,8 @@ const jwtDuration = 20 * time.Minute
 //const jwtDuration = 30 * time.Second
 
 type AuthController struct {
-	DB           *sql.DB
-	UserClient   protoUser.UserServiceClient
-	DeviceClient protoDevice.DeviceServiceClient
+	DB         *sql.DB
+	UserClient protoUser.UserServiceClient
 }
 
 type JwtClaims struct {
@@ -101,9 +99,8 @@ type ResponseError struct {
 
 func NewAuthController(db *sql.DB, service micro.Service) *AuthController {
 	controller := AuthController{
-		DB:           db,
-		UserClient:   protoUser.NewUserServiceClient("users", service.Client()),
-		DeviceClient: protoDevice.NewDeviceServiceClient("devices", service.Client()),
+		DB:         db,
+		UserClient: protoUser.NewUserServiceClient("users", service.Client()),
 	}
 
 	return &controller
@@ -118,7 +115,7 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	// Generate encoded token and send it as response.
-	token, err := rawToken.SignedString([]byte(os.Getenv("GOMO_JWT")))
+	token, err := rawToken.SignedString([]byte(os.Getenv("oldiez_JWT")))
 	if err != nil {
 		return "", err
 	}
@@ -159,7 +156,7 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 			}
 
 			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			return []byte(os.Getenv("GOMO_JWT")), nil
+			return []byte(os.Getenv("oldiez_JWT")), nil
 		})
 
 		if err != nil && c.Request().Method != http.MethodOptions {
@@ -275,45 +272,10 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 				c.Response().Header().Set("set-authorization", accessToken)
 			}
 
-			// TODO refactor with device controller implementtion
-			// get user devices here
-			getRequest := protoDevice.GetUserDevicesRequest{
-				UserID: user.ID,
-			}
-
-			r, err := controller.DeviceClient.GetUserDevices(context.Background(), &getRequest)
-
-			if r.Status != constRes.Success {
-				response := &ResponseError{
-					Status:  r.Status,
-					Message: r.Message,
-				}
-
-				if r.Status == constRes.Fail {
-					return c.JSON(http.StatusBadRequest, response)
-				}
-				if r.Status == constRes.Error {
-					return c.JSON(http.StatusInternalServerError, response)
-				}
-			}
-
-			dvs := make([]*Device, 0)
-			for _, d := range r.Data.Devices {
-				// api removes the secret
-				device := Device{
-					DeviceID:         d.DeviceID,
-					DeviceType:       d.DeviceType,
-					ExternalDeviceID: d.ExternalDeviceID,
-					DeviceToken:      d.DeviceToken,
-				}
-				dvs = append(dvs, &device)
-			}
-
 			response := &ResponseSuccess{
 				Status: constRes.Success,
 				Data: &UserData{
-					User:    user.Info(),
-					Devices: dvs,
+					User: user.Info(),
 				},
 			}
 

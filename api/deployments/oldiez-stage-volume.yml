@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: fomo-stage-api-vol
+  name: oldiez-stage-api-vol
 spec:
   accessModes:
   - ReadWriteOnce

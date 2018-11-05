@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	constRes "github.com/asciiu/gomo/common/constants/response"
-	user "github.com/asciiu/gomo/user-service/models"
-	protoUser "github.com/asciiu/gomo/user-service/proto/user"
+	constRes "github.com/asciiu/oldiez/common/constants/response"
+	user "github.com/asciiu/oldiez/user-service/models"
+	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"

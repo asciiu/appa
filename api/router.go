@@ -12,7 +12,6 @@ import (
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 // clean up stage refresh tokens in DB every 30 minutes
@@ -38,9 +37,9 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	go cleanDatabase(db)
 
 	e := echo.New()
-	e.AutoTLSManager.Prompt = autocert.AcceptTOS
-	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("stage.fomo.exchange")
-	e.AutoTLSManager.Cache = autocert.DirCache("/mnt/fomo/autocert")
+	//e.AutoTLSManager.Prompt = autocert.AcceptTOS
+	//e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("stage.fomo.exchange")
+	//e.AutoTLSManager.Cache = autocert.DirCache("/mnt/fomo/autocert")
 
 	middlewares.SetMainMiddlewares(e)
 
