@@ -1,6 +1,6 @@
 build:
 	dep ensure -update github.com/asciiu/oldiez
-	docker build --no-cache -t dockerowy/oldiez-api:dev -f ../api/Dockerfile ..
+	docker build --no-cache -t dockerowy/oldiez-api:dev .
 
 update: 
 	dep ensure -update github.com/asciiu/oldiez
