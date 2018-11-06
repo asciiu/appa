@@ -10,7 +10,7 @@ RUN apk --no-cache add ca-certificates
 RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /go/src/github.com/asciiu/oldiez/api/api .
-EXPOSE 9000
+#EXPOSE 9000
 
 CMD ["./api"]
 

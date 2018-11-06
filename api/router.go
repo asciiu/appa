@@ -43,8 +43,7 @@ func NewRouter(db *sql.DB) *echo.Echo {
 
 	middlewares.SetMainMiddlewares(e)
 
-	service := k8s.NewService(
-		micro.Name("api"))
+	service := k8s.NewService(micro.Name("api"))
 
 	service.Init()
 

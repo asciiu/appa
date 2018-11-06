@@ -15,7 +15,7 @@ func SetMainMiddlewares(e *echo.Echo) {
 	}))
 
 	// redirect http to https
-	e.Pre(middleware.HTTPSRedirect())
+	//e.Pre(middleware.HTTPSRedirect())
 
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

@@ -43,22 +43,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func checkErr(err error) {
-	if err != nil {
-		log.Printf("ERROR: %s", err)
-		panic(err)
-	}
-}
-
 func main() {
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	oldiezDB, err := db.NewDB(dbURL)
-	checkErr(err)
-	defer oldiezDB.Close()
+	if err != nil {
+		log.Printf("ERROR: %s", err)
+	} else {
+		defer oldiezDB.Close()
+		router := NewRouter(oldiezDB)
 
-	router := NewRouter(oldiezDB)
-
-	// HTTPs server
-	//router.Logger.Fatal(router.StartAutoTLS(":443"))
-	router.Logger.Fatal(router.Start(":9000"))
+		// HTTPs server
+		//router.Logger.Fatal(router.StartAutoTLS(":443"))
+		router.Logger.Fatal(router.Start(":9000"))
+	}
 }

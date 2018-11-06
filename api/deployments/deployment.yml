@@ -26,9 +26,7 @@ spec:
               name: oldiez-config
           env:
           - name: UPDATED_AT
-            value: "Sun Nov  4 21:20:24 MST 2018"
+            value: "Mon Nov  5 20:32:37 MST 2018"
           ports:
-          - containerPort: 443 
-            name: https-port
           - containerPort: 9000
             name: http-port
