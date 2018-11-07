@@ -20,7 +20,7 @@
     "user-service/proto/user",
   ]
   pruneopts = "UT"
-  revision = "1385e8c9cd1ea5b959a815c5c5274fa083f553ab"
+  revision = "b0e7957131aade4b9b01a09c26863f0444adc2d0"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
