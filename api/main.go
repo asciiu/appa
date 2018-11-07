@@ -54,6 +54,7 @@ func main() {
 
 		// HTTPs server
 		//router.Logger.Fatal(router.StartAutoTLS(":443"))
-		router.Logger.Fatal(router.Start(":9000"))
+		port := fmt.Sprintf("%s", os.Getenv("API_PORT"))
+		router.Logger.Fatal(router.Start(":" + port))
 	}
 }
