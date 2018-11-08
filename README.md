@@ -49,7 +49,7 @@ kubectl create -f configs/local-config-map.yaml
 ```
 Create cluster role to minikube:
 ```
-kubectl create -f configs/cluster-role-admin.yaml
+kubectl create -f configs/cluster-role-admin.yml
 ```
 
 **Edit your pg_hba.conf file to trust kubernetes connections if necessary. 

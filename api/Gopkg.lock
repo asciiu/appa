@@ -20,7 +20,7 @@
     "user-service/proto/user",
   ]
   pruneopts = "UT"
-  revision = "e92bb64b045873e4a052801329852807f640abf1"
+  revision = "53e9e88d65f75882bc45beb8d308e0a5e0959b48"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
@@ -62,6 +62,14 @@
   pruneopts = "UT"
   revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:7b5c6e2eeaa9ae5907c391a91c132abfd5c9e8a784a341b5625e750c67e6825d"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
 
 [[projects]]
   digest = "1:949eed2f9570022751c2cd40777fbd1b45c04b932ea58874274286ba3a7566c8"
@@ -464,6 +472,7 @@
     "github.com/asciiu/oldiez/user-service/proto/user",
     "github.com/dgrijalva/jwt-go",
     "github.com/google/uuid",
+    "github.com/gorilla/websocket",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/lib/pq",
