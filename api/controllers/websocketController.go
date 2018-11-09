@@ -5,66 +5,75 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/asciiu/oldiez/api/models"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )
 
+const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
+	pongWait = 60 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (pongWait * 9) / 10
+
+	// Maximum message size allowed from peer.
+	maxMessageSize = 512
+)
+
+var (
+	newline = []byte{'\n'}
+	space   = []byte{' '}
+)
+
+// var upgrader = websocket.Upgrader{
+// 	ReadBufferSize:  1024,
+// 	WriteBufferSize: 1024,
+// }
+
 type WebsocketController struct {
 	connections []*websocket.Conn
+	hub         *models.Hub
 }
 
 func NewWebsocketController() *WebsocketController {
+	hub := models.NewHub()
+	go hub.Run()
+
 	return &WebsocketController{
 		connections: make([]*websocket.Conn, 0),
+		hub:         hub,
 	}
 }
 
-var (
-	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
-)
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 // Connect handles websocket connections
 func (controller *WebsocketController) Connect(c echo.Context) error {
-	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
-	defer ws.Close()
 
-	if err := ws.WriteMessage(websocket.TextMessage, []byte("ready!")); err != nil {
-		log.Println("write:", err)
-		return err
+	client := &models.Client{
+		Conn: conn,
+		Send: make(chan []byte, 256),
+		Hub:  controller.hub,
 	}
-	i := len(controller.connections)
-	controller.connections = append(controller.connections, ws)
+	client.Hub.Register <- client
 
-	// block until client closes
-	if _, _, err := ws.ReadMessage(); err != nil {
-		// client closes this will read: websocket: close 1005 (no status)
-		log.Println("read error: ", err)
-	}
+	go client.WritePump()
+	go client.ReadPump()
 
-	// remove the connection from the connect pool
-	controller.connections = append(controller.connections[:i], controller.connections[i+1:]...)
 	return nil
-}
-
-func (controller *WebsocketController) Ticker() {
-	for {
-		time.Sleep(5 * time.Second)
-
-		// send events to all connected clients
-		for _, conn := range controller.connections {
-			//json, err := json.Marshal(events)
-			//if err != nil {
-			//log.Println("marchall error: ", err)
-			//}
-			//conn.WriteMessage(websocket.TextMessage, json)
-			conn.WriteMessage(websocket.TextMessage, []byte("tick"))
-		}
-	}
 }

@@ -55,7 +55,7 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	socketController := controllers.NewWebsocketController()
 
 	// websocket ticker
-	e.GET("/connect", socketController.Connect)
+	e.GET("/ws", socketController.Connect)
 
 	// required for health checks
 	e.GET("/index.html", health)
@@ -88,7 +88,6 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	protectedApi.PUT("/users/:userID/changepassword", userController.HandleChangePassword)
 	protectedApi.PUT("/users/:userID", userController.HandleUpdateUser)
 
-	go socketController.Ticker()
 	go func() {
 		if err := service.Run(); err != nil {
 			log.Println("nope! ", err)
