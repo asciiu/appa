@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  namespace: default
+  name: socket 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket 
+  template:
+    metadata:
+      labels:
+        app: socket 
+    spec:
+        containers:
+        - name: socket 
+          image: dockerowy/oldiez-socket:dev 
+          imagePullPolicy: Always 
+          command: [
+            "./socket",
+            "--selector=static"
+          ]
+          envFrom:
+          - configMapRef:
+              name: oldiez-config
+          env:
+          - name: UPDATED_AT
+            value: "{{ UPDATED_AT }}"
+          ports:
+          - containerPort: 5000
+            name: socket-port
