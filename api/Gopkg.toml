@@ -25,10 +25,6 @@
 #   unused-packages = true
 
 [[constraint]]
-  name = "github.com/gorilla/websocket"
-  version = "1.2.0"
-
-[[constraint]]
   branch = "master"
   name = "github.com/asciiu/oldiez"
 

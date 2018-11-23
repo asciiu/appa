@@ -52,10 +52,6 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	orderController := controllers.NewOrderController(db, service)
 	sessionController := controllers.NewSessionController(db, service)
 	userController := controllers.NewUserController(db, service)
-	socketController := controllers.NewWebsocketController()
-
-	// websocket ticker
-	e.GET("/ws", socketController.Connect)
 
 	// required for health checks
 	e.GET("/index.html", health)
