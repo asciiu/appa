@@ -79,10 +79,10 @@ func (c *Client) ReadPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) WritePump() {
-	message := "tick"
-	ticker := time.NewTicker(1 * time.Second)
+	//message := "tick"
+	//ticker := time.NewTicker(1 * time.Second)
 	defer func() {
-		ticker.Stop()
+		//ticker.Stop()
 		c.Conn.Close()
 	}()
 	for {
@@ -111,22 +111,22 @@ func (c *Client) WritePump() {
 			if err := w.Close(); err != nil {
 				return
 			}
-		case <-ticker.C:
+			//case <-ticker.C:
 
-			//c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if message == "tick" {
-				message = "tock"
-			} else {
-				message = "tick"
-			}
-			log.Printf(message)
+			//	//c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			//	if message == "tick" {
+			//		message = "tock"
+			//	} else {
+			//		message = "tick"
+			//	}
+			//	log.Printf(message)
 
-			if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
-				return
-			}
-			//if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-			//	return
-			//}
+			//	if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+			//		return
+			//	}
+			//	//if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			//	//	return
+			//	//}
 		}
 	}
 }
