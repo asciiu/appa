@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/asciiu/oldiez/socket/models"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )
@@ -66,9 +67,10 @@ func (controller *WebsocketController) Connect(c echo.Context) error {
 	}
 
 	client := &models.Client{
-		Conn: conn,
-		Send: make(chan []byte, 256),
-		Hub:  controller.hub,
+		Conn:     conn,
+		Send:     make(chan []byte, 256),
+		Hub:      controller.hub,
+		ClientID: uuid.New().String(),
 	}
 	client.Hub.Register <- client
 
