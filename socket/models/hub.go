@@ -4,6 +4,7 @@
 package models
 
 import (
+	"encoding/json"
 	"log"
 )
 
@@ -14,7 +15,7 @@ type Hub struct {
 	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	Broadcast chan map[string]interface{}
+	Broadcast chan []byte
 
 	// Register requests from the clients.
 	Register chan *Client
@@ -25,7 +26,7 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		Broadcast:  make(chan map[string]interface{}),
+		Broadcast:  make(chan []byte),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
@@ -43,14 +44,19 @@ func (h *Hub) Run() {
 				close(client.Send)
 			}
 		case message := <-h.Broadcast:
-			for key, value := range message {
-				log.Println("Key:", key, " Value:", value)
-				switch {
-				case key == "setup" && value == "ship":
-					//ship := Ship()
-					h.broadcast([]byte("setup ship!"))
-				default:
+			switch {
+			case json.Unmarshal(message, &ShipSetupRequest{}) == nil:
+				var shipSetup ShipSetupRequest
+				json.Unmarshal(message, &shipSetup)
+
+				ship := NewShip(shipSetup.ClientID, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
+				if s, err := json.Marshal(ship); err != nil {
+					log.Println(err)
+				} else {
+					h.broadcast(s)
 				}
+			default:
+				log.Println("what?")
 			}
 		}
 	}

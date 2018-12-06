@@ -79,7 +79,11 @@ func (c *Client) ReadPump() {
 		} else {
 			m := msg.(map[string]interface{})
 			m["clientID"] = c.ClientID
-			c.Hub.Broadcast <- m
+			if jsonb, err := json.Marshal(m); err != nil {
+				log.Println(err)
+			} else {
+				c.Hub.Broadcast <- jsonb
+			}
 		}
 	}
 }
