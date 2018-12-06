@@ -6,6 +6,7 @@ package models
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -72,7 +73,14 @@ func (c *Client) ReadPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.Hub.Broadcast <- message
+		var msg interface{}
+		if err := json.Unmarshal(message, &msg); err != nil {
+			log.Println(err)
+		} else {
+			m := msg.(map[string]interface{})
+			m["clientID"] = c.ClientID
+			c.Hub.Broadcast <- m
+		}
 	}
 }
 

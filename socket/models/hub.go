@@ -3,6 +3,10 @@
 // license that can be found in the LICENSE file.
 package models
 
+import (
+	"log"
+)
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -10,7 +14,7 @@ type Hub struct {
 	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	Broadcast chan []byte
+	Broadcast chan map[string]interface{}
 
 	// Register requests from the clients.
 	Register chan *Client
@@ -21,7 +25,7 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		Broadcast:  make(chan []byte),
+		Broadcast:  make(chan map[string]interface{}),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
@@ -39,14 +43,26 @@ func (h *Hub) Run() {
 				close(client.Send)
 			}
 		case message := <-h.Broadcast:
-			for client := range h.Clients {
-				select {
-				case client.Send <- message:
+			for key, value := range message {
+				log.Println("Key:", key, " Value:", value)
+				switch {
+				case key == "setup" && value == "ship":
+					//ship := Ship()
+					h.broadcast([]byte("setup ship!"))
 				default:
-					close(client.Send)
-					delete(h.Clients, client)
 				}
 			}
+		}
+	}
+}
+
+func (h *Hub) broadcast(message []byte) {
+	for client := range h.Clients {
+		select {
+		case client.Send <- message:
+		default:
+			close(client.Send)
+			delete(h.Clients, client)
 		}
 	}
 }
