@@ -3,11 +3,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9926d464020e89611081eec6a214b2aef8da80bd0a905d0c17b3a87ad7c743fc"
+  digest = "1:19dc40320de8d61bb338d06337cb81073347d262b25d2052216825c4404a4718"
   name = "github.com/asciiu/oldiez"
-  packages = ["common/db"]
+  packages = [
+    "common/constants/response",
+    "common/db",
+  ]
   pruneopts = "UT"
-  revision = "f9c0ead1cfe3c1b75833192b76c01fc3d393ac60"
+  revision = "1f90329f08e86536167a51681741eb44e6aded35"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
@@ -488,6 +491,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/asciiu/oldiez/common/constants/response",
     "github.com/asciiu/oldiez/common/db",
     "github.com/google/uuid",
     "github.com/gorilla/websocket",

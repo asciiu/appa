@@ -6,6 +6,8 @@ package models
 import (
 	"encoding/json"
 	"log"
+
+	"github.com/asciiu/oldiez/common/constants/response"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -44,19 +46,37 @@ func (h *Hub) Run() {
 				close(client.Send)
 			}
 		case message := <-h.Broadcast:
-			switch {
-			case json.Unmarshal(message, &ShipSetupRequest{}) == nil:
-				var shipSetup ShipSetupRequest
-				json.Unmarshal(message, &shipSetup)
+			var msg interface{}
+			if err := json.Unmarshal(message, &msg); err != nil {
+				log.Println(err)
+			} else {
+				// add the client ID to all client requests
+				m := msg.(map[string]interface{})
 
-				shipResponse := NewShipRequest(shipSetup.ClientID, shipSetup.Topic, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
-				if res, err := json.Marshal(shipResponse); err != nil {
-					log.Println(err)
-				} else {
-					h.broadcast(res)
+				switch m["topic"] {
+				case response.ShipSetup:
+					var shipSetup ShipSetupRequest
+					json.Unmarshal(message, &shipSetup)
+
+					shipResponse := NewShipRequest(shipSetup.ClientID, shipSetup.Topic, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
+					if res, err := json.Marshal(shipResponse); err != nil {
+						log.Println(err)
+					} else {
+						h.broadcast(res)
+					}
+
+				case response.ShipBoost:
+					var boost ShipBoostUpdate
+					json.Unmarshal(message, &boost)
+					if res, err := json.Marshal(boost); err != nil {
+						log.Println(err)
+					} else {
+						h.broadcast(res)
+					}
+
+				default:
+					log.Println("what?")
 				}
-			default:
-				log.Println("what?")
 			}
 		}
 	}

@@ -3,8 +3,14 @@ package models
 type ShipSetupRequest struct {
 	ClientID     string `json:"clientID"`
 	Topic        string `json:"topic"`
-	ScreenWidth  uint32 `json:"width"`
-	ScreenHeight uint32 `json:"height"`
+	ScreenWidth  uint32 `json:"screenWidth"`
+	ScreenHeight uint32 `json:"screenHeight"`
+}
+
+type ShipBoostUpdate struct {
+	ClientID string `json:"clientID"`
+	Topic    string `json:"topic"`
+	Boost    uint32 `json:"boost"`
 }
 
 type ShipResponse struct {
