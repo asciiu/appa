@@ -77,6 +77,7 @@ func (c *Client) ReadPump() {
 		if err := json.Unmarshal(message, &msg); err != nil {
 			log.Println(err)
 		} else {
+			// add the client ID to all client requests
 			m := msg.(map[string]interface{})
 			m["clientID"] = c.ClientID
 			if jsonb, err := json.Marshal(m); err != nil {
