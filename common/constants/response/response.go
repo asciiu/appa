@@ -8,6 +8,6 @@ const (
 	Nonentity string = "nonentity"
 
 	// socket stuffs
-	SetupResponse  string = "setup"
-	UpdateResponse string = "update"
+	ShipSetup  string = "ship-setup"
+	ShipUpdate string = "ship-update"
 )
