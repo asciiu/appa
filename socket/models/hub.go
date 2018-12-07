@@ -49,11 +49,11 @@ func (h *Hub) Run() {
 				var shipSetup ShipSetupRequest
 				json.Unmarshal(message, &shipSetup)
 
-				ship := NewShip(shipSetup.ClientID, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
-				if s, err := json.Marshal(ship); err != nil {
+				shipResponse := NewShipRequest(shipSetup.ClientID, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
+				if res, err := json.Marshal(shipResponse); err != nil {
 					log.Println(err)
 				} else {
-					h.broadcast(s)
+					h.broadcast(res)
 				}
 			default:
 				log.Println("what?")

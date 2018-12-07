@@ -6,4 +6,8 @@ const (
 	Fail      string = "fail"
 	Success   string = "success"
 	Nonentity string = "nonentity"
+
+	// socket stuffs
+	SetupResponse  string = "setup"
+	UpdateResponse string = "update"
 )
