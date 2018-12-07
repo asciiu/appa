@@ -3,14 +3,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:19dc40320de8d61bb338d06337cb81073347d262b25d2052216825c4404a4718"
+  digest = "1:bef6b79d023616c04f74e4c55fbe1da85cc31cd6bfca7547849e8a8ebadb5914"
   name = "github.com/asciiu/oldiez"
   packages = [
     "common/constants/response",
     "common/db",
   ]
   pruneopts = "UT"
-  revision = "1f90329f08e86536167a51681741eb44e6aded35"
+  revision = "0fc0542a35bd2635fdb5d4e8cd987870bf3908d4"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"

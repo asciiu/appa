@@ -10,7 +10,7 @@ type ShipSetupRequest struct {
 type ShipBoostUpdate struct {
 	ClientID string `json:"clientID"`
 	Topic    string `json:"topic"`
-	Boost    uint32 `json:"boost"`
+	Boost    bool   `json:"boost"`
 }
 
 type ShipResponse struct {
