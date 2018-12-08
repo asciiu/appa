@@ -77,11 +77,11 @@ func (h *Hub) Run() {
 					responses = append(responses, rot)
 
 				case topic.ShipLaser:
-					rot := ShipLaser{
+					laser := ShipLaser{
 						ClientID: m["clientID"].(string),
 						Topic:    m["topic"].(string),
 					}
-					responses = append(responses, rot)
+					responses = append(responses, laser)
 
 				default:
 					log.Println("what?")
