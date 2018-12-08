@@ -17,7 +17,7 @@ type Hub struct {
 	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	Broadcast chan []byte
+	Broadcast chan []interface{}
 
 	// Register requests from the clients.
 	Register chan *Client
@@ -28,7 +28,7 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		Broadcast:  make(chan []byte),
+		Broadcast:  make(chan []interface{}),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
@@ -45,38 +45,46 @@ func (h *Hub) Run() {
 				delete(h.Clients, client)
 				close(client.Send)
 			}
-		case message := <-h.Broadcast:
-			var msg interface{}
-			if err := json.Unmarshal(message, &msg); err != nil {
-				log.Println(err)
-			} else {
-				// add the client ID to all client requests
+		case messages := <-h.Broadcast:
+			responses := make([]interface{}, 0)
+
+			for _, msg := range messages {
 				m := msg.(map[string]interface{})
 
 				switch m["topic"] {
 				case topic.ShipSetup:
-					var shipSetup ShipSetupRequest
-					json.Unmarshal(message, &shipSetup)
-
-					shipResponse := NewShipRequest(shipSetup.ClientID, shipSetup.Topic, shipSetup.ScreenWidth, shipSetup.ScreenHeight)
-					if res, err := json.Marshal(shipResponse); err != nil {
-						log.Println(err)
-					} else {
-						h.broadcast(res)
-					}
+					shipResponse := NewShipRequest(
+						m["clientID"].(string),
+						m["topic"].(string),
+						m["screenWidth"].(float64),
+						m["screenHeight"].(float64))
+					responses = append(responses, shipResponse)
 
 				case topic.ShipBoost:
-					var boost ShipBoostUpdate
-					json.Unmarshal(message, &boost)
-					if res, err := json.Marshal(boost); err != nil {
-						log.Println(err)
-					} else {
-						h.broadcast(res)
+					boost := ShipBoostUpdate{
+						ClientID: m["clientID"].(string),
+						Topic:    m["topic"].(string),
+						Boost:    m["boost"].(bool),
 					}
+					responses = append(responses, boost)
+
+				case topic.ShipRotation:
+					rot := ShipBoostRotation{
+						ClientID: m["clientID"].(string),
+						Topic:    m["topic"].(string),
+						Radian:   m["radian"].(float64),
+					}
+					responses = append(responses, rot)
 
 				default:
 					log.Println("what?")
 				}
+			}
+
+			if res, err := json.Marshal(responses); err != nil {
+				log.Println(err)
+			} else {
+				h.broadcast(res)
 			}
 		}
 	}

@@ -73,18 +73,17 @@ func (c *Client) ReadPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		var msg interface{}
-		if err := json.Unmarshal(message, &msg); err != nil {
+		var msgs []interface{}
+		if err := json.Unmarshal(message, &msgs); err != nil {
 			log.Println(err)
 		} else {
 			// add the client ID to all client requests
-			m := msg.(map[string]interface{})
-			m["clientID"] = c.ClientID
-			if jsonb, err := json.Marshal(m); err != nil {
-				log.Println(err)
-			} else {
-				c.Hub.Broadcast <- jsonb
+			for _, msg := range msgs {
+				m := msg.(map[string]interface{})
+				m["clientID"] = c.ClientID
 			}
+
+			c.Hub.Broadcast <- msgs
 		}
 	}
 }

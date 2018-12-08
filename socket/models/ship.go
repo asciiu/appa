@@ -1,26 +1,25 @@
 package models
 
-type ShipSetupRequest struct {
-	ClientID     string `json:"clientID"`
-	Topic        string `json:"topic"`
-	ScreenWidth  uint32 `json:"screenWidth"`
-	ScreenHeight uint32 `json:"screenHeight"`
-}
-
 type ShipBoostUpdate struct {
 	ClientID string `json:"clientID"`
 	Topic    string `json:"topic"`
 	Boost    bool   `json:"boost"`
 }
 
-type ShipResponse struct {
-	Topic    string `json:"topic"`
-	ClientID string `json:"clientID"`
-	X        uint32 `json:"x"`
-	Y        uint32 `json:"y"`
+type ShipBoostRotation struct {
+	ClientID string  `json:"clientID"`
+	Topic    string  `json:"topic"`
+	Radian   float64 `json:"radian"`
 }
 
-func NewShipRequest(clientID, topic string, width, height uint32) *ShipResponse {
+type ShipResponse struct {
+	Topic    string  `json:"topic"`
+	ClientID string  `json:"clientID"`
+	X        float64 `json:"x"`
+	Y        float64 `json:"y"`
+}
+
+func NewShipRequest(clientID, topic string, width, height float64) *ShipResponse {
 	return &ShipResponse{
 		Topic:    topic,
 		ClientID: clientID,
