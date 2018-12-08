@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/asciiu/oldiez/common/constants/response"
+	"github.com/asciiu/oldiez/socket/constants/topic"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -54,7 +54,7 @@ func (h *Hub) Run() {
 				m := msg.(map[string]interface{})
 
 				switch m["topic"] {
-				case response.ShipSetup:
+				case topic.ShipSetup:
 					var shipSetup ShipSetupRequest
 					json.Unmarshal(message, &shipSetup)
 
@@ -65,7 +65,7 @@ func (h *Hub) Run() {
 						h.broadcast(res)
 					}
 
-				case response.ShipBoost:
+				case topic.ShipBoost:
 					var boost ShipBoostUpdate
 					json.Unmarshal(message, &boost)
 					if res, err := json.Marshal(boost); err != nil {
