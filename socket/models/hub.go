@@ -61,7 +61,7 @@ func (h *Hub) Run() {
 					responses = append(responses, shipResponse)
 
 				case topic.ShipBoost:
-					boost := ShipBoostUpdate{
+					boost := ShipBoost{
 						ClientID: m["clientID"].(string),
 						Topic:    m["topic"].(string),
 						Boost:    m["boost"].(bool),
@@ -69,10 +69,17 @@ func (h *Hub) Run() {
 					responses = append(responses, boost)
 
 				case topic.ShipRotation:
-					rot := ShipBoostRotation{
+					rot := ShipRotation{
 						ClientID: m["clientID"].(string),
 						Topic:    m["topic"].(string),
 						Radian:   m["radian"].(float64),
+					}
+					responses = append(responses, rot)
+
+				case topic.ShipLaser:
+					rot := ShipLaser{
+						ClientID: m["clientID"].(string),
+						Topic:    m["topic"].(string),
 					}
 					responses = append(responses, rot)
 

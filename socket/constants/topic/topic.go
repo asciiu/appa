@@ -6,4 +6,5 @@ const (
 	ShipUpdate   string = "ship-update"
 	ShipBoost    string = "ship-boost"
 	ShipRotation string = "ship-rotation"
+	ShipLaser    string = "ship-laser"
 )
