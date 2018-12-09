@@ -12,7 +12,7 @@ import (
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
-type Hub struct {
+type GameHub struct {
 	// Registered clients.
 	Clients map[*Client]bool
 
@@ -28,8 +28,8 @@ type Hub struct {
 	Players []*ShipSetup
 }
 
-func NewHub() *Hub {
-	return &Hub{
+func NewGameHub() *GameHub {
+	return &GameHub{
 		Broadcast:  make(chan []interface{}),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
@@ -38,7 +38,7 @@ func NewHub() *Hub {
 	}
 }
 
-func (h *Hub) Run() {
+func (h *GameHub) Run() {
 	for {
 		select {
 		case client := <-h.Register:
@@ -101,7 +101,7 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) broadcast(message []byte) {
+func (h *GameHub) broadcast(message []byte) {
 	for client := range h.Clients {
 		select {
 		case client.Send <- message:

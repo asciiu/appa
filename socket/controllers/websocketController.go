@@ -37,16 +37,16 @@ var (
 
 type WebsocketController struct {
 	connections []*websocket.Conn
-	hub         *models.Hub
+	gamehub     *models.GameHub
 }
 
 func NewWebsocketController() *WebsocketController {
-	hub := models.NewHub()
+	hub := models.NewGameHub()
 	go hub.Run()
 
 	return &WebsocketController{
 		connections: make([]*websocket.Conn, 0),
-		hub:         hub,
+		gamehub:     hub,
 	}
 }
 
@@ -69,10 +69,10 @@ func (controller *WebsocketController) Connect(c echo.Context) error {
 	client := &models.Client{
 		Conn:     conn,
 		Send:     make(chan []byte, 256),
-		Hub:      controller.hub,
+		GameHub:  controller.gamehub,
 		ClientID: uuid.New().String(),
 	}
-	client.Hub.Register <- client
+	client.GameHub.Register <- client
 
 	go client.WritePump()
 	go client.ReadPump()

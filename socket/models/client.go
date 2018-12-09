@@ -39,7 +39,7 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	Hub *Hub
+	GameHub *GameHub
 
 	// The websocket connection.
 	Conn *websocket.Conn
@@ -58,7 +58,7 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) ReadPump() {
 	defer func() {
-		c.Hub.Unregister <- c
+		c.GameHub.Unregister <- c
 		c.Conn.Close()
 		log.Printf("read pump shutdown")
 	}()
@@ -79,7 +79,7 @@ func (c *Client) ReadPump() {
 			if err := json.Unmarshal(message, &msgs); err != nil {
 				log.Println(err)
 			} else {
-				c.Hub.Broadcast <- msgs
+				c.GameHub.Broadcast <- msgs
 			}
 		}
 	}
