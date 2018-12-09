@@ -46,9 +46,6 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	Send chan []byte
-
-	// client id
-	ClientID string
 }
 
 // readPump pumps messages from the websocket connection to the hub.

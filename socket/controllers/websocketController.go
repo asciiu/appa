@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/asciiu/oldiez/socket/models"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )
@@ -67,12 +66,11 @@ func (controller *WebsocketController) Connect(c echo.Context) error {
 	}
 
 	client := &models.Client{
-		Conn:     conn,
-		Send:     make(chan []byte, 256),
-		GameHub:  controller.gamehub,
-		ClientID: uuid.New().String(),
+		Conn:    conn,
+		Send:    make(chan []byte, 256),
+		GameHub: controller.gamehub,
 	}
-	client.GameHub.Register <- client
+	controller.gamehub.Register <- client
 
 	go client.WritePump()
 	go client.ReadPump()

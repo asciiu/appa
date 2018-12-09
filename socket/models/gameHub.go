@@ -43,6 +43,7 @@ func (h *GameHub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client] = true
+
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)

@@ -7,7 +7,7 @@
   name = "github.com/asciiu/oldiez"
   packages = ["common/db"]
   pruneopts = "UT"
-  revision = "dd3bc91ead9378673d3b2c51dffeaf4d99de73e5"
+  revision = "fc088957b615217d50ef8aa849c063192609953c"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
@@ -489,7 +489,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/asciiu/oldiez/common/db",
-    "github.com/google/uuid",
     "github.com/gorilla/websocket",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
