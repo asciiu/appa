@@ -24,6 +24,8 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	Unregister chan *Client
+
+	Players []*ShipSetup
 }
 
 func NewHub() *Hub {
@@ -32,6 +34,7 @@ func NewHub() *Hub {
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
+		Players:    make([]*ShipSetup, 0),
 	}
 }
 
@@ -53,12 +56,13 @@ func (h *Hub) Run() {
 
 				switch m["topic"] {
 				case topic.ShipSetup:
-					shipResponse := NewShipRequest(
+					shipSetup := NewShipRequest(
 						m["clientID"].(string),
 						m["topic"].(string),
 						m["screenWidth"].(float64),
 						m["screenHeight"].(float64))
-					responses = append(responses, shipResponse)
+					responses = append(responses, shipSetup)
+					h.Players = append(h.Players, shipSetup)
 
 				case topic.ShipBoost:
 					boost := ShipBoost{

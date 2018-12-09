@@ -105,13 +105,11 @@ func (c *Client) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-				log.Println("not ok")
 				return
 			}
 
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
-				log.Println("NextWriter error")
 				return
 			}
 			w.Write(message)
@@ -124,7 +122,6 @@ func (c *Client) WritePump() {
 			}
 
 			if err := w.Close(); err != nil {
-				log.Println("w.Close error")
 				return
 			}
 			//case <-ticker.C:

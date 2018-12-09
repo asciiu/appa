@@ -22,6 +22,9 @@ type ShipSetup struct {
 	ClientID string  `json:"clientID"`
 	X        float64 `json:"x"`
 	Y        float64 `json:"y"`
+	Width    float64 `json:"width"`
+	Height   float64 `json:'height"`
+	Image    string  `json:"image"`
 }
 
 func NewShipRequest(clientID, topic string, width, height float64) *ShipSetup {
