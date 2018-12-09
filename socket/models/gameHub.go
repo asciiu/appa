@@ -25,7 +25,7 @@ type GameHub struct {
 	// Unregister requests from clients.
 	Unregister chan *Client
 
-	Players []*ShipSetup
+	Players []*Ship
 }
 
 func NewGameHub() *GameHub {
@@ -34,7 +34,7 @@ func NewGameHub() *GameHub {
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
-		Players:    make([]*ShipSetup, 0),
+		Players:    make([]*Ship, 0),
 	}
 }
 

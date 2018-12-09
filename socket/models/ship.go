@@ -17,7 +17,7 @@ type ShipLaser struct {
 	Topic    string `json:"topic"`
 }
 
-type ShipSetup struct {
+type Ship struct {
 	Topic    string  `json:"topic"`
 	ClientID string  `json:"clientID"`
 	X        float64 `json:"x"`
@@ -27,8 +27,8 @@ type ShipSetup struct {
 	Image    string  `json:"image"`
 }
 
-func NewShipRequest(clientID, topic string, width, height float64) *ShipSetup {
-	return &ShipSetup{
+func NewShipRequest(clientID, topic string, width, height float64) *Ship {
+	return &Ship{
 		Topic:    topic,
 		ClientID: clientID,
 		X:        width / 2,
