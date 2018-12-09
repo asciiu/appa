@@ -60,24 +60,27 @@ func (c *Client) ReadPump() {
 	defer func() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
+		log.Printf("read pump shutdown")
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+
+	// unmarshal successful reads and log all read errors
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
+			log.Printf("read error: %v", err)
+			// close the connection when close error
 			break
-		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		var msgs []interface{}
-		if err := json.Unmarshal(message, &msgs); err != nil {
-			log.Println(err)
 		} else {
-			c.Hub.Broadcast <- msgs
+			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+			var msgs []interface{}
+			if err := json.Unmarshal(message, &msgs); err != nil {
+				log.Println(err)
+			} else {
+				c.Hub.Broadcast <- msgs
+			}
 		}
 	}
 }
@@ -93,6 +96,7 @@ func (c *Client) WritePump() {
 	defer func() {
 		//ticker.Stop()
 		c.Conn.Close()
+		log.Println("write pump shutdown")
 	}()
 	for {
 		select {
@@ -101,11 +105,13 @@ func (c *Client) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				log.Println("not ok")
 				return
 			}
 
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				log.Println("NextWriter error")
 				return
 			}
 			w.Write(message)
@@ -118,6 +124,7 @@ func (c *Client) WritePump() {
 			}
 
 			if err := w.Close(); err != nil {
+				log.Println("w.Close error")
 				return
 			}
 			//case <-ticker.C:
