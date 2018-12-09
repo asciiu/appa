@@ -43,6 +43,14 @@ func (h *GameHub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client] = true
+			// send current players to new client
+			if len(h.Players) > 0 {
+				if res, err := json.Marshal(h.Players); err != nil {
+					log.Println(err)
+				} else {
+					client.Send <- res
+				}
+			}
 
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
@@ -56,14 +64,14 @@ func (h *GameHub) Run() {
 				m := msg.(map[string]interface{})
 
 				switch m["topic"] {
-				case topic.ShipSetup:
-					shipSetup := NewShipRequest(
+				case topic.PlayerSetup:
+					playerShip := NewShipRequest(
 						m["clientID"].(string),
 						m["topic"].(string),
 						m["screenWidth"].(float64),
 						m["screenHeight"].(float64))
-					responses = append(responses, shipSetup)
-					h.Players = append(h.Players, shipSetup)
+					h.Players = append(h.Players, playerShip)
+					responses = append(responses, playerShip)
 
 				case topic.ShipBoost:
 					boost := ShipBoost{

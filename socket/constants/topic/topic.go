@@ -2,7 +2,7 @@ package topic
 
 const (
 	// socket stuffs
-	ShipSetup    string = "ship-setup"
+	PlayerSetup  string = "player-setup"
 	ShipUpdate   string = "ship-update"
 	ShipBoost    string = "ship-boost"
 	ShipRotation string = "ship-rotation"

@@ -70,10 +70,11 @@ func (controller *WebsocketController) Connect(c echo.Context) error {
 		Send:    make(chan []byte, 256),
 		GameHub: controller.gamehub,
 	}
-	controller.gamehub.Register <- client
 
 	go client.WritePump()
 	go client.ReadPump()
+
+	controller.gamehub.Register <- client
 
 	return nil
 }
