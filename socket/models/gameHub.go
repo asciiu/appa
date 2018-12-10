@@ -69,20 +69,20 @@ func (h *GameHub) Run() {
 
 			for _, msg := range messages {
 				m := msg.(map[string]interface{})
+				clientID := m["clientID"].(string)
 
 				switch m["topic"] {
 				case topic.PlayerRegister:
-					clientID := m["clientID"].(string)
 					playerShip := NewShipRequest(
 						clientID,
 						m["topic"].(string),
 						m["screenWidth"].(float64),
-						m["screenHeight"].(float64))
+						m["screenHeight"].(float64),
+					)
 					h.Players[clientID] = playerShip
 					responses = append(responses, playerShip)
 
 				case topic.PlayerUnregister:
-					clientID := m["clientID"].(string)
 					delete(h.Players, clientID)
 					responses = append(responses, Message{
 						ClientID: clientID,
@@ -91,7 +91,7 @@ func (h *GameHub) Run() {
 
 				case topic.ShipBoost:
 					boost := ShipBoost{
-						ClientID: m["clientID"].(string),
+						ClientID: clientID,
 						Topic:    m["topic"].(string),
 						Boost:    m["boost"].(bool),
 					}
@@ -99,7 +99,7 @@ func (h *GameHub) Run() {
 
 				case topic.ShipRotation:
 					rot := ShipRotation{
-						ClientID: m["clientID"].(string),
+						ClientID: clientID,
 						Topic:    m["topic"].(string),
 						Radian:   m["radian"].(float64),
 					}
@@ -107,7 +107,7 @@ func (h *GameHub) Run() {
 
 				case topic.ShipLaser:
 					responses = append(responses, Message{
-						ClientID: m["clientID"].(string),
+						ClientID: clientID,
 						Topic:    m["topic"].(string),
 					})
 

@@ -20,6 +20,7 @@ type Ship struct {
 	Width    float64 `json:"width"`
 	Height   float64 `json:'height"`
 	Image    string  `json:"image"`
+	Heading  float64 `json:"heading"`
 }
 
 type Message struct {
