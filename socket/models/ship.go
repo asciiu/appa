@@ -13,14 +13,16 @@ type ShipRotation struct {
 }
 
 type Ship struct {
-	Topic    string  `json:"topic"`
-	ClientID string  `json:"clientID"`
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
-	Width    float64 `json:"width"`
-	Height   float64 `json:'height"`
-	Image    string  `json:"image"`
-	Heading  float64 `json:"heading"`
+	Topic     string  `json:"topic"`
+	ClientID  string  `json:"clientID"`
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	VelocityX float64 `json:"velocityX"`
+	VelocityY float64 `json:"velocityY"`
+	Width     float64 `json:"width"`
+	Height    float64 `json:'height"`
+	Image     string  `json:"image"`
+	Heading   float64 `json:"heading"`
 }
 
 type Message struct {

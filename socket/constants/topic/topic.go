@@ -10,4 +10,5 @@ const (
 	ShipLaser        string = "ship-laser"
 	ShipRotation     string = "ship-rotation"
 	ShipUpdate       string = "ship-update"
+	ShipVelocity     string = "ship-velocity"
 )

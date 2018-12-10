@@ -106,6 +106,12 @@ func (h *GameHub) Run() {
 					playerShip := h.Players[clientID]
 					playerShip.Heading = m["heading"].(float64)
 
+				case topic.ShipLaser:
+					responses = append(responses, Message{
+						ClientID: clientID,
+						Topic:    m["topic"].(string),
+					})
+
 				case topic.ShipRotation:
 					rot := ShipRotation{
 						ClientID: clientID,
@@ -114,11 +120,10 @@ func (h *GameHub) Run() {
 					}
 					responses = append(responses, rot)
 
-				case topic.ShipLaser:
-					responses = append(responses, Message{
-						ClientID: clientID,
-						Topic:    m["topic"].(string),
-					})
+				case topic.ShipVelocity:
+					playerShip := h.Players[clientID]
+					playerShip.VelocityX = m["velocityX"].(float64)
+					playerShip.VelocityY = m["velocityY"].(float64)
 
 				default:
 					log.Println("what?")
