@@ -4,8 +4,10 @@ const (
 	// socket stuffs
 	PlayerRegister   string = "player-register"
 	PlayerUnregister string = "player-unregister"
-	ShipUpdate       string = "ship-update"
 	ShipBoost        string = "ship-boost"
-	ShipRotation     string = "ship-rotation"
+	ShipCoordinates  string = "ship-coordinates"
+	ShipHeading      string = "ship-heading"
 	ShipLaser        string = "ship-laser"
+	ShipRotation     string = "ship-rotation"
+	ShipUpdate       string = "ship-update"
 )

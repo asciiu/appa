@@ -97,6 +97,15 @@ func (h *GameHub) Run() {
 					}
 					responses = append(responses, boost)
 
+				case topic.ShipCoordinates:
+					playerShip := h.Players[clientID]
+					playerShip.X = m["x"].(float64)
+					playerShip.Y = m["y"].(float64)
+
+				case topic.ShipHeading:
+					playerShip := h.Players[clientID]
+					playerShip.Heading = m["heading"].(float64)
+
 				case topic.ShipRotation:
 					rot := ShipRotation{
 						ClientID: clientID,
