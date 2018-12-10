@@ -33,8 +33,8 @@ var (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  3072,
+	WriteBufferSize: 3072,
 }
 
 // Client is a middleman between the websocket connection and the hub.
@@ -72,6 +72,7 @@ func (c *Client) ReadPump() {
 			break
 		} else {
 			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+
 			var msgs []interface{}
 			if err := json.Unmarshal(message, &msgs); err != nil {
 				log.Println(err)

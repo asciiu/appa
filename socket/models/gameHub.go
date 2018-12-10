@@ -25,7 +25,8 @@ type GameHub struct {
 	// Unregister requests from clients.
 	Unregister chan *Client
 
-	Players []*Ship
+	// clientID -> ship
+	Players map[string]*Ship
 }
 
 func NewGameHub() *GameHub {
@@ -34,7 +35,7 @@ func NewGameHub() *GameHub {
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
-		Players:    make([]*Ship, 0),
+		Players:    make(map[string]*Ship, 0),
 	}
 }
 
@@ -44,8 +45,12 @@ func (h *GameHub) Run() {
 		case client := <-h.Register:
 			h.Clients[client] = true
 			// send current players to new client
-			if len(h.Players) > 0 {
-				if res, err := json.Marshal(h.Players); err != nil {
+			ships := make([]*Ship, 0)
+			for _, ship := range h.Players {
+				ships = append(ships, ship)
+			}
+			if len(ships) > 0 {
+				if res, err := json.Marshal(ships); err != nil {
 					log.Println(err)
 				} else {
 					client.Send <- res
@@ -57,6 +62,8 @@ func (h *GameHub) Run() {
 				delete(h.Clients, client)
 				close(client.Send)
 			}
+			// TODO you need to remove the player from h.Players here
+
 		case messages := <-h.Broadcast:
 			responses := make([]interface{}, 0)
 
@@ -64,14 +71,23 @@ func (h *GameHub) Run() {
 				m := msg.(map[string]interface{})
 
 				switch m["topic"] {
-				case topic.PlayerSetup:
+				case topic.PlayerRegister:
+					clientID := m["clientID"].(string)
 					playerShip := NewShipRequest(
-						m["clientID"].(string),
+						clientID,
 						m["topic"].(string),
 						m["screenWidth"].(float64),
 						m["screenHeight"].(float64))
-					h.Players = append(h.Players, playerShip)
+					h.Players[clientID] = playerShip
 					responses = append(responses, playerShip)
+
+				case topic.PlayerUnregister:
+					clientID := m["clientID"].(string)
+					delete(h.Players, clientID)
+					responses = append(responses, Message{
+						ClientID: clientID,
+						Topic:    m["topic"].(string),
+					})
 
 				case topic.ShipBoost:
 					boost := ShipBoost{
@@ -90,11 +106,10 @@ func (h *GameHub) Run() {
 					responses = append(responses, rot)
 
 				case topic.ShipLaser:
-					laser := ShipLaser{
+					responses = append(responses, Message{
 						ClientID: m["clientID"].(string),
 						Topic:    m["topic"].(string),
-					}
-					responses = append(responses, laser)
+					})
 
 				default:
 					log.Println("what?")

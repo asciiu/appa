@@ -12,11 +12,6 @@ type ShipRotation struct {
 	Radian   float64 `json:"radian"`
 }
 
-type ShipLaser struct {
-	ClientID string `json:"clientID"`
-	Topic    string `json:"topic"`
-}
-
 type Ship struct {
 	Topic    string  `json:"topic"`
 	ClientID string  `json:"clientID"`
@@ -25,6 +20,11 @@ type Ship struct {
 	Width    float64 `json:"width"`
 	Height   float64 `json:'height"`
 	Image    string  `json:"image"`
+}
+
+type Message struct {
+	ClientID string `json:"clientID"`
+	Topic    string `json:"topic"`
 }
 
 func NewShipRequest(clientID, topic string, width, height float64) *Ship {
