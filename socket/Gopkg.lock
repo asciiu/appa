@@ -7,7 +7,7 @@
   name = "github.com/asciiu/oldiez"
   packages = ["common/db"]
   pruneopts = "UT"
-  revision = "7c1ebd2b56b8aee4cc03484b437198fe9c2726ef"
+  revision = "1d2633d6ad7829a2116b4370b62c7d9dd04d6f48"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"

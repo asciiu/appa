@@ -6,7 +6,6 @@ package models
 
 import (
 	"bytes"
-	"encoding/json"
 	"log"
 	"time"
 
@@ -17,7 +16,7 @@ const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
 
-	// Time allowed to read the next pong message from the peer.
+	// Time allowed to read the next message from the peer.
 	pongWait = 60 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
@@ -60,7 +59,8 @@ func (c *Client) ReadPump() {
 		log.Printf("read pump shutdown")
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	//c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.Conn.SetReadDeadline(time.Time{})
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 
 	// unmarshal successful reads and log all read errors
@@ -72,13 +72,7 @@ func (c *Client) ReadPump() {
 			break
 		} else {
 			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-
-			var msgs []interface{}
-			if err := json.Unmarshal(message, &msgs); err != nil {
-				log.Println(err)
-			} else {
-				c.GameHub.Broadcast <- msgs
-			}
+			c.GameHub.Broadcast <- message
 		}
 	}
 }

@@ -17,7 +17,8 @@ type GameHub struct {
 	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	Broadcast chan []interface{}
+	//Broadcast chan []interface{}
+	Broadcast chan []byte
 
 	// Register requests from the clients.
 	Register chan *Client
@@ -31,7 +32,8 @@ type GameHub struct {
 
 func NewGameHub() *GameHub {
 	return &GameHub{
-		Broadcast:  make(chan []interface{}),
+		//Broadcast:  make(chan []interface{}),
+		Broadcast:  make(chan []byte),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
@@ -64,10 +66,22 @@ func (h *GameHub) Run() {
 			}
 			// TODO you need to remove the player from h.Players here
 
-		case messages := <-h.Broadcast:
+		case msgs := <-h.Broadcast:
+			var messages []interface{}
+			if err := json.Unmarshal(msgs, &messages); err != nil {
+				log.Println(err)
+				continue
+			}
 			responses := make([]interface{}, 0)
 
 			for _, msg := range messages {
+				//var msgs []interface{}
+				//if err := json.Unmarshal(message, &msgs); err != nil {
+				//	log.Println(err)
+				//} else {
+				//	c.GameHub.Broadcast <- msgs
+				//}
+
 				m := msg.(map[string]interface{})
 				clientID := m["clientID"].(string)
 
