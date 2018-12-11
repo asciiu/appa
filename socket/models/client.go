@@ -56,7 +56,6 @@ func (c *Client) ReadPump() {
 	defer func() {
 		c.GameHub.Unregister <- c
 		c.Conn.Close()
-		log.Printf("read pump shutdown")
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
 	//c.Conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -67,8 +66,9 @@ func (c *Client) ReadPump() {
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Printf("read error: %v", err)
-			// close the connection when close error
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
+				log.Printf("error: %v", err)
+			}
 			break
 		} else {
 			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
@@ -88,7 +88,6 @@ func (c *Client) WritePump() {
 	defer func() {
 		//ticker.Stop()
 		c.Conn.Close()
-		log.Println("write pump shutdown")
 	}()
 	for {
 		select {
