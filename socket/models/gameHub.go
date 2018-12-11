@@ -112,13 +112,15 @@ func (h *GameHub) Run() {
 					responses = append(responses, boost)
 
 				case topic.ShipCoordinates:
-					playerShip := h.Players[clientID]
-					playerShip.X = m["x"].(float64)
-					playerShip.Y = m["y"].(float64)
+					if playerShip, ok := h.Players[clientID]; ok {
+						playerShip.X = m["x"].(float64)
+						playerShip.Y = m["y"].(float64)
+					}
 
 				case topic.ShipHeading:
-					playerShip := h.Players[clientID]
-					playerShip.Heading = m["heading"].(float64)
+					if playerShip, ok := h.Players[clientID]; ok {
+						playerShip.Heading = m["heading"].(float64)
+					}
 
 				case topic.ShipLaser:
 					responses = append(responses, Message{
@@ -135,9 +137,10 @@ func (h *GameHub) Run() {
 					responses = append(responses, rot)
 
 				case topic.ShipVelocity:
-					playerShip := h.Players[clientID]
-					playerShip.VelocityX = m["velocityX"].(float64)
-					playerShip.VelocityY = m["velocityY"].(float64)
+					if playerShip, ok := h.Players[clientID]; ok {
+						playerShip.VelocityX = m["velocityX"].(float64)
+						playerShip.VelocityY = m["velocityY"].(float64)
+					}
 
 				default:
 					log.Println("what?")
