@@ -147,10 +147,13 @@ func (h *GameHub) Run() {
 				}
 			}
 
-			if res, err := json.Marshal(responses); err != nil {
-				log.Println(err)
-			} else {
-				h.broadcast(res)
+			// only broadcast when non empty
+			if len(responses) > 0 {
+				if res, err := json.Marshal(responses); err != nil {
+					log.Println(err)
+				} else {
+					h.broadcast(res)
+				}
 			}
 		}
 	}
