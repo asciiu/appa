@@ -1,6 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
 package models
 
 import (
@@ -17,7 +14,6 @@ type GameHub struct {
 	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	//Broadcast chan []interface{}
 	Broadcast chan []byte
 
 	// Register requests from the clients.
@@ -47,16 +43,12 @@ func (h *GameHub) Run() {
 		case client := <-h.Register:
 			h.Clients[client] = true
 			// send current players to new client
-			ships := make([]*Ship, 0)
-			for _, ship := range h.Players {
-				ships = append(ships, ship)
-			}
-			if len(ships) > 0 {
-				if res, err := json.Marshal(ships); err != nil {
-					log.Println(err)
-				} else {
-					client.Send <- res
+			if len(h.Players) > 0 {
+				players := make([]interface{}, 0)
+				for _, player := range h.Players {
+					players = append(players, player)
 				}
+				client.Send <- players
 			}
 
 		case client := <-h.Unregister:
@@ -75,13 +67,6 @@ func (h *GameHub) Run() {
 			responses := make([]interface{}, 0)
 
 			for _, msg := range messages {
-				//var msgs []interface{}
-				//if err := json.Unmarshal(message, &msgs); err != nil {
-				//	log.Println(err)
-				//} else {
-				//	c.GameHub.Broadcast <- msgs
-				//}
-
 				m := msg.(map[string]interface{})
 				clientID := m["clientID"].(string)
 
@@ -149,17 +134,13 @@ func (h *GameHub) Run() {
 
 			// only broadcast when non empty
 			if len(responses) > 0 {
-				if res, err := json.Marshal(responses); err != nil {
-					log.Println(err)
-				} else {
-					h.broadcast(res)
-				}
+				h.broadcast(responses)
 			}
 		}
 	}
 }
 
-func (h *GameHub) broadcast(message []byte) {
+func (h *GameHub) broadcast(message []interface{}) {
 	for client := range h.Clients {
 		select {
 		case client.Send <- message:

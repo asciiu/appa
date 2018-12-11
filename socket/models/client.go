@@ -1,11 +1,8 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package models
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -44,7 +41,8 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	Send chan []byte
+	//Send chan []byte
+	Send chan []interface{}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -91,7 +89,7 @@ func (c *Client) WritePump() {
 	}()
 	for {
 		select {
-		case message, ok := <-c.Send:
+		case messages, ok := <-c.Send:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
@@ -103,13 +101,20 @@ func (c *Client) WritePump() {
 			if err != nil {
 				return
 			}
-			w.Write(message)
 
-			// Add queued chat messages to the current websocket message.
+			// append queued messages to the current websocket message.
 			n := len(c.Send)
 			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.Send)
+				msgs := <-c.Send
+				for _, msg := range msgs {
+					messages = append(messages, msg)
+				}
+			}
+
+			if json, err := json.Marshal(messages); err != nil {
+				log.Println(err)
+			} else {
+				w.Write(json)
 			}
 
 			if err := w.Close(); err != nil {

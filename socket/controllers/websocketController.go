@@ -67,7 +67,7 @@ func (controller *WebsocketController) Connect(c echo.Context) error {
 
 	client := &models.Client{
 		Conn:    conn,
-		Send:    make(chan []byte, 256),
+		Send:    make(chan []interface{}, 256),
 		GameHub: controller.gamehub,
 	}
 
