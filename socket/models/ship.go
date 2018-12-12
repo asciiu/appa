@@ -12,9 +12,15 @@ type ShipRotation struct {
 	Radian   float64 `json:"radian"`
 }
 
+type Asteroid struct {
+	OrderID string  `json:"orderID"`
+	Topic   string  `json:"topic"`
+	Size    float64 `json:"size"`
+}
+
 type Ship struct {
-	Topic     string  `json:"topic"`
 	ClientID  string  `json:"clientID"`
+	Topic     string  `json:"topic"`
 	X         float64 `json:"x"`
 	Y         float64 `json:"y"`
 	VelocityX float64 `json:"velocityX"`

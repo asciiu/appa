@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/asciiu/oldiez/socket/constants/topic"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -81,10 +83,10 @@ func (c *Client) ReadPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) WritePump() {
-	//message := "tick"
-	//ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(9 * time.Second)
+
 	defer func() {
-		//ticker.Stop()
+		ticker.Stop()
 		c.Conn.Close()
 	}()
 	for {
@@ -120,22 +122,26 @@ func (c *Client) WritePump() {
 			if err := w.Close(); err != nil {
 				return
 			}
-			//case <-ticker.C:
 
-			//	//c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			//	if message == "tick" {
-			//		message = "tock"
-			//	} else {
-			//		message = "tick"
-			//	}
-			//	log.Printf(message)
+		case <-ticker.C:
 
-			//	if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
-			//		return
-			//	}
-			//	//if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-			//	//	return
-			//	//}
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			asteroids := make([]interface{}, 0)
+			asteroids = append(asteroids,
+				Asteroid{
+					Topic:   topic.NewAsteroid,
+					OrderID: uuid.New().String(),
+					Size:    0.01,
+				},
+			)
+
+			if json, err := json.Marshal(asteroids); err != nil {
+				log.Println(err)
+			} else {
+				if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(json)); err != nil {
+					return
+				}
+			}
 		}
 	}
 }

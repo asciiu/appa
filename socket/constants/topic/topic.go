@@ -2,6 +2,7 @@ package topic
 
 const (
 	// socket stuffs
+	NewAsteroid      string = "new-asteroid"
 	PlayerRegister   string = "player-register"
 	PlayerUnregister string = "player-unregister"
 	ShipBoost        string = "ship-boost"
