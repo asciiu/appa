@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+service OrderService {
+  rpc AddOrder(OrderRequest) returns (OrderResponse) {}
+}
+
+// Requests
+message OrderRequest {
+  string userID  = 1;
+  string marketName = 2;
+  string side = 3;
+  double size = 4;
+}
+
+// Responses
+message Order {
+  string orderID = 1;
+  string userID = 2;
+  string marketName = 3;
+  string side = 4;
+  double size = 5;
+}
+
+message OrderData {
+  Order order = 1;
+}
+
+message OrderResponse {
+  string status = 1;
+  string message = 2;
+  OrderData data = 3;
+}

@@ -11,9 +11,10 @@ import (
 )
 
 type OrderRequest struct {
-	CurrencyName string `json:"currencyName"`
-	MarketName   string `json:"marketName"`
-	Side         string `json:"side"`
+	CurrencyName string  `json:"currencyName"`
+	MarketName   string  `json:"marketName"`
+	Side         string  `json:"side"`
+	Size         float64 `json:"size"`
 }
 
 type OrderController struct {
