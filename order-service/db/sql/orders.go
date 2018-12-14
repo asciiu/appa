@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/asciiu/oldiez/order-service/models"
+	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
 )
 
 func DeleteOrder(db *sql.DB, orderID string) error {
@@ -35,14 +36,15 @@ func FindOrder(db *sql.DB, orderID string) (*models.Order, error) {
 	return &o, nil
 }
 
-func InsertOrder(db *sql.DB, order *models.Order) (*models.Order, error) {
+func InsertOrder(db *sql.DB, order *protoOrder.Order) (*protoOrder.Order, error) {
 	sqlStatement := `insert into orders (
 		id, 
 		user_id, 
 		market_name, 
 		side, 
 		size, 
-		created_on) values ($1, $2, $3, $4, $5, $6)`
+		created_on, 
+		updated_on) values ($1, $2, $3, $4, $5, $6, $7)`
 	_, err := db.Exec(sqlStatement,
 		order.OrderID,
 		order.UserID,
@@ -50,6 +52,7 @@ func InsertOrder(db *sql.DB, order *models.Order) (*models.Order, error) {
 		order.Side,
 		order.Size,
 		order.CreatedOn,
+		order.UpdatedOn,
 	)
 
 	if err != nil {

@@ -19,6 +19,8 @@ message Order {
   string marketName = 3;
   string side = 4;
   double size = 5;
+  string createdOn = 6;
+  string updatedOn = 7;
 }
 
 message OrderData {
