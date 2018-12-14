@@ -83,7 +83,7 @@ func (c *Client) ReadPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) WritePump() {
-	ticker := time.NewTicker(9 * time.Second)
+	ticker := time.NewTicker(3 * time.Second)
 
 	defer func() {
 		ticker.Stop()
