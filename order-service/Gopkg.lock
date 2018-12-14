@@ -11,11 +11,23 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9926d464020e89611081eec6a214b2aef8da80bd0a905d0c17b3a87ad7c743fc"
+  digest = "1:30535f891639836301d52cfe44ada28e282ce4e4c49eae07ad7ee9f83883bef5"
   name = "github.com/asciiu/oldiez"
-  packages = ["common/db"]
+  packages = [
+    "common/db",
+    "user-service/db/sql",
+    "user-service/models",
+  ]
   pruneopts = "UT"
-  revision = "b2a3dd85051bbcc3daaf9c71928cae91c1fb41a8"
+  revision = "42ee6a6f79615afe8d760fc709cd949a3b299c4a"
+
+[[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:4be5d1a52c61b74c0a4d62f37c0640f706ae6e07eb73617dd013990d565717d5"
@@ -372,6 +384,14 @@
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "UT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:579c4bbcc2e16d4caf871ba91c0e2c331b07c5560c80d142d82c0de01c57fa96"
   name = "github.com/sean-/seed"
@@ -380,10 +400,20 @@
   revision = "e2103e2c35297fb7e17febb81e49b312087a2372"
 
 [[projects]]
+  digest = "1:18752d0b95816a1b777505a97f71c7467a8445b8ffb55631a7bf779f6ba4fa83"
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  pruneopts = "UT"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
+
+[[projects]]
   branch = "master"
-  digest = "1:d5891c5bca9c62e5d394ca26491d2b710a1dc08cedeb0ca8f9ac4c3305120b02"
+  digest = "1:0199120c0958f5c74a2adfb040fd1554156d39df8068e7695e6654e507d08dc5"
   name = "golang.org/x/crypto"
   packages = [
+    "bcrypt",
+    "blowfish",
     "ed25519",
     "ed25519/internal/edwards25519",
   ]
@@ -495,11 +525,16 @@
   analyzer-version = 1
   input-imports = [
     "github.com/asciiu/oldiez/common/db",
+    "github.com/asciiu/oldiez/user-service/db/sql",
+    "github.com/asciiu/oldiez/user-service/models",
     "github.com/golang/protobuf/proto",
+    "github.com/google/uuid",
+    "github.com/lib/pq",
     "github.com/micro/go-micro",
     "github.com/micro/go-micro/client",
     "github.com/micro/go-micro/server",
     "github.com/micro/kubernetes/go/micro",
+    "github.com/stretchr/testify/assert",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

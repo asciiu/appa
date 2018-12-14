@@ -3,7 +3,6 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/asciiu/oldiez/order-service/models"
 	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
 )
 
@@ -12,15 +11,16 @@ func DeleteOrder(db *sql.DB, orderID string) error {
 	return err
 }
 
-func FindOrder(db *sql.DB, orderID string) (*models.Order, error) {
-	var o models.Order
+func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
+	var o protoOrder.Order
 	err := db.QueryRow(`SELECT 
 	    id, 
 	    user_id, 
 	    market_name, 
 	    side, 
 	    size, 
-	    created_on 
+		created_on,
+		updated_on
 	    FROM orders WHERE id = $1`, orderID).Scan(
 		&o.OrderID,
 		&o.UserID,
@@ -28,6 +28,7 @@ func FindOrder(db *sql.DB, orderID string) (*models.Order, error) {
 		&o.Side,
 		&o.Size,
 		&o.CreatedOn,
+		&o.UpdatedOn,
 	)
 
 	if err != nil {

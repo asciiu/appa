@@ -1,16 +1,11 @@
 package models
 
+import (
+	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+)
+
 type OrderBook struct {
 	MarketName string
-	BuyOrders  []*Order
-	SellOrders []*Order
-}
-
-type Order struct {
-	OrderID    string
-	UserID     string
-	MarketName string
-	Side       string
-	Size       float64
-	CreatedOn  string
+	BuyOrders  []*protoOrder.Order
+	SellOrders []*protoOrder.Order
 }
