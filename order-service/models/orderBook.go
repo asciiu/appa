@@ -7,7 +7,10 @@ type OrderBook struct {
 }
 
 type Order struct {
-	UserID string
-	Side   string
-	Size   float64
+	OrderID    string
+	UserID     string
+	MarketName string
+	Side       string
+	Size       float64
+	CreatedOn  string
 }
