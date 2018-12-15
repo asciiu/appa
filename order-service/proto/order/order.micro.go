@@ -9,9 +9,11 @@ It is generated from these files:
 
 It has these top-level messages:
 	OrderRequest
+	NewOrderRequest
 	Order
 	OrderData
 	OrderResponse
+	StatusResponse
 */
 package order
 
@@ -44,7 +46,9 @@ var _ server.Option
 // Client API for OrderService service
 
 type OrderService interface {
-	AddOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error)
+	AddOrder(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error)
+	CancelOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error)
+	FindOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error)
 }
 
 type orderService struct {
@@ -65,8 +69,28 @@ func NewOrderService(name string, c client.Client) OrderService {
 	}
 }
 
-func (c *orderService) AddOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error) {
+func (c *orderService) AddOrder(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error) {
 	req := c.c.NewRequest(c.name, "OrderService.AddOrder", in)
+	out := new(OrderResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderService) CancelOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error) {
+	req := c.c.NewRequest(c.name, "OrderService.CancelOrder", in)
+	out := new(StatusResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderService) FindOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error) {
+	req := c.c.NewRequest(c.name, "OrderService.FindOrder", in)
 	out := new(OrderResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -78,12 +102,16 @@ func (c *orderService) AddOrder(ctx context.Context, in *OrderRequest, opts ...c
 // Server API for OrderService service
 
 type OrderServiceHandler interface {
-	AddOrder(context.Context, *OrderRequest, *OrderResponse) error
+	AddOrder(context.Context, *NewOrderRequest, *OrderResponse) error
+	CancelOrder(context.Context, *OrderRequest, *StatusResponse) error
+	FindOrder(context.Context, *OrderRequest, *OrderResponse) error
 }
 
 func RegisterOrderServiceHandler(s server.Server, hdlr OrderServiceHandler, opts ...server.HandlerOption) error {
 	type orderService interface {
-		AddOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error
+		AddOrder(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error
+		CancelOrder(ctx context.Context, in *OrderRequest, out *StatusResponse) error
+		FindOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error
 	}
 	type OrderService struct {
 		orderService
@@ -96,6 +124,14 @@ type orderServiceHandler struct {
 	OrderServiceHandler
 }
 
-func (h *orderServiceHandler) AddOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error {
+func (h *orderServiceHandler) AddOrder(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error {
 	return h.OrderServiceHandler.AddOrder(ctx, in, out)
+}
+
+func (h *orderServiceHandler) CancelOrder(ctx context.Context, in *OrderRequest, out *StatusResponse) error {
+	return h.OrderServiceHandler.CancelOrder(ctx, in, out)
+}
+
+func (h *orderServiceHandler) FindOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error {
+	return h.OrderServiceHandler.FindOrder(ctx, in, out)
 }

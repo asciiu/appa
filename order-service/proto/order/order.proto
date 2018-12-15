@@ -1,11 +1,17 @@
 syntax = "proto3";
 
 service OrderService {
-  rpc AddOrder(OrderRequest) returns (OrderResponse) {}
+  rpc AddOrder(NewOrderRequest) returns (OrderResponse) {}
+  rpc CancelOrder(OrderRequest) returns (StatusResponse) {}
+  rpc FindOrder(OrderRequest) returns (OrderResponse) {}
 }
 
 // Requests
-message OrderRequest {
+message OrderRequest{
+  string orderID = 1;
+}
+
+message NewOrderRequest {
   string userID  = 1;
   string marketName = 2;
   string side = 3;
@@ -34,4 +40,9 @@ message OrderResponse {
   string status = 1;
   string message = 2;
   OrderData data = 3;
+}
+
+message StatusResponse {
+  string status = 1;
+  string message = 2;
 }
