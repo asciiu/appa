@@ -41,7 +41,7 @@ func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
 	return &o, nil
 }
 
-func InsertOrder(db *sql.DB, order *protoOrder.Order) (*protoOrder.Order, error) {
+func InsertOrder(db *sql.DB, order *protoOrder.Order) error {
 	sqlStatement := `insert into orders (
 		id, 
 		user_id, 
@@ -64,8 +64,5 @@ func InsertOrder(db *sql.DB, order *protoOrder.Order) (*protoOrder.Order, error)
 		order.UpdatedOn,
 	)
 
-	if err != nil {
-		return nil, err
-	}
-	return order, nil
+	return err
 }

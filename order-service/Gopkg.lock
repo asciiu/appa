@@ -11,15 +11,16 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:30535f891639836301d52cfe44ada28e282ce4e4c49eae07ad7ee9f83883bef5"
+  digest = "1:558bf2c3113f5260cdd46bcda7667fb4ec45a9c2810fbf4164923f1eb8b83fa4"
   name = "github.com/asciiu/oldiez"
   packages = [
+    "common/constants/response",
     "common/db",
     "user-service/db/sql",
     "user-service/models",
   ]
   pruneopts = "UT"
-  revision = "7c37ecf9a8fea2696735a309799e5fe7517e1787"
+  revision = "ea6a4e07fd4b999885442f436fe401f652983db1"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -524,6 +525,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/asciiu/oldiez/common/constants/response",
     "github.com/asciiu/oldiez/common/db",
     "github.com/asciiu/oldiez/user-service/db/sql",
     "github.com/asciiu/oldiez/user-service/models",
