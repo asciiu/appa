@@ -17,7 +17,7 @@
     "common/db",
   ]
   pruneopts = "UT"
-  revision = "b2a3dd85051bbcc3daaf9c71928cae91c1fb41a8"
+  revision = "b65f9a24b72e32b90675fe9b06835de1119a5f74"
 
 [[projects]]
   digest = "1:4be5d1a52c61b74c0a4d62f37c0640f706ae6e07eb73617dd013990d565717d5"
@@ -31,7 +31,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:4c0989ca0bcd10799064318923b9bc2db6b4d6338dd75f3f2d86c3511aaaf5cf"
+  digest = "1:3638dd58eb7a77bb1ed3f57e81f46ce636f0325f68e0900bb9170f71df93b9bc"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -41,8 +41,7 @@
     "ptypes/timestamp",
   ]
   pruneopts = "UT"
-  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
-  version = "v1.2.0"
+  revision = "1d3f30b51784bec5aad268e59fd3c2fc1c2fe73f"
 
 [[projects]]
   digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
@@ -64,6 +63,14 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:0ade334594e69404d80d9d323445d2297ff8161637f9b2d347cc6973d2d6f05b"
+  name = "github.com/hashicorp/errwrap"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8a6fb523712970c966eefc6b39ed2c5e74880354"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:77cb3be9b21ba7f1a4701e870c84ea8b66e7d74c7c8951c58155fdadae9414ec"
   name = "github.com/hashicorp/go-cleanhttp"
   packages = ["."]
@@ -72,11 +79,43 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:b8ba23b0b493e601d5ebaf21079bd3433eb304a5d73c0fb40b8aea526e94f46b"
+  name = "github.com/hashicorp/go-msgpack"
+  packages = ["codec"]
+  pruneopts = "UT"
+  revision = "fa3f63826f7c23912c15263591e65d54d080b458"
+
+[[projects]]
+  digest = "1:f668349b83f7d779567c880550534addeca7ebadfdcf44b0b9c39be61864b4b7"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "886a7fbe3eb1c874d46f623bfa70af45f425b3d1"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
   digest = "1:45aad874d3c7d5e8610427c81870fb54970b981692930ec2a319ce4cb89d7a00"
   name = "github.com/hashicorp/go-rootcerts"
   packages = ["."]
   pruneopts = "UT"
   revision = "6bb64b370b90e7ef1fa532be9e591a81c3493e00"
+
+[[projects]]
+  branch = "master"
+  digest = "1:14f2005c31ddf99c4a0f36fc440f8d1ac43224194c7c4a904b3c8f4ba5654d0b"
+  name = "github.com/hashicorp/go-sockaddr"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6d291a969b86c4b633730bfc6b8b9d64c3aafed9"
+
+[[projects]]
+  digest = "1:c303b69fce100a685a87a43c99169644966e88c4ff372965813df11fa92ec937"
+  name = "github.com/hashicorp/memberlist"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ce8abaa0c60c2d6bee7219f5ddf500e0a1457b28"
+  version = "v0.1.0"
 
 [[projects]]
   digest = "1:acc81e4e4289587b257ccdfccbc6eaf16d4c2fb57dda73c6bb349bf50f02501f"
@@ -129,7 +168,7 @@
   revision = "cbfa9447f9b655f8e66583237e51f40ca9bff860"
 
 [[projects]]
-  digest = "1:7c024c6f7410fd9c083277b06c82ed3d367e9cc3656a510cf7dddc88a0deb327"
+  digest = "1:bfceccd8a76dc549d4d8c5711243b18f4e1cacacea2df674652e4bdaa21ad081"
   name = "github.com/micro/go-micro"
   packages = [
     ".",
@@ -146,6 +185,8 @@
     "metadata",
     "registry",
     "registry/consul",
+    "registry/gossip",
+    "registry/gossip/proto",
     "registry/mdns",
     "selector",
     "selector/cache",
@@ -157,8 +198,8 @@
     "transport/http",
   ]
   pruneopts = "UT"
-  revision = "4cee1f19f6748700518a8ca647e26ab3ad7f2a2f"
-  version = "v0.12.0"
+  revision = "c2cc03a47266763aba03ae7980765a2177d1ee6b"
+  version = "v0.15.0"
 
 [[projects]]
   digest = "1:3c010191b71659d25001ce0bc0c94a9e0402b868a8a8cded081c440c5e790a4d"
@@ -218,6 +259,14 @@
   ]
   pruneopts = "UT"
   revision = "2c703400301b46ab89350e7539834de03073527e"
+
+[[projects]]
+  digest = "1:4ecc9eb4e64de90f1863fd4851b94f0c867b1f0f53ff0e037cd678c4b4028d0a"
+  name = "github.com/micro/h2c"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b2f7b8ee5ff4fd7a8af036ecda297deb1c584460"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:f4e23216c844a5d78d54a792e82aa46a1904357b0f3aa5c44cc2c667316087b3"
@@ -296,20 +345,20 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:e5d0bd87abc2781d14e274807a470acd180f0499f8bf5bb18606e9ec22ad9de9"
-  name = "github.com/pborman/uuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1"
-  version = "v1.2"
-
-[[projects]]
   digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:579c4bbcc2e16d4caf871ba91c0e2c331b07c5560c80d142d82c0de01c57fa96"
+  name = "github.com/sean-/seed"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e2103e2c35297fb7e17febb81e49b312087a2372"
 
 [[projects]]
   branch = "master"
@@ -397,7 +446,6 @@
     "github.com/micro/go-micro/server",
     "github.com/micro/kubernetes/go/micro",
     "golang.org/x/crypto/bcrypt",
-    "golang.org/x/net/context",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -46,7 +46,11 @@
 
 [[constraint]]
   name = "github.com/micro/go-micro"
-  version = "0.12.0"
+  version = "0.15.0"
+
+[[override]]
+  name = "github.com/golang/protobuf"
+  revision = "1d3f30b51784bec5aad268e59fd3c2fc1c2fe73f"
 
 [[constraint]]
   name = "github.com/micro/kubernetes"

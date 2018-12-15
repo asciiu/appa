@@ -1,7 +1,9 @@
 build:
 	dep ensure -update github.com/asciiu/oldiez
-	protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/asciiu/oldiez/user-service proto/user/user.proto
 	docker build -t dockerowy/oldiez-user-service:dev .
+
+prodo: 
+	protoc --proto_path=${GOPATH}/src/github.com/asciiu/oldiez/user-service --micro_out=. --go_out=. proto/user/user.proto 
 
 push:
 	docker push dockerowy/oldiez-user-service:dev 

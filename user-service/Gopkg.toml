@@ -31,7 +31,7 @@
 
 [[constraint]]
   name = "github.com/golang/protobuf"
-  version = "1.2.0"
+  revision = "1d3f30b51784bec5aad268e59fd3c2fc1c2fe73f"
 
 [[constraint]]
   name = "github.com/google/uuid"
@@ -39,7 +39,7 @@
 
 [[constraint]]
   name = "github.com/micro/go-micro"
-  version = "0.12.0"
+  version = "0.15.0"
 
 [[constraint]]
   name = "github.com/micro/kubernetes"
@@ -48,10 +48,6 @@
 [[constraint]]
   branch = "master"
   name = "golang.org/x/crypto"
-
-[[constraint]]
-  branch = "master"
-  name = "golang.org/x/net"
 
 [prune]
   go-tests = true
