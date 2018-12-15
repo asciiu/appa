@@ -18,7 +18,9 @@ func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
 	    user_id, 
 	    market_name, 
 	    side, 
-	    size, 
+		size, 
+		type,
+		status,
 		created_on,
 		updated_on
 	    FROM orders WHERE id = $1`, orderID).Scan(
@@ -27,6 +29,8 @@ func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
 		&o.MarketName,
 		&o.Side,
 		&o.Size,
+		&o.Type,
+		&o.Status,
 		&o.CreatedOn,
 		&o.UpdatedOn,
 	)
@@ -44,14 +48,18 @@ func InsertOrder(db *sql.DB, order *protoOrder.Order) (*protoOrder.Order, error)
 		market_name, 
 		side, 
 		size, 
+		type,
+		status,
 		created_on, 
-		updated_on) values ($1, $2, $3, $4, $5, $6, $7)`
+		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 	_, err := db.Exec(sqlStatement,
 		order.OrderID,
 		order.UserID,
 		order.MarketName,
 		order.Side,
 		order.Size,
+		order.Type,
+		order.Status,
 		order.CreatedOn,
 		order.UpdatedOn,
 	)

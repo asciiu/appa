@@ -41,6 +41,8 @@ func TestInsertOrder(t *testing.T) {
 		MarketName: "ada-btc",
 		Side:       constants.Sell,
 		Size:       0.00001,
+		Type:       constants.LimitOrder,
+		Status:     constants.Pending,
 		CreatedOn:  now,
 		UpdatedOn:  now,
 	}
@@ -51,6 +53,8 @@ func TestInsertOrder(t *testing.T) {
 	assert.Equal(t, newOrder.MarketName, savedOrder.MarketName, "market names not equal")
 	assert.Equal(t, newOrder.Side, savedOrder.Side, "sides not equal")
 	assert.Equal(t, newOrder.Size, savedOrder.Size, "size not equal")
+	assert.Equal(t, newOrder.Type, savedOrder.Type, "type not equal")
+	assert.Equal(t, newOrder.Status, savedOrder.Status, "status not equal")
 
 	repoUser.DeleteUserHard(db, user.ID)
 }

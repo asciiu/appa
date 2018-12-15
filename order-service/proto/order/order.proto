@@ -10,6 +10,7 @@ message OrderRequest {
   string marketName = 2;
   string side = 3;
   double size = 4;
+  string type = 5;
 }
 
 // Responses
@@ -19,8 +20,10 @@ message Order {
   string marketName = 3;
   string side = 4;
   double size = 5;
-  string createdOn = 6;
-  string updatedOn = 7;
+  string type = 6;
+  string status = 7;
+  string createdOn = 8;
+  string updatedOn = 9;
 }
 
 message OrderData {
