@@ -33,7 +33,7 @@ const jwtDuration = 20 * time.Minute
 
 type AuthController struct {
 	DB         *sql.DB
-	UserClient protoUser.UserServiceClient
+	UserClient protoUser.UserService
 }
 
 type JwtClaims struct {
@@ -100,7 +100,7 @@ type ResponseError struct {
 func NewAuthController(db *sql.DB, service micro.Service) *AuthController {
 	controller := AuthController{
 		DB:         db,
-		UserClient: protoUser.NewUserServiceClient("users", service.Client()),
+		UserClient: protoUser.NewUserService("users", service.Client()),
 	}
 
 	return &controller

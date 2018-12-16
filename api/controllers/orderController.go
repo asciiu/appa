@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	constRes "github.com/asciiu/oldiez/common/constants/response"
+	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 )
@@ -20,14 +21,14 @@ type OrderRequest struct {
 type OrderController struct {
 	DB *sql.DB
 	// TODO change this to be the OrderClient
-	//UserClient protoUser.UserServiceClient
+	OrderClient protoOrder.OrderService
 }
 
 func NewOrderController(db *sql.DB, service micro.Service) *OrderController {
 	controller := OrderController{
 		DB: db,
 		// TODO order client service
-		//Orderlient: protoOrder.NewOrderServiceClient("orders", service.Client()),
+		OrderClient: protoOrder.NewOrderService("orders", service.Client()),
 	}
 	return &controller
 }

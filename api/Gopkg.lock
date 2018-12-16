@@ -10,17 +10,18 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f0eaa45a1e444aaa44bac4dc802501c868e3ca98b22c7c44204233cf898ec61b"
+  digest = "1:82b20afb9610626b07ebb6e9d070ab16cf3c257cc90e8706efa738d7116aa285"
   name = "github.com/asciiu/oldiez"
   packages = [
     "common/constants/response",
     "common/db",
+    "order-service/proto/order",
     "user-service/db/sql",
     "user-service/models",
     "user-service/proto/user",
   ]
   pruneopts = "UT"
-  revision = "b65f9a24b72e32b90675fe9b06835de1119a5f74"
+  revision = "e307a20faa58c131c93fb7157e1a04be3952428f"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
@@ -508,6 +509,7 @@
   input-imports = [
     "github.com/asciiu/oldiez/common/constants/response",
     "github.com/asciiu/oldiez/common/db",
+    "github.com/asciiu/oldiez/order-service/proto/order",
     "github.com/asciiu/oldiez/user-service/db/sql",
     "github.com/asciiu/oldiez/user-service/models",
     "github.com/asciiu/oldiez/user-service/proto/user",

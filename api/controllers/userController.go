@@ -16,7 +16,7 @@ import (
 
 type UserController struct {
 	DB         *sql.DB
-	UserClient protoUser.UserServiceClient
+	UserClient protoUser.UserService
 }
 
 // swagger:parameters ChangePassword
@@ -45,7 +45,7 @@ type UpdateUserRequest struct {
 func NewUserController(db *sql.DB, service micro.Service) *UserController {
 	controller := UserController{
 		DB:         db,
-		UserClient: protoUser.NewUserServiceClient("users", service.Client()),
+		UserClient: protoUser.NewUserService("users", service.Client()),
 	}
 	return &controller
 }

@@ -14,7 +14,7 @@ import (
 
 type SessionController struct {
 	DB         *sql.DB
-	UserClient protoUser.UserServiceClient
+	UserClient protoUser.UserService
 }
 
 type UserMetaData struct {
@@ -45,7 +45,7 @@ type ResponseSessionSuccess struct {
 func NewSessionController(db *sql.DB, service micro.Service) *SessionController {
 	controller := SessionController{
 		DB:         db,
-		UserClient: protoUser.NewUserServiceClient("users", service.Client()),
+		UserClient: protoUser.NewUserService("users", service.Client()),
 	}
 	return &controller
 }
