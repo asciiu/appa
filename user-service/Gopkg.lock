@@ -17,7 +17,7 @@
     "common/db",
   ]
   pruneopts = "UT"
-  revision = "b65f9a24b72e32b90675fe9b06835de1119a5f74"
+  revision = "ccad1b7abea6e0ee68d6adbbc6ad3a108debe1e5"
 
 [[projects]]
   digest = "1:4be5d1a52c61b74c0a4d62f37c0640f706ae6e07eb73617dd013990d565717d5"
