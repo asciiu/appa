@@ -1,6 +1,6 @@
 build:
 	dep ensure -update github.com/asciiu/oldiez
-	docker build -t dockerowy/oldiez-order-service:dev .
+	docker build -t dockerowy/oldiez-order-service:dev -f ../order-service/Dockerfile ..
 
 prodo: 
 	protoc --proto_path=${GOPATH}/src/github.com/asciiu/oldiez/order-service --micro_out=. --go_out=. proto/order/order.proto 
