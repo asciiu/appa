@@ -26,10 +26,9 @@ import (
 
 // refresh is set to 15 days
 const refreshDuration = 360 * time.Hour
-const jwtDuration = 20 * time.Minute
+const jwtDuration = 3 * time.Hour
 
-//const refreshDuration = 30 * time.Minute
-//const jwtDuration = 30 * time.Second
+//const jwtDuration = 20 * time.Minute
 
 type AuthController struct {
 	DB         *sql.DB

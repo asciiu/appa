@@ -51,14 +51,6 @@ type Order struct {
 	UpdatedOn  string  `json:"updatedOn"`
 }
 
-// swagger:route POST /orders orders order
-//
-// creates a new order in the system (open)
-//
-// blah blah blah
-//
-// responses:
-//  200: responseSuccess "data" will be non null with "status": "success"
 func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
@@ -164,11 +156,40 @@ func (controller *OrderController) HandleGetOrders(c echo.Context) error {
 func (controller *OrderController) HandleGetOrder(c echo.Context) error {
 	//token := c.Get("user").(*jwt.Token)
 	//claims := token.Claims.(jwt.MapClaims)
-	//orderID := c.Param("orderId")
 	//userID := claims["jti"].(string)
 
-	response := &ResponseSuccess{
+	request := protoOrder.OrderRequest{
+		OrderID: c.Param("orderID"),
+	}
+
+	r, _ := controller.OrderClient.FindOrder(context.Background(), &request)
+	if r.Status != constRes.Success {
+		res := &ResponseError{
+			Status:  r.Status,
+			Message: r.Message,
+		}
+
+		if r.Status == constRes.Fail {
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		if r.Status == constRes.Error {
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+
+	order := r.Data.Order
+	response := &ResponseOrderSuccess{
 		Status: constRes.Success,
+		Data: &Order{
+			OrderID:    order.OrderID,
+			MarketName: order.MarketName,
+			Side:       order.Side,
+			Size:       order.Size,
+			Type:       order.Type,
+			Status:     order.Status,
+			CreatedOn:  order.CreatedOn,
+			UpdatedOn:  order.UpdatedOn,
+		},
 	}
 
 	return c.JSON(http.StatusOK, response)
