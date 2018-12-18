@@ -198,10 +198,27 @@ func (controller *OrderController) HandleGetOrder(c echo.Context) error {
 func (controller *OrderController) HandleDeleteOrder(c echo.Context) error {
 	//token := c.Get("user").(*jwt.Token)
 	//claims := token.Claims.(jwt.MapClaims)
-	//orderID := c.Param("orderId")
 	//userID := claims["jti"].(string)
+	request := protoOrder.OrderRequest{
+		OrderID: c.Param("orderID"),
+	}
 
-	response := &ResponseSuccess{
+	r, _ := controller.OrderClient.CancelOrder(context.Background(), &request)
+	if r.Status != constRes.Success {
+		res := &ResponseError{
+			Status:  r.Status,
+			Message: r.Message,
+		}
+
+		if r.Status == constRes.Fail {
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		if r.Status == constRes.Error {
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+
+	response := &ResponseOrderSuccess{
 		Status: constRes.Success,
 	}
 
