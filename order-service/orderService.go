@@ -38,6 +38,10 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		res.Status = constRes.Fail
 		res.Message = "side must be buy or sell"
 		return nil
+	case !ValidateType(newOrder.Type):
+		res.Status = constRes.Fail
+		res.Message = "type must be limit or market"
+		return nil
 	}
 
 	if err := repoOrder.InsertOrder(service.DB, &newOrder); err != nil {

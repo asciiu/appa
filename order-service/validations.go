@@ -4,12 +4,18 @@ import (
 	constOrder "github.com/asciiu/oldiez/order-service/constants"
 )
 
-// plans must have a title
 func ValidateSide(side string) bool {
 	switch side {
-	case constOrder.Buy:
+	case constOrder.Buy, constOrder.Sell:
 		return true
-	case constOrder.Sell:
+	default:
+		return false
+	}
+}
+
+func ValidateType(typ string) bool {
+	switch typ {
+	case constOrder.LimitOrder, constOrder.MarketOrder:
 		return true
 	default:
 		return false
