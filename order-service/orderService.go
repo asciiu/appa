@@ -33,6 +33,13 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		UpdatedOn:  now,
 	}
 
+	switch {
+	case !ValidateSide(newOrder.Side):
+		res.Status = constRes.Fail
+		res.Message = "side must be buy or sell"
+		return nil
+	}
+
 	if err := repoOrder.InsertOrder(service.DB, &newOrder); err != nil {
 		msg := fmt.Sprintf("insert order failed %s", err.Error())
 		log.Println(msg)
