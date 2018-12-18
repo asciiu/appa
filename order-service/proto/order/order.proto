@@ -10,6 +10,7 @@ service OrderService {
 // Requests
 message OrderRequest{
   string orderID = 1;
+  string userID = 2;
 }
 
 message UserOrdersRequest{

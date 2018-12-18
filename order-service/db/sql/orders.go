@@ -6,12 +6,12 @@ import (
 	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
 )
 
-func DeleteOrder(db *sql.DB, orderID string) error {
-	_, err := db.Exec("DELETE FROM orders WHERE id = $1", orderID)
+func DeleteOrder(db *sql.DB, orderID, userID string) error {
+	_, err := db.Exec("DELETE FROM orders WHERE id = $1 and user_id = $2", orderID, userID)
 	return err
 }
 
-func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
+func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	var o protoOrder.Order
 	err := db.QueryRow(`SELECT 
 	    id, 
@@ -23,7 +23,7 @@ func FindOrder(db *sql.DB, orderID string) (*protoOrder.Order, error) {
 		status,
 		created_on,
 		updated_on
-	    FROM orders WHERE id = $1`, orderID).Scan(
+	    FROM orders WHERE id = $1 and user_id = $2`, orderID, userID).Scan(
 		&o.OrderID,
 		&o.UserID,
 		&o.MarketName,

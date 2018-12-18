@@ -61,7 +61,7 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 }
 
 func (service *OrderService) CancelOrder(ctx context.Context, req *protoOrder.OrderRequest, res *protoOrder.StatusResponse) error {
-	err := repoOrder.DeleteOrder(service.DB, req.OrderID)
+	err := repoOrder.DeleteOrder(service.DB, req.OrderID, req.UserID)
 	switch {
 	case err == sql.ErrNoRows:
 		res.Status = constRes.Nonentity
@@ -77,7 +77,7 @@ func (service *OrderService) CancelOrder(ctx context.Context, req *protoOrder.Or
 }
 
 func (service *OrderService) FindOrder(ctx context.Context, req *protoOrder.OrderRequest, res *protoOrder.OrderResponse) error {
-	order, err := repoOrder.FindOrder(service.DB, req.OrderID)
+	order, err := repoOrder.FindOrder(service.DB, req.OrderID, req.UserID)
 
 	switch {
 	case err == sql.ErrNoRows:
