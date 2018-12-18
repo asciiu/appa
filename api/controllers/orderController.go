@@ -7,15 +7,15 @@ import (
 
 	constRes "github.com/asciiu/oldiez/common/constants/response"
 	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
+	"golang.org/x/net/context"
 )
 
-type OrderRequest struct {
-	CurrencyName string  `json:"currencyName"`
-	MarketName   string  `json:"marketName"`
-	Side         string  `json:"side"`
-	Size         float64 `json:"size"`
+type ResponseOrderSuccess struct {
+	Status string `json:"status"`
+	Data   *Order `json:"data"`
 }
 
 type OrderController struct {
@@ -33,6 +33,24 @@ func NewOrderController(db *sql.DB, service micro.Service) *OrderController {
 	return &controller
 }
 
+type NewOrder struct {
+	MarketName string  `json:"marketName"`
+	Side       string  `json:"side"`
+	Size       float64 `json:"size"`
+	Type       string  `json:"type"`
+}
+
+type Order struct {
+	OrderID    string  `json:"orderID"`
+	MarketName string  `json:"marketName"`
+	Side       string  `json:"side"`
+	Size       float64 `json:"size"`
+	Type       string  `json:"type"`
+	Status     string  `json:"status"`
+	CreatedOn  string  `json:"createdOn"`
+	UpdatedOn  string  `json:"updatedOn"`
+}
+
 // swagger:route POST /orders orders order
 //
 // creates a new order in the system (open)
@@ -42,12 +60,12 @@ func NewOrderController(db *sql.DB, service micro.Service) *OrderController {
 // responses:
 //  200: responseSuccess "data" will be non null with "status": "success"
 func (controller *OrderController) HandlePostOrder(c echo.Context) error {
-	//token := c.Get("user").(*jwt.Token)
-	//claims := token.Claims.(jwt.MapClaims)
-	//userID := claims["jti"].(string)
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := claims["jti"].(string)
 
-	var orderRequest OrderRequest
-	err := json.NewDecoder(c.Request().Body).Decode(&orderRequest)
+	newOrder := new(NewOrder)
+	err := c.Bind(&newOrder)
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Fail,
@@ -57,8 +75,42 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	response := &ResponseSuccess{
+	request := protoOrder.NewOrderRequest{
+		UserID:     userID,
+		MarketName: newOrder.MarketName,
+		Side:       newOrder.Side,
+		Size:       newOrder.Size,
+		Type:       newOrder.Type,
+	}
+
+	r, _ := controller.OrderClient.AddOrder(context.Background(), &request)
+	if r.Status != constRes.Success {
+		res := &ResponseError{
+			Status:  r.Status,
+			Message: r.Message,
+		}
+
+		if r.Status == constRes.Fail {
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		if r.Status == constRes.Error {
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+
+	order := r.Data.Order
+	response := &ResponseOrderSuccess{
 		Status: constRes.Success,
+		Data: &Order{
+			OrderID:    order.OrderID,
+			MarketName: order.MarketName,
+			Side:       order.Side,
+			Size:       order.Size,
+			Type:       order.Type,
+			Status:     order.Status,
+			CreatedOn:  order.CreatedOn,
+			UpdatedOn:  order.UpdatedOn,
+		},
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -77,7 +129,7 @@ func (controller *OrderController) HandleUpdateOrder(c echo.Context) error {
 	//orderID := c.Param("orderId")
 	//userID := claims["jti"].(string)
 
-	updateRequest := new(OrderRequest)
+	updateRequest := new(Order)
 
 	err := json.NewDecoder(c.Request().Body).Decode(&updateRequest)
 	if err != nil {
