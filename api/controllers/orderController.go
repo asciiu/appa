@@ -154,12 +154,13 @@ func (controller *OrderController) HandleGetOrders(c echo.Context) error {
 }
 
 func (controller *OrderController) HandleGetOrder(c echo.Context) error {
-	//token := c.Get("user").(*jwt.Token)
-	//claims := token.Claims.(jwt.MapClaims)
-	//userID := claims["jti"].(string)
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := claims["jti"].(string)
 
 	request := protoOrder.OrderRequest{
 		OrderID: c.Param("orderID"),
+		UserID:  userID,
 	}
 
 	r, _ := controller.OrderClient.FindOrder(context.Background(), &request)
@@ -196,11 +197,12 @@ func (controller *OrderController) HandleGetOrder(c echo.Context) error {
 }
 
 func (controller *OrderController) HandleDeleteOrder(c echo.Context) error {
-	//token := c.Get("user").(*jwt.Token)
-	//claims := token.Claims.(jwt.MapClaims)
-	//userID := claims["jti"].(string)
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := claims["jti"].(string)
 	request := protoOrder.OrderRequest{
 		OrderID: c.Param("orderID"),
+		UserID:  userID,
 	}
 
 	r, _ := controller.OrderClient.CancelOrder(context.Background(), &request)
