@@ -59,7 +59,8 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 		status,
 		created_on,
 		updated_on
-		FROM orders WHERE user_id = $1 OFFSET $2 LIMIT $3`, userID, page, pageSize)
+		FROM orders WHERE user_id = $1 AND status like '%' || $2 || '%'
+		OFFSET $3 LIMIT $4`, userID, status, page, pageSize)
 
 	if err != nil {
 		return nil, err

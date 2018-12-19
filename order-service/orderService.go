@@ -99,13 +99,12 @@ func (service *OrderService) FindOrder(ctx context.Context, req *protoOrder.Orde
 func (service *OrderService) FindUserOrders(ctx context.Context, req *protoOrder.UserOrdersRequest, res *protoOrder.OrdersPageResponse) error {
 	ordersPage, err := repoOrder.FindUserOrders(service.DB, req.UserID, req.Status, req.Page, req.PageSize)
 
-	switch {
-	case err != nil:
-		res.Status = constRes.Error
-		res.Message = err.Error()
-	case err == nil:
+	if err == nil {
 		res.Status = constRes.Success
 		res.Data = ordersPage
+	} else {
+		res.Status = constRes.Error
+		res.Message = err.Error()
 	}
 
 	return nil
