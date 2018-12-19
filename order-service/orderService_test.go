@@ -52,3 +52,34 @@ func TestAddOrder(t *testing.T) {
 
 	repoUser.DeleteUserHard(service.DB, user.ID)
 }
+
+func TestFindOrder(t *testing.T) {
+	service, user := setupService()
+
+	defer service.DB.Close()
+
+	req := protoOrder.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Size:       1.0,
+		Type:       constOrder.LimitOrder,
+	}
+
+	res := protoOrder.OrderResponse{}
+	service.AddOrder(context.Background(), &req, &res)
+	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
+	order := res.Data.Order
+
+	req2 := protoOrder.OrderRequest{
+		OrderID: order.OrderID,
+		UserID:  user.ID,
+	}
+
+	res2 := protoOrder.OrderResponse{}
+	service.FindOrder(context.Background(), &req2, &res2)
+	assert.Equal(t, "success", res2.Status, "expected success got: "+res.Message)
+	assert.Equal(t, order.OrderID, res2.Data.Order.OrderID, "order ID in find does not match")
+
+	repoUser.DeleteUserHard(service.DB, user.ID)
+}
