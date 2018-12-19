@@ -78,7 +78,6 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	protectedApi.POST("/orders", orderController.HandlePostOrder)
 	protectedApi.DELETE("/orders/:orderID", orderController.HandleDeleteOrder)
 	protectedApi.GET("/orders/:orderID", orderController.HandleGetOrder)
-	protectedApi.PUT("/orders/:orderID", orderController.HandleUpdateOrder)
 
 	// user manangement endpoints
 	protectedApi.PUT("/users/:userID/changepassword", userController.HandleChangePassword)

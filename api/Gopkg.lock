@@ -10,7 +10,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:82d1a5dfb6f74eca35a7736efba657c3890bd30cc68711b3a74b35d2489510b7"
+  digest = "1:2c8dd24300fd2552b2b5f0bd879a7a7b751e623af017e8dd78828b6c16618962"
   name = "github.com/asciiu/oldiez"
   packages = [
     "common/constants/response",
@@ -21,7 +21,7 @@
     "user-service/proto/user",
   ]
   pruneopts = "UT"
-  revision = "05bf8c58ecf22366696e9ba92fb570b0b0a7e028"
+  revision = "33f11787d2a683256505d5c4c416e0fbdaa80d8d"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
