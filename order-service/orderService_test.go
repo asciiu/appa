@@ -83,3 +83,33 @@ func TestFindOrder(t *testing.T) {
 
 	repoUser.DeleteUserHard(service.DB, user.ID)
 }
+
+func TestFindOrderWrongUserID(t *testing.T) {
+	service, user := setupService()
+
+	defer service.DB.Close()
+
+	req := protoOrder.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Size:       1.0,
+		Type:       constOrder.LimitOrder,
+	}
+
+	res := protoOrder.OrderResponse{}
+	service.AddOrder(context.Background(), &req, &res)
+	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
+	order := res.Data.Order
+
+	req2 := protoOrder.OrderRequest{
+		OrderID: order.OrderID,
+		UserID:  "a1c0e0dd-0c73-4b5e-ac5b-a2ac8378427d",
+	}
+
+	res2 := protoOrder.OrderResponse{}
+	service.FindOrder(context.Background(), &req2, &res2)
+	assert.Equal(t, "nonentity", res2.Status, "expected success got: "+res.Message)
+
+	repoUser.DeleteUserHard(service.DB, user.ID)
+}
