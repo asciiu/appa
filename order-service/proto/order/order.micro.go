@@ -13,8 +13,8 @@ It has these top-level messages:
 	NewOrderRequest
 	Order
 	OrderData
-	OrderList
-	OrdersResponse
+	OrdersPage
+	OrdersPageResponse
 	OrderResponse
 	StatusResponse
 */
@@ -52,7 +52,7 @@ type OrderService interface {
 	AddOrder(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error)
 	CancelOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error)
 	FindOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error)
-	FindUserOrders(ctx context.Context, in *UserOrdersRequest, opts ...client.CallOption) (*OrdersResponse, error)
+	FindUserOrders(ctx context.Context, in *UserOrdersRequest, opts ...client.CallOption) (*OrdersPageResponse, error)
 }
 
 type orderService struct {
@@ -103,9 +103,9 @@ func (c *orderService) FindOrder(ctx context.Context, in *OrderRequest, opts ...
 	return out, nil
 }
 
-func (c *orderService) FindUserOrders(ctx context.Context, in *UserOrdersRequest, opts ...client.CallOption) (*OrdersResponse, error) {
+func (c *orderService) FindUserOrders(ctx context.Context, in *UserOrdersRequest, opts ...client.CallOption) (*OrdersPageResponse, error) {
 	req := c.c.NewRequest(c.name, "OrderService.FindUserOrders", in)
-	out := new(OrdersResponse)
+	out := new(OrdersPageResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ type OrderServiceHandler interface {
 	AddOrder(context.Context, *NewOrderRequest, *OrderResponse) error
 	CancelOrder(context.Context, *OrderRequest, *StatusResponse) error
 	FindOrder(context.Context, *OrderRequest, *OrderResponse) error
-	FindUserOrders(context.Context, *UserOrdersRequest, *OrdersResponse) error
+	FindUserOrders(context.Context, *UserOrdersRequest, *OrdersPageResponse) error
 }
 
 func RegisterOrderServiceHandler(s server.Server, hdlr OrderServiceHandler, opts ...server.HandlerOption) error {
@@ -127,7 +127,7 @@ func RegisterOrderServiceHandler(s server.Server, hdlr OrderServiceHandler, opts
 		AddOrder(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error
 		CancelOrder(ctx context.Context, in *OrderRequest, out *StatusResponse) error
 		FindOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error
-		FindUserOrders(ctx context.Context, in *UserOrdersRequest, out *OrdersResponse) error
+		FindUserOrders(ctx context.Context, in *UserOrdersRequest, out *OrdersPageResponse) error
 	}
 	type OrderService struct {
 		orderService
@@ -152,6 +152,6 @@ func (h *orderServiceHandler) FindOrder(ctx context.Context, in *OrderRequest, o
 	return h.OrderServiceHandler.FindOrder(ctx, in, out)
 }
 
-func (h *orderServiceHandler) FindUserOrders(ctx context.Context, in *UserOrdersRequest, out *OrdersResponse) error {
+func (h *orderServiceHandler) FindUserOrders(ctx context.Context, in *UserOrdersRequest, out *OrdersPageResponse) error {
 	return h.OrderServiceHandler.FindUserOrders(ctx, in, out)
 }

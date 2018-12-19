@@ -41,7 +41,14 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	return &o, nil
 }
 
-func FindUserOrders(db *sql.DB, userID string) ([]*protoOrder.Order, error) {
+func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*protoOrder.OrdersPage, error) {
+	var total uint32
+	queryCount := `SELECT count(*) FROM orders WHERE user_id = $1 AND status like '%' || $2 || '%'`
+	err := db.QueryRow(queryCount, userID, status).Scan(&total)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := db.Query(`SELECT 
 	    id, 
 	    user_id, 
@@ -52,7 +59,7 @@ func FindUserOrders(db *sql.DB, userID string) ([]*protoOrder.Order, error) {
 		status,
 		created_on,
 		updated_on
-		FROM orders WHERE user_id = $1`, userID)
+		FROM orders WHERE user_id = $1 OFFSET $2 LIMIT $3`, userID, page, pageSize)
 
 	if err != nil {
 		return nil, err
@@ -81,7 +88,12 @@ func FindUserOrders(db *sql.DB, userID string) ([]*protoOrder.Order, error) {
 		orders = append(orders, o)
 	}
 
-	return orders, nil
+	return &protoOrder.OrdersPage{
+		Page:     page,
+		PageSize: pageSize,
+		Total:    total,
+		Orders:   orders,
+	}, nil
 }
 
 func InsertOrder(db *sql.DB, order *protoOrder.Order) error {
