@@ -31,6 +31,7 @@ type NewOrder struct {
 	MarketName string  `json:"marketName"`
 	Side       string  `json:"side"`
 	Size       float64 `json:"size"`
+	Price      float64 `json:"price"`
 	Type       string  `json:"type"`
 }
 
@@ -39,6 +40,7 @@ type Order struct {
 	MarketName string  `json:"marketName"`
 	Side       string  `json:"side"`
 	Size       float64 `json:"size"`
+	Price      float64 `json:"price"`
 	Type       string  `json:"type"`
 	Status     string  `json:"status"`
 	CreatedOn  string  `json:"createdOn"`
@@ -71,6 +73,7 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 		MarketName: newOrder.MarketName,
 		Side:       newOrder.Side,
 		Size:       newOrder.Size,
+		Price:      newOrder.Price,
 		Type:       newOrder.Type,
 	}
 
@@ -97,6 +100,7 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 			MarketName: order.MarketName,
 			Side:       order.Side,
 			Size:       order.Size,
+			Price:      order.Price,
 			Type:       order.Type,
 			Status:     order.Status,
 			CreatedOn:  order.CreatedOn,
@@ -162,6 +166,7 @@ func (controller *OrderController) HandleGetOrders(c echo.Context) error {
 			MarketName: order.MarketName,
 			Side:       order.Side,
 			Size:       order.Size,
+			Price:      order.Price,
 			Type:       order.Type,
 			Status:     order.Status,
 			CreatedOn:  order.CreatedOn,
@@ -215,6 +220,7 @@ func (controller *OrderController) HandleGetOrder(c echo.Context) error {
 			MarketName: order.MarketName,
 			Side:       order.Side,
 			Size:       order.Size,
+			Price:      order.Price,
 			Type:       order.Type,
 			Status:     order.Status,
 			CreatedOn:  order.CreatedOn,
