@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -104,38 +103,6 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 			CreatedOn:  order.CreatedOn,
 			UpdatedOn:  order.UpdatedOn,
 		},
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
-// swagger:route PUT /users/:id users UpdateUser
-//
-// updates an order (protected)
-//
-// todo
-//
-// responses:
-func (controller *OrderController) HandleUpdateOrder(c echo.Context) error {
-	//token := c.Get("user").(*jwt.Token)
-	//claims := token.Claims.(jwt.MapClaims)
-	//orderID := c.Param("orderId")
-	//userID := claims["jti"].(string)
-
-	updateRequest := new(Order)
-
-	err := json.NewDecoder(c.Request().Body).Decode(&updateRequest)
-	if err != nil {
-		response := &ResponseError{
-			Status:  constRes.Fail,
-			Message: err.Error(),
-		}
-
-		return c.JSON(http.StatusBadRequest, response)
-	}
-
-	response := &ResponseSuccess{
-		Status: constRes.Success,
 	}
 
 	return c.JSON(http.StatusOK, response)
