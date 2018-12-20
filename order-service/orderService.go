@@ -27,6 +27,7 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		MarketName: req.MarketName,
 		Side:       req.Side,
 		Size:       req.Size,
+		Price:      req.Price,
 		Type:       req.Type,
 		Status:     constants.Pending,
 		CreatedOn:  now,

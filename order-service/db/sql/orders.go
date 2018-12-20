@@ -13,12 +13,14 @@ func DeleteOrder(db *sql.DB, orderID, userID string) error {
 
 func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	var o protoOrder.Order
+	var price sql.NullFloat64
 	err := db.QueryRow(`SELECT 
 	    id, 
 	    user_id, 
 	    market_name, 
 	    side, 
 		size, 
+		price,
 		type,
 		status,
 		created_on,
@@ -29,6 +31,7 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 		&o.MarketName,
 		&o.Side,
 		&o.Size,
+		&price,
 		&o.Type,
 		&o.Status,
 		&o.CreatedOn,
@@ -37,6 +40,9 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 
 	if err != nil {
 		return nil, err
+	}
+	if price.Valid {
+		o.Price = price.Float64
 	}
 	return &o, nil
 }
@@ -55,6 +61,7 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 	    market_name, 
 	    side, 
 		size, 
+		price,
 		type,
 		status,
 		created_on,
@@ -70,6 +77,7 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 
 	orders := make([]*protoOrder.Order, 0)
 	for rows.Next() {
+		var price sql.NullFloat64
 		o := new(protoOrder.Order)
 		err := rows.Scan(
 			&o.OrderID,
@@ -77,6 +85,7 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 			&o.MarketName,
 			&o.Side,
 			&o.Size,
+			&price,
 			&o.Type,
 			&o.Status,
 			&o.CreatedOn,
@@ -85,6 +94,9 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 
 		if err != nil {
 			return nil, err
+		}
+		if price.Valid {
+			o.Price = price.Float64
 		}
 		orders = append(orders, o)
 	}
@@ -104,16 +116,18 @@ func InsertOrder(db *sql.DB, order *protoOrder.Order) error {
 		market_name, 
 		side, 
 		size, 
+		price,
 		type,
 		status,
 		created_on, 
-		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 	_, err := db.Exec(sqlStatement,
 		order.OrderID,
 		order.UserID,
 		order.MarketName,
 		order.Side,
 		order.Size,
+		order.Price,
 		order.Type,
 		order.Status,
 		order.CreatedOn,
