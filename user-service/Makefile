@@ -1,15 +1,15 @@
 build:
-	dep ensure -update github.com/asciiu/oldiez
-	docker build -t dockerowy/oldiez-user-service:dev -f ../user-service/Dockerfile .. 
+	dep ensure -update github.com/asciiu/appa
+	docker build -t dockerowy/appa-user-service:dev -f ../user-service/Dockerfile .. 
 
 prodo: 
-	protoc --proto_path=${GOPATH}/src/github.com/asciiu/oldiez/user-service --micro_out=. --go_out=. proto/user/user.proto 
+	protoc --proto_path=${GOPATH}/src/github.com/asciiu/appa/user-service --micro_out=. --go_out=. proto/user/user.proto 
 
 push:
-	docker push dockerowy/oldiez-user-service:dev 
+	docker push dockerowy/appa-user-service:dev 
 
 update:
-	dep ensure -update github.com/asciiu/oldiez
+	dep ensure -update github.com/asciiu/appa
 
 run:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml

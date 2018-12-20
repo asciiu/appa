@@ -19,7 +19,7 @@ func SetMainMiddlewares(e *echo.Echo) {
 
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:  []string{"*", "http://dev.fomo.exchange"},
+		AllowOrigins:  []string{"*", "http://dev.appa.exchange"},
 		AllowMethods:  []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "Refresh"},
 		ExposeHeaders: []string{"set-authorization", "set-refresh"},
@@ -31,7 +31,7 @@ func SetMainMiddlewares(e *echo.Echo) {
 
 func serverHeader(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		c.Response().Header().Set(echo.HeaderServer, "oldiez/0.0.1")
+		c.Response().Header().Set(echo.HeaderServer, "appa/0.0.1")
 		return next(c)
 	}
 }

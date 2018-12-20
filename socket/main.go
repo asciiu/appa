@@ -39,7 +39,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/oldiez/common/db"
+	"github.com/asciiu/appa/common/db"
 	_ "github.com/lib/pq"
 )
 

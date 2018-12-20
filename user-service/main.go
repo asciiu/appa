@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/oldiez/common/db"
-	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
+	"github.com/asciiu/appa/common/db"
+	protoUser "github.com/asciiu/appa/user-service/proto/user"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
 )
@@ -22,7 +22,7 @@ func NewUserService(name, dbUrl string) micro.Service {
 	// Init will parse the command line flags.
 	srv.Init()
 
-	oldiezDB, err := db.NewDB(dbUrl)
+	appaDB, err := db.NewDB(dbUrl)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -31,14 +31,14 @@ func NewUserService(name, dbUrl string) micro.Service {
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	protoUser.RegisterUserServiceHandler(srv.Server(), &UserService{oldiezDB})
+	protoUser.RegisterUserServiceHandler(srv.Server(), &UserService{appaDB})
 
 	return srv
 }
 
 func main() {
 	dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
-	srv := NewUserService("oldiez.users", dbUrl)
+	srv := NewUserService("appa.users", dbUrl)
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

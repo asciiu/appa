@@ -4,9 +4,9 @@ import (
 	"log"
 	"testing"
 
-	"github.com/asciiu/oldiez/common/db"
-	"github.com/asciiu/oldiez/user-service/db/sql"
-	"github.com/asciiu/oldiez/user-service/models"
+	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/user-service/db/sql"
+	"github.com/asciiu/appa/user-service/models"
 )
 
 func checkErr(err error) {
@@ -17,7 +17,7 @@ func checkErr(err error) {
 }
 
 func TestInsertUser(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/oldiez_test?&sslmode=disable")
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
 	checkErr(err)
 	defer db.Close()
 
@@ -30,7 +30,7 @@ func TestInsertUser(t *testing.T) {
 }
 
 func TestFindUser(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/oldiez_test?&sslmode=disable")
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
 	checkErr(err)
 	defer db.Close()
 

@@ -39,18 +39,18 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/oldiez/common/db"
+	"github.com/asciiu/appa/common/db"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
-	oldiezDB, err := db.NewDB(dbURL)
+	appaDB, err := db.NewDB(dbURL)
 	if err != nil {
 		log.Printf("ERROR: %s", err)
 	} else {
-		defer oldiezDB.Close()
-		router := NewRouter(oldiezDB)
+		defer appaDB.Close()
+		router := NewRouter(appaDB)
 
 		// HTTPs server
 		//router.Logger.Fatal(router.StartAutoTLS(":443"))

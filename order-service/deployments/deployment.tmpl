@@ -14,7 +14,7 @@ spec:
     spec:
         containers:
         - name: order-service 
-          image: dockerowy/oldiez-order-service:dev 
+          image: dockerowy/appa-order-service:dev 
           imagePullPolicy: Always 
           command: [
             "./order-service",
@@ -23,7 +23,7 @@ spec:
           ]
           envFrom:
           - configMapRef:
-              name: oldiez-config
+              name: appa-config
           env:
           - name: UPDATED_AT
             value: "{{ UPDATED_AT }}" 

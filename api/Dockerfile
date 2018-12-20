@@ -1,14 +1,14 @@
 FROM golang:1.11.3 as builder
 
-WORKDIR /go/src/github.com/asciiu/oldiez/api
+WORKDIR /go/src/github.com/asciiu/appa/api
 
 ADD id_rsa /root/.ssh/id_rsa
 RUN chmod 700 /root/.ssh/id_rsa
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
-ADD api /go/src/github.com/asciiu/oldiez/api
-CMD cd /go/src/github.com/asciiu/oldiez/api && go get github.com/asciiu/oldiez && go build -o /oldiez
+ADD api /go/src/github.com/asciiu/appa/api
+CMD cd /go/src/github.com/asciiu/appa/api && go get github.com/asciiu/appa && go build -o /appa
 
 
 RUN go get -u github.com/golang/dep/cmd/dep
@@ -22,7 +22,7 @@ RUN apk --no-cache add ca-certificates
 
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/oldiez/api/api .
+COPY --from=builder /go/src/github.com/asciiu/appa/api/api .
 
 EXPOSE 9000
 

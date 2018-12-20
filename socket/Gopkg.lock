@@ -4,7 +4,7 @@
 [[projects]]
   branch = "master"
   digest = "1:9926d464020e89611081eec6a214b2aef8da80bd0a905d0c17b3a87ad7c743fc"
-  name = "github.com/asciiu/oldiez"
+  name = "github.com/asciiu/appa"
   packages = ["common/db"]
   pruneopts = "UT"
   revision = "b2a3dd85051bbcc3daaf9c71928cae91c1fb41a8"
@@ -488,7 +488,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/asciiu/oldiez/common/db",
+    "github.com/asciiu/appa/common/db",
     "github.com/google/uuid",
     "github.com/gorilla/websocket",
     "github.com/labstack/echo",

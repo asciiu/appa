@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 )
 
 func DeleteOrder(db *sql.DB, orderID, userID string) error {

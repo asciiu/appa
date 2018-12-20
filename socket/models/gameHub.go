@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/asciiu/oldiez/socket/constants/topic"
+	"github.com/asciiu/appa/socket/constants/topic"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the

@@ -1,7 +1,7 @@
 package models
 
 import (
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 )
 
 type OrderBook struct {

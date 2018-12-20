@@ -1,12 +1,12 @@
 build:
-	dep ensure -update github.com/asciiu/oldiez
-	docker build --no-cache -t dockerowy/oldiez-api:dev -f ../api/Dockerfile ..
+	dep ensure -update github.com/asciiu/appa
+	docker build --no-cache -t dockerowy/appa-api:dev -f ../api/Dockerfile ..
 
 update: 
-	dep ensure -update github.com/asciiu/oldiez
+	dep ensure -update github.com/asciiu/appa
 
 push:
-	docker push dockerowy/oldiez-api:dev 
+	docker push dockerowy/appa-api:dev 
 
 run:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml

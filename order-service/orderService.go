@@ -7,10 +7,10 @@ import (
 	"log"
 	"time"
 
-	constRes "github.com/asciiu/oldiez/common/constants/response"
-	"github.com/asciiu/oldiez/order-service/constants"
-	repoOrder "github.com/asciiu/oldiez/order-service/db/sql"
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	constRes "github.com/asciiu/appa/common/constants/response"
+	"github.com/asciiu/appa/order-service/constants"
+	repoOrder "github.com/asciiu/appa/order-service/db/sql"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )

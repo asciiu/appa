@@ -4,15 +4,15 @@
 FROM golang:1.11.3 as builder
 
 # Set our workdir to our current service in the gopath
-WORKDIR /go/src/github.com/asciiu/oldiez/user-service
+WORKDIR /go/src/github.com/asciiu/appa/user-service
 
 ADD id_rsa /root/.ssh/id_rsa
 RUN chmod 700 /root/.ssh/id_rsa
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
-ADD user-service /go/src/github.com/asciiu/oldiez/user-service
-CMD cd /go/src/github.com/asciiu/oldiez/user-service && go get github.com/asciiu/oldiez && go build -o /oldiez
+ADD user-service /go/src/github.com/asciiu/appa/user-service
+CMD cd /go/src/github.com/asciiu/appa/user-service && go get github.com/asciiu/appa && go build -o /appa
 
 
 RUN go get -u github.com/golang/dep/cmd/dep
@@ -26,7 +26,7 @@ RUN apk --no-cache add ca-certificates
 
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/oldiez/user-service/user-service .
+COPY --from=builder /go/src/github.com/asciiu/appa/user-service/user-service .
 
 #EXPOSE 9000
 
@@ -36,7 +36,7 @@ CMD ["./user-service"]
 # Copy the current code into our workdir
 #COPY . .
 #
-#WORKDIR /go/src/github.com/asciiu/oldiez/user-service
+#WORKDIR /go/src/github.com/asciiu/appa/user-service
 ## Here we're pulling in godep, which is a dependency manager tool,
 ## we're going to use dep instead of go get, to get around a few
 ## quirks in how go get works with sub-packages.
@@ -67,7 +67,7 @@ CMD ["./user-service"]
 ## we pull the binary from the container named `builder`, within
 ## this build context. This reaches into our previous image, finds
 ## the binary we built, and pulls it into this container. Amazing!
-#COPY --from=builder /go/src/github.com/asciiu/oldiez/user-service/user-service .
+#COPY --from=builder /go/src/github.com/asciiu/appa/user-service/user-service .
 #
 ## Run the binary as per usual! This time with a binary build in a
 ## separate container, with all of the correct dependencies and

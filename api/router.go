@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asciiu/oldiez/api/controllers"
-	repoToken "github.com/asciiu/oldiez/api/db/sql"
-	"github.com/asciiu/oldiez/api/middlewares"
+	"github.com/asciiu/appa/api/controllers"
+	repoToken "github.com/asciiu/appa/api/db/sql"
+	"github.com/asciiu/appa/api/middlewares"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
@@ -38,8 +38,8 @@ func NewRouter(db *sql.DB) *echo.Echo {
 
 	e := echo.New()
 	//e.AutoTLSManager.Prompt = autocert.AcceptTOS
-	//e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("stage.fomo.exchange")
-	//e.AutoTLSManager.Cache = autocert.DirCache("/mnt/fomo/autocert")
+	//e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("stage.appa.exchange")
+	//e.AutoTLSManager.Cache = autocert.DirCache("/mnt/appa/autocert")
 
 	middlewares.SetMainMiddlewares(e)
 

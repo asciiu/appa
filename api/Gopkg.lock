@@ -11,7 +11,7 @@
 [[projects]]
   branch = "master"
   digest = "1:2c8dd24300fd2552b2b5f0bd879a7a7b751e623af017e8dd78828b6c16618962"
-  name = "github.com/asciiu/oldiez"
+  name = "github.com/asciiu/appa"
   packages = [
     "common/constants/response",
     "common/db",
@@ -507,12 +507,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/asciiu/oldiez/common/constants/response",
-    "github.com/asciiu/oldiez/common/db",
-    "github.com/asciiu/oldiez/order-service/proto/order",
-    "github.com/asciiu/oldiez/user-service/db/sql",
-    "github.com/asciiu/oldiez/user-service/models",
-    "github.com/asciiu/oldiez/user-service/proto/user",
+    "github.com/asciiu/appa/common/constants/response",
+    "github.com/asciiu/appa/common/db",
+    "github.com/asciiu/appa/order-service/proto/order",
+    "github.com/asciiu/appa/user-service/db/sql",
+    "github.com/asciiu/appa/user-service/models",
+    "github.com/asciiu/appa/user-service/proto/user",
     "github.com/dgrijalva/jwt-go",
     "github.com/google/uuid",
     "github.com/labstack/echo",

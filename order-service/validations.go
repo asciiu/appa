@@ -1,7 +1,7 @@
 package main
 
 import (
-	constOrder "github.com/asciiu/oldiez/order-service/constants"
+	constOrder "github.com/asciiu/appa/order-service/constants"
 )
 
 func ValidateSide(side string) bool {

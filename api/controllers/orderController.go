@@ -5,18 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
-	constRes "github.com/asciiu/oldiez/common/constants/response"
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	constRes "github.com/asciiu/appa/common/constants/response"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/net/context"
 )
-
-type ResponseOrderSuccess struct {
-	Status string `json:"status"`
-	Data   *Order `json:"data"`
-}
 
 type OrderController struct {
 	DB *sql.DB
@@ -26,8 +21,7 @@ type OrderController struct {
 
 func NewOrderController(db *sql.DB, service micro.Service) *OrderController {
 	controller := OrderController{
-		DB: db,
-		// TODO order client service
+		DB:          db,
 		OrderClient: protoOrder.NewOrderService("orders", service.Client()),
 	}
 	return &controller
@@ -49,6 +43,11 @@ type Order struct {
 	Status     string  `json:"status"`
 	CreatedOn  string  `json:"createdOn"`
 	UpdatedOn  string  `json:"updatedOn"`
+}
+
+type ResponseOrderSuccess struct {
+	Status string `json:"status"`
+	Data   *Order `json:"data"`
 }
 
 func (controller *OrderController) HandlePostOrder(c echo.Context) error {
@@ -108,16 +107,16 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-type ResponseOrdersPageSuccess struct {
-	Status string      `json:"status"`
-	Data   *OrdersPage `json:"data"`
-}
-
 type OrdersPage struct {
 	Page     uint32   `json:"page"`
 	PageSize uint32   `json:"pageSize"`
 	Total    uint32   `json:"total"`
 	Orders   []*Order `json:"orders"`
+}
+
+type ResponseOrdersPageSuccess struct {
+	Status string      `json:"status"`
+	Data   *OrdersPage `json:"data"`
 }
 
 func (controller *OrderController) HandleGetOrders(c echo.Context) error {

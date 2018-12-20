@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/oldiez/common/db"
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
+	"github.com/asciiu/appa/common/db"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
 )
@@ -22,7 +22,7 @@ func NewOrderService(name, dbUrl string) micro.Service {
 	// Init will parse the command line flags.
 	srv.Init()
 
-	oldiezDB, err := db.NewDB(dbUrl)
+	appaDB, err := db.NewDB(dbUrl)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -31,14 +31,14 @@ func NewOrderService(name, dbUrl string) micro.Service {
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	protoOrder.RegisterOrderServiceHandler(srv.Server(), &OrderService{oldiezDB})
+	protoOrder.RegisterOrderServiceHandler(srv.Server(), &OrderService{appaDB})
 
 	return srv
 }
 
 func main() {
 	dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
-	srv := NewOrderService("oldiez.orders", dbUrl)
+	srv := NewOrderService("appa.orders", dbUrl)
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

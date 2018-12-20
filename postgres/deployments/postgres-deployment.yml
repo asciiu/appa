@@ -24,12 +24,12 @@ spec:
           volumeMounts:
             - name: postgres-persistent-storage
               mountPath: /var/lib/postgresql/data
-              subPath: oldiez_stage 
+              subPath: appa_stage 
   volumeClaimTemplates:
   - metadata:
       name: postgres-persistent-storage
       annotations:
-        volume.beta.kubernetes.io/storage-class: "oldiez-disk"
+        volume.beta.kubernetes.io/storage-class: "appa-disk"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

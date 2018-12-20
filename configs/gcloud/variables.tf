@@ -7,9 +7,9 @@ variable "gcloud-zone" {
 }
 
 variable "gcloud-project" {
-  default = "oldiez-204904"
+  default = "appa-204904"
 }
 
 variable "platform-name" {
-  default = "oldiez-platform"
+  default = "appa-platform"
 }

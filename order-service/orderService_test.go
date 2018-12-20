@@ -6,11 +6,11 @@ import (
 	"log"
 	"testing"
 
-	"github.com/asciiu/oldiez/common/db"
-	constOrder "github.com/asciiu/oldiez/order-service/constants"
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
-	repoUser "github.com/asciiu/oldiez/user-service/db/sql"
-	user "github.com/asciiu/oldiez/user-service/models"
+	"github.com/asciiu/appa/common/db"
+	constOrder "github.com/asciiu/appa/order-service/constants"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
+	repoUser "github.com/asciiu/appa/user-service/db/sql"
+	user "github.com/asciiu/appa/user-service/models"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +22,7 @@ func checkErr(err error) {
 }
 
 func setupService() (*OrderService, *user.User) {
-	dbUrl := "postgres://postgres@localhost:5432/oldiez_test?&sslmode=disable"
+	dbUrl := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
 	db, _ := db.NewDB(dbUrl)
 
 	orderService := OrderService{DB: db}

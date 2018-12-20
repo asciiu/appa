@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	asql "github.com/asciiu/oldiez/api/db/sql"
-	constRes "github.com/asciiu/oldiez/common/constants/response"
-	repoUser "github.com/asciiu/oldiez/user-service/db/sql"
-	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
+	asql "github.com/asciiu/appa/api/db/sql"
+	constRes "github.com/asciiu/appa/common/constants/response"
+	repoUser "github.com/asciiu/appa/user-service/db/sql"
+	protoUser "github.com/asciiu/appa/user-service/proto/user"
 	micro "github.com/micro/go-micro"
 
-	apiModels "github.com/asciiu/oldiez/api/models"
-	models "github.com/asciiu/oldiez/user-service/models"
+	apiModels "github.com/asciiu/appa/api/models"
+	models "github.com/asciiu/appa/user-service/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"
@@ -26,9 +26,9 @@ import (
 
 // refresh is set to 15 days
 const refreshDuration = 360 * time.Hour
-const jwtDuration = 3 * time.Hour
 
 //const jwtDuration = 20 * time.Minute
+const jwtDuration = 12 * time.Hour
 
 type AuthController struct {
 	DB         *sql.DB
@@ -114,7 +114,7 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	// Generate encoded token and send it as response.
-	token, err := rawToken.SignedString([]byte(os.Getenv("oldiez_JWT")))
+	token, err := rawToken.SignedString([]byte(os.Getenv("appa_JWT")))
 	if err != nil {
 		return "", err
 	}
@@ -155,7 +155,7 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 			}
 
 			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			return []byte(os.Getenv("oldiez_JWT")), nil
+			return []byte(os.Getenv("appa_JWT")), nil
 		})
 
 		if err != nil && c.Request().Method != http.MethodOptions {

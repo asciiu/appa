@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/asciiu/oldiez/socket/constants/topic"
+	"github.com/asciiu/appa/socket/constants/topic"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )

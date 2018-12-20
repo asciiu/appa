@@ -1,6 +1,6 @@
 FROM golang:1.10.2 as builder
 
-WORKDIR /go/src/github.com/asciiu/oldiez/socket
+WORKDIR /go/src/github.com/asciiu/appa/socket
 COPY . .
 RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure
@@ -9,6 +9,6 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 RUN mkdir /app
 WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/oldiez/socket/socket .
+COPY --from=builder /go/src/github.com/asciiu/appa/socket/socket .
 
 CMD ["./socket"]

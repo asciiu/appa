@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 
-	constRes "github.com/asciiu/oldiez/common/constants/response"
-	protoUser "github.com/asciiu/oldiez/user-service/proto/user"
+	constRes "github.com/asciiu/appa/common/constants/response"
+	protoUser "github.com/asciiu/appa/user-service/proto/user"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"

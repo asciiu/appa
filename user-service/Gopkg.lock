@@ -11,7 +11,7 @@
 [[projects]]
   branch = "master"
   digest = "1:c156d974b8e55a98eae18ae369205f5d2d8a158a46b4d2d9c47fe96eb2b4254b"
-  name = "github.com/asciiu/oldiez"
+  name = "github.com/asciiu/appa"
   packages = [
     "common/constants/response",
     "common/db",
@@ -437,8 +437,8 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/asciiu/oldiez/common/constants/response",
-    "github.com/asciiu/oldiez/common/db",
+    "github.com/asciiu/appa/common/constants/response",
+    "github.com/asciiu/appa/common/db",
     "github.com/golang/protobuf/proto",
     "github.com/google/uuid",
     "github.com/micro/go-micro",

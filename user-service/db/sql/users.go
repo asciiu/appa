@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/asciiu/oldiez/user-service/models"
+	"github.com/asciiu/appa/user-service/models"
 )
 
 func DeleteUserHard(db *sql.DB, userID string) error {

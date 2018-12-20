@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/asciiu/oldiez/socket/controllers"
-	"github.com/asciiu/oldiez/socket/middlewares"
+	"github.com/asciiu/appa/socket/controllers"
+	"github.com/asciiu/appa/socket/middlewares"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"

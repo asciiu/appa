@@ -15,7 +15,7 @@ spec:
     spec:
         containers:
         - name: socket 
-          image: dockerowy/oldiez-socket:dev 
+          image: dockerowy/appa-socket:dev 
           imagePullPolicy: Always 
           command: [
             "./socket",
@@ -23,7 +23,7 @@ spec:
           ]
           envFrom:
           - configMapRef:
-              name: oldiez-config
+              name: appa-config
           env:
           - name: UPDATED_AT
             value: "{{ UPDATED_AT }}"

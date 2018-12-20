@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asciiu/oldiez/socket/models"
+	"github.com/asciiu/appa/socket/models"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )

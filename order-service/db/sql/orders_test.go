@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/asciiu/oldiez/common/db"
-	"github.com/asciiu/oldiez/order-service/constants"
-	repoOrder "github.com/asciiu/oldiez/order-service/db/sql"
-	protoOrder "github.com/asciiu/oldiez/order-service/proto/order"
-	repoUser "github.com/asciiu/oldiez/user-service/db/sql"
-	"github.com/asciiu/oldiez/user-service/models"
+	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/order-service/constants"
+	repoOrder "github.com/asciiu/appa/order-service/db/sql"
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
+	repoUser "github.com/asciiu/appa/user-service/db/sql"
+	"github.com/asciiu/appa/user-service/models"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func checkErr(err error) {
 }
 
 func TestInsertOrder(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/oldiez_test?&sslmode=disable")
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
 	checkErr(err)
 	defer db.Close()
 
@@ -60,7 +60,7 @@ func TestInsertOrder(t *testing.T) {
 }
 
 func TestFindOrder(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/oldiez_test?&sslmode=disable")
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
 	checkErr(err)
 	defer db.Close()
 
