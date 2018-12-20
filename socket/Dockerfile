@@ -1,4 +1,4 @@
-FROM golang:1.10.2 as builder
+FROM golang:1.11.3 as builder
 
 WORKDIR /go/src/github.com/asciiu/appa/socket
 COPY . .

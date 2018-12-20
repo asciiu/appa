@@ -15,7 +15,7 @@ spec:
     spec:
         containers:
         - name: api 
-          image: dockerowy/oldiez-api:dev 
+          image: dockerowy/appa-api:dev 
           imagePullPolicy: Always 
           command: [
             "./api",
@@ -23,10 +23,10 @@ spec:
           ]
           envFrom:
           - configMapRef:
-              name: oldiez-config
+              name: appa-config
           env:
           - name: UPDATED_AT
-            value: "Tue Dec 18 20:44:51 MST 2018"
+            value: "Wed Dec 19 21:48:11 MST 2018"
           ports:
           - containerPort: 9000
             name: http-port

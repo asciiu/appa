@@ -7,7 +7,7 @@
   name = "github.com/asciiu/appa"
   packages = ["common/db"]
   pruneopts = "UT"
-  revision = "b2a3dd85051bbcc3daaf9c71928cae91c1fb41a8"
+  revision = "98e6aabf57a72a1f1dda3e146571211a23163c1d"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"

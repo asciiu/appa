@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:558bf2c3113f5260cdd46bcda7667fb4ec45a9c2810fbf4164923f1eb8b83fa4"
+  digest = "1:a9563d5fcb776439c602f79ee9658f18afdcb3a324299f3e2c2903063280d6d7"
   name = "github.com/asciiu/appa"
   packages = [
     "common/constants/response",
@@ -20,7 +20,7 @@
     "user-service/models",
   ]
   pruneopts = "UT"
-  revision = "33f11787d2a683256505d5c4c416e0fbdaa80d8d"
+  revision = "98e6aabf57a72a1f1dda3e146571211a23163c1d"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"

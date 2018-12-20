@@ -10,7 +10,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2c8dd24300fd2552b2b5f0bd879a7a7b751e623af017e8dd78828b6c16618962"
+  digest = "1:33a97c7b805ae4f765b83bb91989d1e2527352c4ec8df26cfe6ceb00ee610f53"
   name = "github.com/asciiu/appa"
   packages = [
     "common/constants/response",
@@ -21,7 +21,7 @@
     "user-service/proto/user",
   ]
   pruneopts = "UT"
-  revision = "33f11787d2a683256505d5c4c416e0fbdaa80d8d"
+  revision = "98e6aabf57a72a1f1dda3e146571211a23163c1d"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
