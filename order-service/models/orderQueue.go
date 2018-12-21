@@ -21,7 +21,6 @@ func (queue *OrderQueue) AddOrder(order *protoOrder.Order) {
 	if order.Price != queue.Price || queue.IsQueued(order.OrderID) {
 		return
 	}
-
 	queue.Orders = append(queue.Orders, order)
 }
 

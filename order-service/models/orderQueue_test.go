@@ -62,3 +62,45 @@ func TestUniqueQueue(t *testing.T) {
 
 	assert.Equal(t, 1, len(queue.Orders), "queue should be empty")
 }
+
+func TestRemoveQueue(t *testing.T) {
+	queue := NewOrderQueue(0.01)
+	order1 := protoOrder.Order{
+		OrderID:    uuid.New().String(),
+		UserID:     uuid.New().String(),
+		MarketName: "bch-btc",
+		Side:       constOrder.Buy,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+	}
+	order2 := protoOrder.Order{
+		OrderID:    uuid.New().String(),
+		UserID:     uuid.New().String(),
+		MarketName: "bch-btc",
+		Side:       constOrder.Buy,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+	}
+	order3 := protoOrder.Order{
+		OrderID:    uuid.New().String(),
+		UserID:     uuid.New().String(),
+		MarketName: "bch-btc",
+		Side:       constOrder.Buy,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+	}
+
+	// cannot add same order twice
+	queue.AddOrder(&order1)
+	queue.AddOrder(&order2)
+	queue.AddOrder(&order3)
+
+	assert.Equal(t, 3, len(queue.Orders), "queue should be empty")
+
+	queue.RemoveOrder(order2.OrderID)
+
+	assert.Equal(t, 2, len(queue.Orders), "queue should be empty")
+}
