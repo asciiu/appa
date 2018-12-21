@@ -9,3 +9,11 @@ type OrderBook struct {
 	BuyOrders  []*protoOrder.Order
 	SellOrders []*protoOrder.Order
 }
+
+func (book *OrderBook) AddOrder(order *protoOrder.Order) {
+
+}
+
+func (book *OrderBook) CancelOrder(orderID string) {
+
+}
