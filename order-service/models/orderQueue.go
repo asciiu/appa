@@ -18,27 +18,32 @@ func NewOrderQueue(price float64) *OrderQueue {
 }
 
 func (queue *OrderQueue) AddOrder(order *protoOrder.Order) {
-	if order.Price != queue.Price {
+	if order.Price != queue.Price || queue.IsQueued(order.OrderID) {
 		return
-	}
-	// cannot add order if already existing
-	for _, o := range queue.Orders {
-		if o.OrderID == order.OrderID {
-			return
-		}
 	}
 
 	queue.Orders = append(queue.Orders, order)
 }
 
-func (queue *OrderQueue) RemoveOrder(orderID string) {
+func (queue *OrderQueue) IsQueued(orderID string) bool {
+	// cannot add order if already existing
+	for _, o := range queue.Orders {
+		if o.OrderID == orderID {
+			return true
+		}
+	}
+	return false
+}
+
+func (queue *OrderQueue) RemoveOrder(orderID string) *protoOrder.Order {
 	orders := queue.Orders
 	for i, order := range orders {
 		if order.OrderID == orderID {
 			queue.Orders = append(orders[:i], orders[i+1:]...)
-			break
+			return order
 		}
 	}
+	return nil
 }
 
 func (queue *OrderQueue) Pop() *protoOrder.Order {
