@@ -21,6 +21,13 @@ func (queue *OrderQueue) AddOrder(order *protoOrder.Order) {
 	if order.Price != queue.Price {
 		return
 	}
+	// cannot add order if already existing
+	for _, o := range queue.Orders {
+		if o.OrderID == order.OrderID {
+			return
+		}
+	}
+
 	queue.Orders = append(queue.Orders, order)
 }
 
