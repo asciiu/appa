@@ -11,6 +11,14 @@ type OrderBook struct {
 	Sells      []*OrderQueue
 }
 
+type BuyerBook struct {
+	Buys []*OrderQueue
+}
+
+type SellerBook struct {
+	Sells []*OrderQueue
+}
+
 func NewOrderBook(marketName string) *OrderBook {
 	return &OrderBook{
 		MarketName: marketName,
