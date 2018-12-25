@@ -12,11 +12,13 @@ type OrderBook struct {
 }
 
 type BuyerBook struct {
-	Buys []*OrderQueue
+	MarketName string
+	Buys       []*OrderQueue
 }
 
 type SellerBook struct {
-	Sells []*OrderQueue
+	Marketname string
+	Sells      []*OrderQueue
 }
 
 func NewOrderBook(marketName string) *OrderBook {

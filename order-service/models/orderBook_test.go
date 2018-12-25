@@ -22,8 +22,8 @@ func TestOrderBook(t *testing.T) {
 	}
 	book.AddOrder(&order)
 
-	assert.Equal(t, 1, len(book.BuyQ), "should be 1 order in buys")
-	assert.Equal(t, 0, len(book.SellQ), "should be 0 order in sells")
+	assert.Equal(t, 1, len(book.Buys), "should be 1 order in buys")
+	assert.Equal(t, 0, len(book.Sells), "should be 0 order in sells")
 }
 
 func TestOrderBookWrongOrder(t *testing.T) {
@@ -39,6 +39,6 @@ func TestOrderBookWrongOrder(t *testing.T) {
 	}
 	book.AddOrder(&order)
 
-	assert.Equal(t, 0, len(book.BuyQ), "should be 0 order in buys")
-	assert.Equal(t, 0, len(book.SellQ), "should be 0 order in sells")
+	assert.Equal(t, 0, len(book.Buys), "should be 0 order in buys")
+	assert.Equal(t, 0, len(book.Sells), "should be 0 order in sells")
 }
