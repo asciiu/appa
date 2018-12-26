@@ -1,63 +1,27 @@
 package models
 
 import (
-	constOrder "github.com/asciiu/appa/order-service/constants"
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 )
 
+type Order struct {
+	OrderID string
+	UserID  string
+	Side    string
+	Price   float64
+	Size    float64
+}
+
 type OrderBook struct {
 	MarketName string
-	Buys       []*OrderQueue
-	Sells      []*OrderQueue
+	Side       string
+	Orders     []*protoOrder.Order
 }
 
-type BuyerBook struct {
-	MarketName string
-	Buys       []*OrderQueue
-}
-
-type SellerBook struct {
-	Marketname string
-	Sells      []*OrderQueue
-}
-
-func NewOrderBook(marketName string) *OrderBook {
+func NewOrderBook(marketName, side string) *OrderBook {
 	return &OrderBook{
 		MarketName: marketName,
-		Buys:       make([]*OrderQueue, 0),
-		Sells:      make([]*OrderQueue, 0),
-	}
-}
-
-func (book *OrderBook) AddOrder(order *protoOrder.Order) {
-	switch {
-	case order.MarketName != book.MarketName:
-		return
-	case order.Side == constOrder.Buy:
-	case order.Side == constOrder.Sell:
-	}
-}
-
-func (book *OrderBook) AddBuyOrder(order *protoOrder.Order) {
-
-	for _, queue := range book.Buys {
-		if queue.Price == order.Price {
-			queue.AddOrder(order)
-			break
-		}
-	}
-
-}
-
-func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
-
-}
-
-func (book *OrderBook) CancelOrder(order *protoOrder.Order) {
-	switch {
-	case order.MarketName != book.MarketName:
-		return
-	case order.Side == constOrder.Buy:
-	case order.Side == constOrder.Sell:
+		Orders:     make([]*protoOrder.Order, 0),
+		Side:       side,
 	}
 }

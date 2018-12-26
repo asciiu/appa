@@ -1,6 +1,6 @@
 package models
 
-func MergeSort(slice []float64) []float64 {
+func MergeSort(slice []Order) []Order {
 
 	if len(slice) < 2 {
 		return slice
@@ -10,10 +10,10 @@ func MergeSort(slice []float64) []float64 {
 }
 
 // Merges left and right slice into newly created slice
-func Merge(left, right []float64) []float64 {
+func Merge(left, right []Order) []Order {
 
 	size, i, j := len(left)+len(right), 0, 0
-	slice := make([]float64, size, size)
+	slice := make([]Order, size, size)
 
 	for k := 0; k < size; k++ {
 		if i > len(left)-1 && j <= len(right)-1 {
@@ -22,7 +22,7 @@ func Merge(left, right []float64) []float64 {
 		} else if j > len(right)-1 && i <= len(left)-1 {
 			slice[k] = left[i]
 			i++
-		} else if left[i] < right[j] {
+		} else if left[i].Price < right[j].Price {
 			slice[k] = left[i]
 			i++
 		} else {
