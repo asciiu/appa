@@ -3,29 +3,31 @@ package models
 import (
 	"fmt"
 	"testing"
+
+	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 )
 
 func TestMergeSort(t *testing.T) {
 	//example := []float64{0.04, 0.02, 0.03, 0.01, 0.007}
-	order1 := Order{
+	order1 := protoOrder.Order{
 		OrderID: "#1",
 		Price:   0.04,
 		Size:    1.2,
 		Side:    "buy",
 	}
-	order2 := Order{
+	order2 := protoOrder.Order{
 		OrderID: "#2",
 		Price:   0.007,
 		Size:    0.2,
 		Side:    "buy",
 	}
-	order3 := Order{
+	order3 := protoOrder.Order{
 		OrderID: "#3",
 		Price:   0.03,
 		Size:    2.7,
 		Side:    "buy",
 	}
-	orders := []Order{order1, order2, order3}
+	orders := []protoOrder.Order{order1, order2, order3}
 	sorted := MergeSort(orders)
 
 	for _, order := range sorted {
