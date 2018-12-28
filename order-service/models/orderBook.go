@@ -30,6 +30,17 @@ func (book *OrderBook) AddBuyOrder(order *protoOrder.Order) {
 	}
 }
 
+func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
+	if order.Side != constOrder.Sell || order.MarketName != book.MarketName {
+		return
+	}
+	book.SellOrders = append(book.SellOrders, order)
+
+	if len(book.SellOrders) > 1 {
+		book.SellOrders = MergeSort(book.SellOrders)
+	}
+}
+
 func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) []int {
 	if sellOrder.Side != constOrder.Sell {
 		return nil
@@ -46,17 +57,28 @@ func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) []int {
 	return MatchIndices(book.SellOrders, buyOrder.Price, buyOrder.Size)
 }
 
-//func (book *OrderBook) RemoveBuyOrders(to, from index) {
-//
-//}
-
-func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
-	if order.Side != constOrder.Sell || order.MarketName != book.MarketName {
-		return
+func (book *OrderBook) RemoveBuyOrders(from, to int, upToSize float64) {
+	sum := upToSize
+	for i := from; i < to; i++ {
+		order := book.BuyOrders[i]
+		sum -= order.Size
+		if sum < 0 {
+			order.Size -= sum
+			break
+		}
+		book.BuyOrders = append(book.BuyOrders[:i], book.BuyOrders[i+1:]...)
 	}
-	book.SellOrders = append(book.SellOrders, order)
+}
 
-	if len(book.SellOrders) > 1 {
-		book.SellOrders = MergeSort(book.SellOrders)
+func (book *OrderBook) RemoveSellOrders(from, to int, upToSize float64) {
+	sum := upToSize
+	for i := from; i < to; i++ {
+		order := book.SellOrders[i]
+		sum -= order.Size
+		if sum < 0 {
+			order.Size -= sum
+			break
+		}
+		book.SellOrders = append(book.SellOrders[:i], book.SellOrders[i+1:]...)
 	}
 }

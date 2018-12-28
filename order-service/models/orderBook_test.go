@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -43,7 +42,8 @@ func TestOrderBookWrongOrder(t *testing.T) {
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 }
 
-func TestOrderBookWrongSideOrder(t *testing.T) {
+// Order book should reject adding a sell order when the order side is buy
+func TestOrderBookRejectBuyOrder(t *testing.T) {
 	book := NewOrderBook("test-btc")
 	order := protoOrder.Order{
 		OrderID:    uuid.New().String(),
@@ -54,6 +54,22 @@ func TestOrderBookWrongSideOrder(t *testing.T) {
 		Type:       constOrder.LimitOrder,
 	}
 	book.AddSellOrder(&order)
+
+	assert.Equal(t, 0, len(book.BuyOrders), "should be 0 order in buys")
+	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
+}
+
+func TestOrderBookRejectSellOrder(t *testing.T) {
+	book := NewOrderBook("test-btc")
+	order := protoOrder.Order{
+		OrderID:    uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+	}
+	book.AddBuyOrder(&order)
 
 	assert.Equal(t, 0, len(book.BuyOrders), "should be 0 order in buys")
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
@@ -101,9 +117,9 @@ func TestOrderBookMatchSellOrder(t *testing.T) {
 	}
 	match := book.MatchSellOrders(buyOrder)
 
-	for _, o := range match {
-		fmt.Printf("%+v\n", o)
-	}
+	// for _, o := range match {
+	// 	fmt.Printf("%+v\n", o)
+	// }
 
 	assert.Equal(t, 1, len(match), "should be 1 match sell order")
 }

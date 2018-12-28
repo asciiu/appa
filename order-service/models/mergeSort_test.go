@@ -102,7 +102,7 @@ func TestSearchIndex(t *testing.T) {
 	sorted := MergeSort(orders)
 
 	searchPrice := 0.01
-	index := SearchIndex(sorted, searchPrice)
+	index := searchIndex(sorted, searchPrice)
 	assert.Equal(t, 4, index, "match should be at index 4")
 }
 

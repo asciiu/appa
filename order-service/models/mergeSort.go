@@ -10,11 +10,11 @@ func MergeSort(slice []*protoOrder.Order) []*protoOrder.Order {
 		return slice
 	}
 	mid := (len(slice)) / 2
-	return Merge(MergeSort(slice[:mid]), MergeSort(slice[mid:]))
+	return merge(MergeSort(slice[:mid]), MergeSort(slice[mid:]))
 }
 
 // Merges left and right slice into newly created slice
-func Merge(left, right []*protoOrder.Order) []*protoOrder.Order {
+func merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 
 	size, i, j := len(left)+len(right), 0, 0
 	slice := make([]*protoOrder.Order, size, size)
@@ -40,15 +40,16 @@ func Merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 	return slice
 }
 
-func binarySearch(a []*protoOrder.Order, search float64) (index int) {
+// should return index where Order.Price == price
+func binarySearch(a []*protoOrder.Order, price float64) (index int) {
 	mid := len(a) / 2
 	switch {
 	case len(a) == 0:
 		index = -1 // not found
-	case a[mid].Price > search:
-		index = binarySearch(a[:mid], search)
-	case a[mid].Price < search:
-		index = binarySearch(a[mid+1:], search)
+	case a[mid].Price > price:
+		index = binarySearch(a[:mid], price)
+	case a[mid].Price < price:
+		index = binarySearch(a[mid+1:], price)
 		index += mid + 1
 	default: // a[mid] == search
 		index = mid // found
@@ -56,15 +57,16 @@ func binarySearch(a []*protoOrder.Order, search float64) (index int) {
 	return
 }
 
-func SearchIndex(sorted []*protoOrder.Order, search float64) (index int) {
-	idx := binarySearch(sorted, search)
+// returns first index where Order.Price == price
+func searchIndex(sorted []*protoOrder.Order, price float64) (index int) {
+	idx := binarySearch(sorted, price)
 	slice := sorted[:idx]
 	index = idx
 	for i := len(slice) - 1; i >= 0; i-- {
-		if slice[i].Price == search {
+		if slice[i].Price == price {
 			index = i
 		}
-		if slice[i].Price < search {
+		if slice[i].Price < price {
 			break
 		}
 	}
@@ -73,7 +75,7 @@ func SearchIndex(sorted []*protoOrder.Order, search float64) (index int) {
 }
 
 func MatchIndices(sorted []*protoOrder.Order, price, size float64) (indices []int) {
-	first := SearchIndex(sorted, price)
+	first := searchIndex(sorted, price)
 	sum := 0.0
 	//orders := make([]*protoOrder.Order, 0)
 	for i, order := range sorted[first:] {
