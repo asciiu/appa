@@ -29,6 +29,9 @@ func Merge(left, right []protoOrder.Order) []protoOrder.Order {
 		} else if left[i].Price < right[j].Price {
 			slice[k] = left[i]
 			i++
+		} else if left[i].Price == right[j].Price && left[i].CreatedOn < right[j].CreatedOn {
+			slice[k] = left[i]
+			i++
 		} else {
 			slice[k] = right[j]
 			j++
