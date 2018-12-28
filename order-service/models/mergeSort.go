@@ -40,15 +40,15 @@ func Merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 	return slice
 }
 
-func BinarySearch(a []*protoOrder.Order, search float64) (index int) {
+func binarySearch(a []*protoOrder.Order, search float64) (index int) {
 	mid := len(a) / 2
 	switch {
 	case len(a) == 0:
 		index = -1 // not found
 	case a[mid].Price > search:
-		index = BinarySearch(a[:mid], search)
+		index = binarySearch(a[:mid], search)
 	case a[mid].Price < search:
-		index = BinarySearch(a[mid+1:], search)
+		index = binarySearch(a[mid+1:], search)
 		index += mid + 1
 	default: // a[mid] == search
 		index = mid // found
@@ -56,8 +56,8 @@ func BinarySearch(a []*protoOrder.Order, search float64) (index int) {
 	return
 }
 
-func Search(sorted []*protoOrder.Order, search float64) (index int) {
-	idx := BinarySearch(sorted, search)
+func SearchIndex(sorted []*protoOrder.Order, search float64) (index int) {
+	idx := binarySearch(sorted, search)
 	slice := sorted[:idx]
 	index = idx
 	for i := len(slice) - 1; i >= 0; i-- {
@@ -70,4 +70,18 @@ func Search(sorted []*protoOrder.Order, search float64) (index int) {
 	}
 
 	return
+}
+
+func MatchOrders(sorted []*protoOrder.Order, price, size float64) []*protoOrder.Order {
+	first := SearchIndex(sorted, price)
+	sum := 0.0
+	orders := make([]*protoOrder.Order, 0)
+	for _, order := range sorted[first:] {
+		sum += order.Size
+		orders = append(orders, order)
+		if sum >= size {
+			break
+		}
+	}
+	return orders
 }
