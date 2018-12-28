@@ -77,6 +77,9 @@ func MatchOrders(sorted []*protoOrder.Order, price, size float64) []*protoOrder.
 	sum := 0.0
 	orders := make([]*protoOrder.Order, 0)
 	for _, order := range sorted[first:] {
+		if order.Price > price {
+			break
+		}
 		sum += order.Size
 		orders = append(orders, order)
 		if sum >= size {
