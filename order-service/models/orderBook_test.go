@@ -174,9 +174,9 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 	}
 	match := book.MatchBuyOrders(sellOrder)
 
-	for _, o := range match {
-		fmt.Printf("%+v\n", o)
-	}
+	//for _, o := range match {
+	//	fmt.Printf("%+v\n", o)
+	//}
 
 	assert.Equal(t, 3, len(match), "should be 3 matched buy orders")
 }

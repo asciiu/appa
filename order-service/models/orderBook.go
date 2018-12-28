@@ -30,21 +30,25 @@ func (book *OrderBook) AddBuyOrder(order *protoOrder.Order) {
 	}
 }
 
-func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) []*protoOrder.Order {
+func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) []int {
 	if sellOrder.Side != constOrder.Sell {
 		return nil
 	}
 
-	return MatchOrders(book.BuyOrders, sellOrder.Price, sellOrder.Size)
+	return MatchIndices(book.BuyOrders, sellOrder.Price, sellOrder.Size)
 }
 
-func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) []*protoOrder.Order {
+func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) []int {
 	if buyOrder.Side != constOrder.Buy {
 		return nil
 	}
 
-	return MatchOrders(book.SellOrders, buyOrder.Price, buyOrder.Size)
+	return MatchIndices(book.SellOrders, buyOrder.Price, buyOrder.Size)
 }
+
+//func (book *OrderBook) RemoveBuyOrders(to, from index) {
+//
+//}
 
 func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 	if order.Side != constOrder.Sell || order.MarketName != book.MarketName {

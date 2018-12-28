@@ -106,7 +106,7 @@ func TestSearchIndex(t *testing.T) {
 	assert.Equal(t, 4, index, "match should be at index 4")
 }
 
-func TestSearchSize(t *testing.T) {
+func TestMatchIndices(t *testing.T) {
 	now := time.Now().UTC()
 	//example := []float64{0.04, 0.02, 0.03, 0.01, 0.007}
 	order1 := &protoOrder.Order{
@@ -149,7 +149,7 @@ func TestSearchSize(t *testing.T) {
 	sorted := MergeSort(orders)
 
 	searchPrice := 0.007
-	match := MatchOrders(sorted, searchPrice, 1.5)
+	match := MatchIndices(sorted, searchPrice, 1.5)
 	//for _, o := range match {
 	//	fmt.Printf("%+v\n", o)
 	//}

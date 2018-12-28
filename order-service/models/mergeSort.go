@@ -72,19 +72,19 @@ func SearchIndex(sorted []*protoOrder.Order, search float64) (index int) {
 	return
 }
 
-func MatchOrders(sorted []*protoOrder.Order, price, size float64) []*protoOrder.Order {
+func MatchIndices(sorted []*protoOrder.Order, price, size float64) (indices []int) {
 	first := SearchIndex(sorted, price)
 	sum := 0.0
-	orders := make([]*protoOrder.Order, 0)
-	for _, order := range sorted[first:] {
+	//orders := make([]*protoOrder.Order, 0)
+	for i, order := range sorted[first:] {
 		if order.Price > price {
 			break
 		}
 		sum += order.Size
-		orders = append(orders, order)
+		indices = append(indices, first+i)
 		if sum >= size {
 			break
 		}
 	}
-	return orders
+	return
 }
