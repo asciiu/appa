@@ -26,7 +26,7 @@ func TestOrderBook(t *testing.T) {
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 }
 
-func TestOrderBookWrongOrder(t *testing.T) {
+func TestOrderBookWrongMarketName(t *testing.T) {
 	book := NewOrderBook("test-btc")
 	order := protoOrder.Order{
 		OrderID:    uuid.New().String(),

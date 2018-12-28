@@ -61,7 +61,6 @@ func TestMergeSort(t *testing.T) {
 
 func TestSearchIndex(t *testing.T) {
 	now := time.Now().UTC()
-	//example := []float64{0.04, 0.02, 0.03, 0.01, 0.007}
 	order1 := &protoOrder.Order{
 		OrderID:   "#1",
 		Price:     0.01,
