@@ -30,6 +30,15 @@ func (book *OrderBook) AddBuyOrder(order *protoOrder.Order) {
 	}
 }
 
+// func (book *OrderBook) MatchSellOrder(order *protoOrder.Order) *protoOrder.Order {
+// 	if order.Side != constOrder.Sell {
+// 		return nil
+// 	}
+
+// 	mid := (len(book.BuyOrders)) / 2
+// 	return Merge(MergeSort(slice[:mid]), MergeSort(slice[mid:]))
+// }
+
 func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 	if order.Side != constOrder.Sell || order.MarketName != book.MarketName {
 		return

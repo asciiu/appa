@@ -39,3 +39,35 @@ func Merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 	}
 	return slice
 }
+
+func BinarySearch(a []*protoOrder.Order, search float64) (index int) {
+	mid := len(a) / 2
+	switch {
+	case len(a) == 0:
+		index = -1 // not found
+	case a[mid].Price > search:
+		index = BinarySearch(a[:mid], search)
+	case a[mid].Price < search:
+		index = BinarySearch(a[mid+1:], search)
+		index += mid + 1
+	default: // a[mid] == search
+		index = mid // found
+	}
+	return
+}
+
+func Search(sorted []*protoOrder.Order, search float64) (index int) {
+	idx := BinarySearch(sorted, search)
+	slice := sorted[:idx]
+	index = idx
+	for i := len(slice) - 1; i >= 0; i-- {
+		if slice[i].Price == search {
+			index = i
+		}
+		if slice[i].Price < search {
+			break
+		}
+	}
+
+	return
+}
