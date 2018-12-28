@@ -1,11 +1,11 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMergeSort(t *testing.T) {
@@ -39,13 +39,22 @@ func TestMergeSort(t *testing.T) {
 		Side:      "buy",
 		CreatedOn: now.Add(time.Second * 2).String(),
 	}
+	order5 := protoOrder.Order{
+		OrderID:   "#0",
+		Price:     0.00034,
+		Size:      0.9,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 100).String(),
+	}
 
-	orders := []protoOrder.Order{order1, order2, order3, order4}
+	orders := []protoOrder.Order{order1, order2, order3, order4, order5}
 	sorted := MergeSort(orders)
 
-	for _, order := range sorted {
-		fmt.Printf("%+v\n", order)
-	}
-	//assert.Equal(t, 1, len(book.BuyQ), "should be 1 order in buys")
-	//assert.Equal(t, 0, len(book.SellQ), "should be 0 order in sells")
+	// for _, order := range sorted {
+	// 	fmt.Printf("%+v\n", order)
+	// }
+	assert.Equal(t, 5, len(sorted), "should be 5 sorted orders")
+	assert.Equal(t, 1.2, sorted[1].Size, "order 2 size did not match")
+	assert.Equal(t, "#3", sorted[3].OrderID, "order 3 order ID did not match")
+	assert.Equal(t, 0.9, sorted[0].Size, "order 1 size did not match")
 }
