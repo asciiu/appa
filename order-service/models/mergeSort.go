@@ -37,7 +37,7 @@ func merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 			sorted[k] = left[leftIndex]
 			leftIndex++
 		case left[leftIndex].Price == right[rightIndex].Price && left[leftIndex].CreatedOn < right[rightIndex].CreatedOn:
-			// if price is equal do comparison on created on date
+			// if prices are equal do comparison with created on dates
 			sorted[k] = left[leftIndex]
 			leftIndex++
 		default:
@@ -65,7 +65,7 @@ func binarySearch(a []*protoOrder.Order, price float64) (index int) {
 	return
 }
 
-// returns first index where Order.Price == price
+// returns first index where Order.Price <= price
 func searchIndex(sorted []*protoOrder.Order, price float64) (index int) {
 	idx := binarySearch(sorted, price)
 	slice := sorted[:idx]
@@ -75,6 +75,21 @@ func searchIndex(sorted []*protoOrder.Order, price float64) (index int) {
 			index = i
 		}
 		if slice[i].Price < price {
+			break
+		}
+	}
+
+	return
+}
+
+// returns first index where Order.Price > price
+func searchIndexGT(sorted []*protoOrder.Order, price float64) (index int) {
+	idx := binarySearch(sorted, price)
+	slice := sorted[idx:]
+	index = idx
+	for i := 0; i < len(slice); i++ {
+		if slice[i].Price > price {
+			index += i
 			break
 		}
 	}

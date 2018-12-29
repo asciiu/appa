@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -70,21 +71,21 @@ func TestSearchIndex(t *testing.T) {
 	}
 	order2 := &protoOrder.Order{
 		OrderID:   "#2",
-		Price:     0.007,
+		Price:     0.0081,
 		Size:      0.2,
 		Side:      "buy",
 		CreatedOn: now.Add(time.Second * 1).String(),
 	}
 	order3 := &protoOrder.Order{
 		OrderID:   "#4",
-		Price:     0.007,
+		Price:     0.0073,
 		Size:      2.7,
 		Side:      "buy",
 		CreatedOn: now.Add(time.Second * 20).String(),
 	}
 	order4 := &protoOrder.Order{
 		OrderID:   "#3",
-		Price:     0.007,
+		Price:     0.0072,
 		Size:      0.9,
 		Side:      "buy",
 		CreatedOn: now.Add(time.Second * 2).String(),
@@ -100,9 +101,65 @@ func TestSearchIndex(t *testing.T) {
 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
 	sorted := MergeSort(orders)
 
-	searchPrice := 0.01
+	searchPrice := 0.00735
+	// find index where Order.Price <= searchPrice
 	index := searchIndex(sorted, searchPrice)
-	assert.Equal(t, 4, index, "match should be at index 4")
+	//for _, o := range sorted {
+	//	fmt.Printf("%+v\n", o)
+	//}
+	//fmt.Println(index)
+	assert.Equal(t, 2, index, "match should be at index 2")
+}
+
+func TestSearchIndexGreaterThan(t *testing.T) {
+	now := time.Now().UTC()
+	order1 := &protoOrder.Order{
+		OrderID:   "#1",
+		Price:     0.01,
+		Size:      1.2,
+		Side:      "buy",
+		CreatedOn: now.String(),
+	}
+	order2 := &protoOrder.Order{
+		OrderID:   "#2",
+		Price:     0.0081,
+		Size:      0.2,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 1).String(),
+	}
+	order3 := &protoOrder.Order{
+		OrderID:   "#4",
+		Price:     0.0073,
+		Size:      2.7,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 20).String(),
+	}
+	order4 := &protoOrder.Order{
+		OrderID:   "#3",
+		Price:     0.0072,
+		Size:      0.9,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 2).String(),
+	}
+	order5 := &protoOrder.Order{
+		OrderID:   "#0",
+		Price:     0.00034,
+		Size:      0.9,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 100).String(),
+	}
+
+	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
+	sorted := MergeSort(orders)
+
+	sellPrice := 0.00735
+	// find index where Order.Price >= searchPrice
+	index := searchIndexGT(sorted, sellPrice)
+	for _, o := range sorted {
+		fmt.Printf("%+v\n", o)
+	}
+	fmt.Println(index)
+	assert.Equal(t, 3, index, "match should be at index 3")
 }
 
 func TestMatchIndices(t *testing.T) {
@@ -149,8 +206,60 @@ func TestMatchIndices(t *testing.T) {
 
 	searchPrice := 0.007
 	match := MatchIndices(sorted, searchPrice, 1.5)
-	//for _, o := range match {
+	for _, o := range sorted {
+		fmt.Printf("%+v\n", o)
+	}
+	fmt.Println(match)
+	assert.Equal(t, 3, len(match), "should be 3 matches")
+}
+
+func TestBinarySearch(t *testing.T) {
+	now := time.Now().UTC()
+	order1 := &protoOrder.Order{
+		OrderID:   "#1",
+		Price:     0.01,
+		Size:      1.2,
+		Side:      "buy",
+		CreatedOn: now.String(),
+	}
+	order2 := &protoOrder.Order{
+		OrderID:   "#2",
+		Price:     0.007,
+		Size:      0.2,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 1).String(),
+	}
+	order3 := &protoOrder.Order{
+		OrderID:   "#4",
+		Price:     0.007,
+		Size:      2.7,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 20).String(),
+	}
+	order4 := &protoOrder.Order{
+		OrderID:   "#3",
+		Price:     0.007,
+		Size:      0.9,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 2).String(),
+	}
+	order5 := &protoOrder.Order{
+		OrderID:   "#0",
+		Price:     0.00034,
+		Size:      0.9,
+		Side:      "buy",
+		CreatedOn: now.Add(time.Second * 100).String(),
+	}
+
+	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
+	sorted := MergeSort(orders)
+
+	searchPrice := 0.011
+	// index of order where Order.Price <= searchPrice
+	index := binarySearch(sorted, searchPrice)
+	//for _, o := range sorted {
 	//	fmt.Printf("%+v\n", o)
 	//}
-	assert.Equal(t, 3, len(match), "should be 3 matches")
+	//fmt.Println(index)
+	assert.Equal(t, 4, index, "should return index of last item")
 }
