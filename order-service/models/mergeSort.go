@@ -66,15 +66,13 @@ func binarySearch(a []*protoOrder.Order, price float64) (index int) {
 }
 
 // returns first index where Order.Price <= price
-func searchIndex(sorted []*protoOrder.Order, price float64) (index int) {
+func searchLessThan(sorted []*protoOrder.Order, price float64) (index int) {
 	idx := binarySearch(sorted, price)
-	slice := sorted[:idx]
+	slice := sorted[idx:]
 	index = idx
 	for i := len(slice) - 1; i >= 0; i-- {
-		if slice[i].Price == price {
-			index = i
-		}
 		if slice[i].Price < price {
+			index += i
 			break
 		}
 	}
@@ -83,7 +81,7 @@ func searchIndex(sorted []*protoOrder.Order, price float64) (index int) {
 }
 
 // returns first index where Order.Price > price
-func searchIndexGT(sorted []*protoOrder.Order, price float64) (index int) {
+func searchGreaterThan(sorted []*protoOrder.Order, price float64) (index int) {
 	idx := binarySearch(sorted, price)
 	slice := sorted[idx:]
 	index = idx
@@ -98,7 +96,7 @@ func searchIndexGT(sorted []*protoOrder.Order, price float64) (index int) {
 }
 
 func MatchIndices(sorted []*protoOrder.Order, price, size float64) (indices []int) {
-	first := searchIndex(sorted, price)
+	first := searchLessThan(sorted, price)
 	sum := 0.0
 	//orders := make([]*protoOrder.Order, 0)
 	for i, order := range sorted[first:] {

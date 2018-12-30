@@ -60,7 +60,7 @@ func TestMergeSort(t *testing.T) {
 	assert.Equal(t, 0.9, sorted[0].Size, "order 1 size did not match")
 }
 
-func TestSearchIndex(t *testing.T) {
+func TestSearchLessThan(t *testing.T) {
 	now := time.Now().UTC()
 	order1 := &protoOrder.Order{
 		OrderID:   "#1",
@@ -101,14 +101,14 @@ func TestSearchIndex(t *testing.T) {
 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
 	sorted := MergeSort(orders)
 
-	searchPrice := 0.00735
+	buyPrice := 0.00735
 	// find index where Order.Price <= searchPrice
-	index := searchIndex(sorted, searchPrice)
-	//for _, o := range sorted {
-	//	fmt.Printf("%+v\n", o)
-	//}
-	//fmt.Println(index)
-	assert.Equal(t, 2, index, "match should be at index 2")
+	index := searchLessThan(sorted, buyPrice)
+	for _, o := range sorted {
+		fmt.Printf("%+v\n", o)
+	}
+	fmt.Println(index)
+	assert.Equal(t, 2, index, "less than should be index 2")
 }
 
 func TestSearchIndexGreaterThan(t *testing.T) {
@@ -153,13 +153,13 @@ func TestSearchIndexGreaterThan(t *testing.T) {
 	sorted := MergeSort(orders)
 
 	sellPrice := 0.00735
-	// find index where Order.Price >= searchPrice
-	index := searchIndexGT(sorted, sellPrice)
+	// find index where Order.Price > searchPrice
+	index := searchGreaterThan(sorted, sellPrice)
 	for _, o := range sorted {
 		fmt.Printf("%+v\n", o)
 	}
 	fmt.Println(index)
-	assert.Equal(t, 3, index, "match should be at index 3")
+	assert.Equal(t, 3, index, "index 3 should be greater than price")
 }
 
 func TestMatchIndices(t *testing.T) {
