@@ -162,56 +162,56 @@ func TestSearchIndexGreaterThan(t *testing.T) {
 	assert.Equal(t, 3, index, "index 3 should be greater than price")
 }
 
-func TestMatchIndices(t *testing.T) {
-	now := time.Now().UTC()
-	//example := []float64{0.04, 0.02, 0.03, 0.01, 0.007}
-	order1 := &protoOrder.Order{
-		OrderID:   "#1",
-		Price:     0.01,
-		Size:      1.2,
-		Side:      "buy",
-		CreatedOn: now.String(),
-	}
-	order2 := &protoOrder.Order{
-		OrderID:   "#2",
-		Price:     0.007,
-		Size:      0.2,
-		Side:      "buy",
-		CreatedOn: now.Add(time.Second * 1).String(),
-	}
-	order3 := &protoOrder.Order{
-		OrderID:   "#4",
-		Price:     0.007,
-		Size:      2.7,
-		Side:      "buy",
-		CreatedOn: now.Add(time.Second * 20).String(),
-	}
-	order4 := &protoOrder.Order{
-		OrderID:   "#3",
-		Price:     0.007,
-		Size:      0.9,
-		Side:      "buy",
-		CreatedOn: now.Add(time.Second * 2).String(),
-	}
-	order5 := &protoOrder.Order{
-		OrderID:   "#0",
-		Price:     0.00034,
-		Size:      0.9,
-		Side:      "buy",
-		CreatedOn: now.Add(time.Second * 100).String(),
-	}
+// func TestMatchIndices(t *testing.T) {
+// 	now := time.Now().UTC()
+// 	//example := []float64{0.04, 0.02, 0.03, 0.01, 0.007}
+// 	order1 := &protoOrder.Order{
+// 		OrderID:   "#1",
+// 		Price:     0.01,
+// 		Size:      1.2,
+// 		Side:      "buy",
+// 		CreatedOn: now.String(),
+// 	}
+// 	order2 := &protoOrder.Order{
+// 		OrderID:   "#2",
+// 		Price:     0.007,
+// 		Size:      0.2,
+// 		Side:      "buy",
+// 		CreatedOn: now.Add(time.Second * 1).String(),
+// 	}
+// 	order3 := &protoOrder.Order{
+// 		OrderID:   "#4",
+// 		Price:     0.007,
+// 		Size:      2.7,
+// 		Side:      "buy",
+// 		CreatedOn: now.Add(time.Second * 20).String(),
+// 	}
+// 	order4 := &protoOrder.Order{
+// 		OrderID:   "#3",
+// 		Price:     0.007,
+// 		Size:      0.9,
+// 		Side:      "buy",
+// 		CreatedOn: now.Add(time.Second * 2).String(),
+// 	}
+// 	order5 := &protoOrder.Order{
+// 		OrderID:   "#0",
+// 		Price:     0.00034,
+// 		Size:      0.9,
+// 		Side:      "buy",
+// 		CreatedOn: now.Add(time.Second * 100).String(),
+// 	}
 
-	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-	sorted := MergeSort(orders)
+// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
+// 	sorted := MergeSort(orders)
 
-	searchPrice := 0.007
-	match := MatchIndices(sorted, searchPrice, 1.5)
-	for _, o := range sorted {
-		fmt.Printf("%+v\n", o)
-	}
-	fmt.Println(match)
-	assert.Equal(t, 3, len(match), "should be 3 matches")
-}
+// 	searchPrice := 0.007
+// 	match := MatchIndices(sorted, searchPrice, 1.5)
+// 	for _, o := range sorted {
+// 		fmt.Printf("%+v\n", o)
+// 	}
+// 	fmt.Println(match)
+// 	assert.Equal(t, 3, len(match), "should be 3 matches")
+// }
 
 func TestBinarySearch(t *testing.T) {
 	now := time.Now().UTC()

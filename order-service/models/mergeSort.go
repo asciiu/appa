@@ -95,19 +95,19 @@ func searchGreaterThan(sorted []*protoOrder.Order, price float64) (index int) {
 	return
 }
 
-func MatchIndices(sorted []*protoOrder.Order, price, size float64) (indices []int) {
-	first := searchLessThan(sorted, price)
-	sum := 0.0
-	//orders := make([]*protoOrder.Order, 0)
-	for i, order := range sorted[first:] {
-		if order.Price > price {
-			break
-		}
-		sum += order.Size
-		indices = append(indices, first+i)
-		if sum >= size {
-			break
-		}
-	}
-	return
-}
+// func MatchIndices(sorted []*protoOrder.Order, price, size float64) (indices []int) {
+// 	first := searchLessThan(sorted, price)
+// 	sum := 0.0
+// 	//orders := make([]*protoOrder.Order, 0)
+// 	for i, order := range sorted[first:] {
+// 		if order.Price > price {
+// 			break
+// 		}
+// 		sum += order.Size
+// 		indices = append(indices, first+i)
+// 		if sum >= size {
+// 			break
+// 		}
+// 	}
+// 	return
+// }

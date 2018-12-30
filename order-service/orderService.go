@@ -10,13 +10,15 @@ import (
 	constRes "github.com/asciiu/appa/common/constants/response"
 	"github.com/asciiu/appa/order-service/constants"
 	repoOrder "github.com/asciiu/appa/order-service/db/sql"
+	"github.com/asciiu/appa/order-service/models"
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
 type OrderService struct {
-	DB *sql.DB
+	DB         *sql.DB
+	OrderBooks map[string]*models.OrderBook
 }
 
 func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOrderRequest, res *protoOrder.OrderResponse) error {
@@ -52,6 +54,14 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		res.Status = constRes.Error
 		res.Message = msg
 		return nil
+	}
+
+	if book, ok := service.OrderBooks[newOrder.MarketName]; ok {
+		book.AddOrder(&newOrder)
+	} else {
+		newOrderBook := models.NewOrderBook(newOrder.MarketName)
+		newOrderBook.AddOrder(&newOrder)
+		service.OrderBooks[newOrder.MarketName] = newOrderBook
 	}
 
 	res.Status = constRes.Success

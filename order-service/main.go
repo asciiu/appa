@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/order-service/models"
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
@@ -28,10 +29,14 @@ func NewOrderService(name, dbUrl string) micro.Service {
 		log.Fatalf(err.Error())
 	}
 
+	service := OrderService{
+		DB:         appaDB,
+		OrderBooks: make(map[string]*models.OrderBook),
+	}
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	protoOrder.RegisterOrderServiceHandler(srv.Server(), &OrderService{appaDB})
+	protoOrder.RegisterOrderServiceHandler(srv.Server(), &service)
 
 	return srv
 }
