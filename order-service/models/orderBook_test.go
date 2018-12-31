@@ -2,6 +2,7 @@ package models
 
 import (
 	"testing"
+	"time"
 
 	constOrder "github.com/asciiu/appa/order-service/constants"
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
@@ -74,54 +75,62 @@ func TestOrderBookRejectSellOrder(t *testing.T) {
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 }
 
-// func TestOrderBookMatchSellOrder(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	book := NewOrderBook("test-btc")
-// 	order0 := &protoOrder.Order{
-// 		OrderID:    uuid.New().String(),
-// 		MarketName: "test-btc",
-// 		Side:       constOrder.Buy,
-// 		Size:       1,
-// 		Price:      0.01,
-// 		Type:       constOrder.LimitOrder,
-// 	}
-// 	order1 := &protoOrder.Order{
-// 		OrderID:    "#1",
-// 		MarketName: "test-btc",
-// 		Price:      0.01,
-// 		Size:       1.2,
-// 		Side:       "sell",
-// 		CreatedOn:  now.String(),
-// 	}
-// 	order2 := &protoOrder.Order{
-// 		OrderID:    "#2",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       0.2,
-// 		Side:       "sell",
-// 		CreatedOn:  now.Add(time.Second * 1).String(),
-// 	}
+func TestOrderBookMatchSellOrder(t *testing.T) {
+	now := time.Now().UTC()
+	book := NewOrderBook("test-btc")
+	order0 := &protoOrder.Order{
+		OrderID:    "#0",
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+		CreatedOn:  now.String(),
+	}
+	order1 := &protoOrder.Order{
+		OrderID:    "#1",
+		MarketName: "test-btc",
+		Price:      0.01,
+		Size:       1.2,
+		Side:       constOrder.Sell,
+		CreatedOn:  now.Add(time.Second * 10).String(),
+	}
+	order2 := &protoOrder.Order{
+		OrderID:    "#2",
+		MarketName: "test-btc",
+		Price:      0.007,
+		Size:       0.2,
+		Side:       constOrder.Sell,
+		CreatedOn:  now.Add(time.Second * 1).String(),
+	}
 
-// 	orders := []*protoOrder.Order{order0, order1, order2}
-// 	for _, o := range orders {
-// 		book.AddSellOrder(o)
-// 	}
+	orders := []*protoOrder.Order{order0, order1, order2}
+	for _, o := range orders {
+		book.AddOrder(o)
+	}
 
-// 	buyOrder := &protoOrder.Order{
-// 		OrderID:    "#buyer",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       0.9,
-// 		Side:       "buy",
-// 	}
-// 	match := book.MatchSellOrders(buyOrder)
+	// for _, o := range book.SellOrders {
+	// 	fmt.Printf("%+v\n", o)
+	// }
 
-// 	// for _, o := range match {
-// 	// 	fmt.Printf("%+v\n", o)
-// 	// }
+	buyOrder := &protoOrder.Order{
+		OrderID:    "#buyer",
+		MarketName: "test-btc",
+		Price:      0.01,
+		Size:       0.9,
+		Side:       "buy",
+	}
+	//fmt.Printf("buy order %+v\n", buyOrder)
 
-// 	assert.Equal(t, 1, len(match), "should be 1 match sell order")
-// }
+	matches := book.MatchSellOrders(buyOrder)
+	// for _, o := range matches {
+	// 	fmt.Printf("%+v\n", o)
+	// }
+
+	assert.Equal(t, 2, len(matches), "should be 2 matched sell orders")
+	assert.Equal(t, 0.2, matches[0].Fill, "fill for 1st match should be 0.2")
+	assert.Equal(t, 0.7, matches[1].Fill, "fill for 2nd match should be 0.7")
+}
 
 // func TestOrderBookMatchBuyOrder(t *testing.T) {
 // 	now := time.Now().UTC()

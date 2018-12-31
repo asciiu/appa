@@ -39,8 +39,9 @@ message Order {
   double price = 6;
   string type = 7;
   string status = 8;
-  string createdOn = 9;
-  string updatedOn = 10;
+  double fill = 9;
+  string createdOn = 10;
+  string updatedOn = 11;
 }
 
 message OrderData {
