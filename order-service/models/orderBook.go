@@ -50,18 +50,38 @@ func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 	}
 }
 
-// func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) []int {
-// 	if sellOrder.Side != constOrder.Sell {
-// 		return nil
-// 	}
+// get all buy orders that can fill a sell order
+func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
+	if sellOrder.Side != constOrder.Sell {
+		return
+	}
 
-// 	return MatchIndices(book.BuyOrders, sellOrder.Price, sellOrder.Size)
-// }
+	buyOrders = make([]*protoOrder.Order, 0)
+	sellSize := sellOrder.Size
+	for i := len(book.BuyOrders) - 1; i >= 0; i-- {
+		buy := book.BuyOrders[i]
+		if buy.Price >= sellOrder.Price && sellSize > 0 {
+			buySize := buy.Size
+
+			if sellSize < buySize {
+				buy.Fill = sellSize
+				sellSize = 0
+			} else {
+				buy.Fill = buySize
+				sellSize -= buySize
+			}
+
+			buyOrders = append(buyOrders, buy)
+		}
+	}
+
+	return
+}
 
 // get all sell orders that a buy order can fill
 func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) (sellOrders []*protoOrder.Order) {
 	if buyOrder.Side != constOrder.Buy {
-		return nil
+		return
 	}
 
 	sellOrders = make([]*protoOrder.Order, 0)
@@ -82,7 +102,7 @@ func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) (sellOrders [
 		}
 	}
 
-	return sellOrders
+	return
 }
 
 func (book *OrderBook) RemoveBuyOrders(from, to int, upToSize float64) {

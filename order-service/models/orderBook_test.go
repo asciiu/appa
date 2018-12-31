@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -132,76 +133,81 @@ func TestOrderBookMatchSellOrder(t *testing.T) {
 	assert.Equal(t, 0.7, matches[1].Fill, "fill for 2nd match should be 0.7")
 }
 
-// func TestOrderBookMatchBuyOrder(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	book := NewOrderBook("test-btc")
-// 	order0 := &protoOrder.Order{
-// 		OrderID:    uuid.New().String(),
-// 		MarketName: "test-btc",
-// 		Side:       constOrder.Buy,
-// 		Size:       1,
-// 		Price:      0.01,
-// 		Type:       constOrder.LimitOrder,
-// 	}
-// 	order1 := &protoOrder.Order{
-// 		OrderID:    "#1",
-// 		MarketName: "test-btc",
-// 		Price:      0.01,
-// 		Size:       1.2,
-// 		Side:       "buy",
-// 		CreatedOn:  now.String(),
-// 	}
-// 	order2 := &protoOrder.Order{
-// 		OrderID:    "#2",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       0.2,
-// 		Side:       "buy",
-// 		CreatedOn:  now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := &protoOrder.Order{
-// 		OrderID:    "#4",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       2.7,
-// 		Side:       "buy",
-// 		CreatedOn:  now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := &protoOrder.Order{
-// 		OrderID:    "#3",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       0.9,
-// 		Side:       "buy",
-// 		CreatedOn:  now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := &protoOrder.Order{
-// 		OrderID:    "#0",
-// 		MarketName: "test-btc",
-// 		Price:      0.00034,
-// 		Size:       0.9,
-// 		Side:       "buy",
-// 		CreatedOn:  now.Add(time.Second * 100).String(),
-// 	}
+func TestOrderBookMatchBuyOrder(t *testing.T) {
+	now := time.Now().UTC()
+	book := NewOrderBook("test-btc")
+	order0 := &protoOrder.Order{
+		OrderID:    "#0",
+		MarketName: "test-btc",
+		Side:       constOrder.Buy,
+		Size:       1,
+		Price:      0.01,
+		Type:       constOrder.LimitOrder,
+	}
+	order1 := &protoOrder.Order{
+		OrderID:    "#1",
+		MarketName: "test-btc",
+		Price:      0.01,
+		Size:       1.2,
+		Side:       "buy",
+		CreatedOn:  now.String(),
+	}
+	order2 := &protoOrder.Order{
+		OrderID:    "#2",
+		MarketName: "test-btc",
+		Price:      0.007,
+		Size:       0.2,
+		Side:       "buy",
+		CreatedOn:  now.Add(time.Second * 1).String(),
+	}
+	order3 := &protoOrder.Order{
+		OrderID:    "#4",
+		MarketName: "test-btc",
+		Price:      0.007,
+		Size:       2.7,
+		Side:       "buy",
+		CreatedOn:  now.Add(time.Second * 20).String(),
+	}
+	order4 := &protoOrder.Order{
+		OrderID:    "#3",
+		MarketName: "test-btc",
+		Price:      0.007,
+		Size:       0.9,
+		Side:       "buy",
+		CreatedOn:  now.Add(time.Second * 2).String(),
+	}
+	order5 := &protoOrder.Order{
+		OrderID:    "#5",
+		MarketName: "test-btc",
+		Price:      0.00034,
+		Size:       0.9,
+		Side:       "buy",
+		CreatedOn:  now.Add(time.Second * 100).String(),
+	}
 
-// 	orders := []*protoOrder.Order{order0, order1, order2, order3, order4, order5}
-// 	for _, o := range orders {
-// 		book.AddOrder(o)
-// 	}
+	orders := []*protoOrder.Order{order0, order1, order2, order3, order4, order5}
+	for _, o := range orders {
+		book.AddOrder(o)
+	}
+	for _, o := range book.BuyOrders {
+		fmt.Printf("%+v\n", o)
+	}
 
-// 	sellOrder := &protoOrder.Order{
-// 		OrderID:    "#sell",
-// 		MarketName: "test-btc",
-// 		Price:      0.007,
-// 		Size:       1.9,
-// 		Side:       "sell",
-// 	}
-// 	match := book.MatchBuyOrders(sellOrder)
+	sellOrder := &protoOrder.Order{
+		OrderID:    "#sell",
+		MarketName: "test-btc",
+		Price:      0.007,
+		Size:       1.9,
+		Side:       "sell",
+	}
+	fmt.Printf("sell order %+v\n", sellOrder)
+	matches := book.MatchBuyOrders(sellOrder)
 
-// 	for _, o := range book.BuyOrders {
-// 		fmt.Printf("%+v\n", o)
-// 	}
-// 	fmt.Println(match)
+	for _, o := range matches {
+		fmt.Printf("%+v\n", o)
+	}
 
-// 	assert.Equal(t, 3, match, "should be 3 matched buy orders")
-// }
+	assert.Equal(t, 2, len(matches), "should be 2 matched buy orders")
+	assert.Equal(t, 1.2, matches[0].Fill, "fill for 1st match should be 1.2")
+	assert.Equal(t, 0.7, matches[1].Fill, "fill for 2nd match should be 0.7")
+}
