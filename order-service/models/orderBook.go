@@ -105,28 +105,30 @@ func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) (sellOrders [
 	return
 }
 
-func (book *OrderBook) RemoveBuyOrders(from, to int, upToSize float64) {
-	sum := upToSize
-	for i := from; i < to; i++ {
-		order := book.BuyOrders[i]
-		sum -= order.Size
-		if sum < 0 {
-			order.Size -= sum
-			break
-		}
+func (book *OrderBook) FindBuyOrder(buyOrder *protoOrder.Order) (index int) {
+	index = -1
+	if len(book.BuyOrders) > 0 {
+		index = FindOrder(book.BuyOrders, buyOrder)
+	}
+	return
+}
+
+func (book *OrderBook) FindSellOrder(sellOrder *protoOrder.Order) (index int) {
+	index = -1
+	if len(book.SellOrders) > 0 {
+		index = FindOrder(book.SellOrders, sellOrder)
+	}
+	return
+}
+
+func (book *OrderBook) CancelBuyOrder(buyOrder *protoOrder.Order) {
+	if i := book.FindBuyOrder(buyOrder); i >= 0 {
 		book.BuyOrders = append(book.BuyOrders[:i], book.BuyOrders[i+1:]...)
 	}
 }
 
-func (book *OrderBook) RemoveSellOrders(from, to int, upToSize float64) {
-	sum := upToSize
-	for i := from; i < to; i++ {
-		order := book.SellOrders[i]
-		sum -= order.Size
-		if sum < 0 {
-			order.Size -= sum
-			break
-		}
-		book.SellOrders = append(book.SellOrders[:i], book.SellOrders[i+1:]...)
+func (book *OrderBook) CancelSellOrder(sellOrder *protoOrder.Order) {
+	if i := book.FindSellOrder(sellOrder); i >= 0 {
+		book.BuyOrders = append(book.SellOrders[:i], book.SellOrders[i+1:]...)
 	}
 }
