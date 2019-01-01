@@ -51,7 +51,7 @@ func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 }
 
 // get all buy orders that can fill a sell order
-func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
+func (book *OrderBook) FillBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
 	if sellOrder.Side != constOrder.Sell {
 		return
 	}
@@ -65,10 +65,13 @@ func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) (buyOrders []
 
 			if sellSize < buySize {
 				buy.Fill = sellSize
+				buy.Size -= sellSize
 				sellSize = 0
 			} else {
 				buy.Fill = buySize
 				sellSize -= buySize
+				// remove filled orders
+				book.BuyOrders = book.BuyOrders[:i]
 			}
 
 			buyOrders = append(buyOrders, buy)
@@ -79,23 +82,25 @@ func (book *OrderBook) MatchBuyOrders(sellOrder *protoOrder.Order) (buyOrders []
 }
 
 // get all sell orders that a buy order can fill
-func (book *OrderBook) MatchSellOrders(buyOrder *protoOrder.Order) (sellOrders []*protoOrder.Order) {
+func (book *OrderBook) FillSellOrders(buyOrder *protoOrder.Order) (sellOrders []*protoOrder.Order) {
 	if buyOrder.Side != constOrder.Buy {
 		return
 	}
 
 	sellOrders = make([]*protoOrder.Order, 0)
 	buySize := buyOrder.Size
-	for _, sell := range book.SellOrders {
+	for i, sell := range book.SellOrders {
 		if sell.Price <= buyOrder.Price && buySize > 0 {
 			sellSize := sell.Size
 
 			if buySize < sellSize {
 				sell.Fill = buySize
+				sell.Size -= buySize
 				buySize = 0
 			} else {
 				sell.Fill = sellSize
 				buySize -= sellSize
+				book.SellOrders = book.SellOrders[i+1:]
 			}
 
 			sellOrders = append(sellOrders, sell)
