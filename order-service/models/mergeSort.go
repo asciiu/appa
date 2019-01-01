@@ -68,6 +68,11 @@ func binarySearch(a []*protoOrder.Order, price float64) (index int) {
 // returns first index where Order.Price <= price
 func searchLessThan(sorted []*protoOrder.Order, price float64) (index int) {
 	idx := binarySearch(sorted, price)
+	index = -1
+	if idx < 0 {
+		return
+	}
+
 	slice := sorted[idx:]
 	index = idx
 	for i := len(slice) - 1; i >= 0; i-- {
@@ -98,6 +103,10 @@ func searchGreaterThan(sorted []*protoOrder.Order, price float64) (index int) {
 func FindOrder(sorted []*protoOrder.Order, order *protoOrder.Order) (index int) {
 	start := searchLessThan(sorted, order.Price)
 	index = -1
+	if start < 0 {
+		return
+	}
+
 	for i, o := range sorted[start:] {
 		if o.OrderID == order.OrderID {
 			index = start + i
