@@ -14,12 +14,14 @@ func DeleteOrder(db *sql.DB, orderID, userID string) error {
 func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	var o protoOrder.Order
 	var price sql.NullFloat64
+	var fill sql.NullFloat64
 	err := db.QueryRow(`SELECT 
 	    id, 
 	    user_id, 
 	    market_name, 
 	    side, 
 		size, 
+		fill,
 		price,
 		type,
 		status,
@@ -31,6 +33,7 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 		&o.MarketName,
 		&o.Side,
 		&o.Size,
+		&fill,
 		&price,
 		&o.Type,
 		&o.Status,
@@ -43,6 +46,9 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	}
 	if price.Valid {
 		o.Price = price.Float64
+	}
+	if fill.Valid {
+		o.Fill = fill.Float64
 	}
 	return &o, nil
 }
@@ -116,17 +122,19 @@ func InsertOrder(db *sql.DB, order *protoOrder.Order) error {
 		market_name, 
 		side, 
 		size, 
+		fill,
 		price,
 		type,
 		status,
 		created_on, 
-		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 	_, err := db.Exec(sqlStatement,
 		order.OrderID,
 		order.UserID,
 		order.MarketName,
 		order.Side,
 		order.Size,
+		order.Fill,
 		order.Price,
 		order.Type,
 		order.Status,

@@ -50,6 +50,17 @@ func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 	}
 }
 
+func (book *OrderBook) FillOrders(order *protoOrder.Order) (filledOrders []*protoOrder.Order) {
+	filledOrders = make([]*protoOrder.Order, 0)
+	switch {
+	case order.Side == constOrder.Buy:
+		filledOrders = book.FillSellOrders(order)
+	case order.Side == constOrder.Sell:
+		filledOrders = book.FillBuyOrders(order)
+	}
+	return
+}
+
 // get all buy orders that can fill a sell order
 func (book *OrderBook) FillBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
 	if sellOrder.Side != constOrder.Sell {

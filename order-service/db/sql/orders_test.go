@@ -41,20 +41,15 @@ func TestInsertOrder(t *testing.T) {
 		MarketName: "ada-btc",
 		Side:       constants.Sell,
 		Size:       0.00001,
+		Fill:       0.00001,
 		Type:       constants.LimitOrder,
 		Status:     constants.Pending,
 		CreatedOn:  now,
 		UpdatedOn:  now,
 	}
 
-	savedOrder, _ := repoOrder.InsertOrder(db, &newOrder)
-	assert.Equal(t, newOrder.OrderID, savedOrder.OrderID, "order ids not equal")
-	assert.Equal(t, newOrder.UserID, savedOrder.UserID, "user ids not equal")
-	assert.Equal(t, newOrder.MarketName, savedOrder.MarketName, "market names not equal")
-	assert.Equal(t, newOrder.Side, savedOrder.Side, "sides not equal")
-	assert.Equal(t, newOrder.Size, savedOrder.Size, "size not equal")
-	assert.Equal(t, newOrder.Type, savedOrder.Type, "type not equal")
-	assert.Equal(t, newOrder.Status, savedOrder.Status, "status not equal")
+	err = repoOrder.InsertOrder(db, &newOrder)
+	assert.Equal(t, nil, err, "err should be nil")
 
 	repoUser.DeleteUserHard(db, user.ID)
 }
@@ -77,6 +72,7 @@ func TestFindOrder(t *testing.T) {
 		MarketName: "test-btc",
 		Side:       constants.Buy,
 		Size:       1.0,
+		Fill:       0.5,
 		Type:       constants.LimitOrder,
 		Status:     constants.Pending,
 		CreatedOn:  now,
@@ -84,13 +80,14 @@ func TestFindOrder(t *testing.T) {
 	}
 
 	repoOrder.InsertOrder(db, &newOrder)
-	findOrder, _ := repoOrder.FindOrder(db, newOrder.OrderID)
+	findOrder, _ := repoOrder.FindOrder(db, newOrder.OrderID, user.ID)
 
 	assert.Equal(t, newOrder.OrderID, findOrder.OrderID, "order ids not equal")
 	assert.Equal(t, newOrder.UserID, findOrder.UserID, "user ids not equal")
 	assert.Equal(t, newOrder.MarketName, findOrder.MarketName, "market names not equal")
 	assert.Equal(t, newOrder.Side, findOrder.Side, "sides not equal")
 	assert.Equal(t, newOrder.Size, findOrder.Size, "size not equal")
+	assert.Equal(t, newOrder.Fill, findOrder.Fill, "fills not equal")
 	assert.Equal(t, newOrder.Type, findOrder.Type, "type not equal")
 	assert.Equal(t, newOrder.Status, findOrder.Status, "status not equal")
 

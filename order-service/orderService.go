@@ -47,6 +47,23 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		return nil
 	}
 
+	if book, ok := service.OrderBooks[newOrder.MarketName]; ok {
+		filledOrders := book.FillOrders(&newOrder)
+		sumFilled := 0.0
+		for _, f := range filledOrders {
+			sumFilled = f.Fill
+		}
+		if sumFilled < newOrder.Size {
+			newOrder.Fill = sumFilled
+			newOrder.Size -= sumFilled
+			book.AddOrder(&newOrder)
+		}
+	} else {
+		newOrderBook := models.NewOrderBook(newOrder.MarketName)
+		newOrderBook.AddOrder(&newOrder)
+		service.OrderBooks[newOrder.MarketName] = newOrderBook
+	}
+
 	if err := repoOrder.InsertOrder(service.DB, &newOrder); err != nil {
 		msg := fmt.Sprintf("insert order failed %s", err.Error())
 		log.Println(msg)
@@ -54,14 +71,6 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		res.Status = constRes.Error
 		res.Message = msg
 		return nil
-	}
-
-	if book, ok := service.OrderBooks[newOrder.MarketName]; ok {
-		book.AddOrder(&newOrder)
-	} else {
-		newOrderBook := models.NewOrderBook(newOrder.MarketName)
-		newOrderBook.AddOrder(&newOrder)
-		service.OrderBooks[newOrder.MarketName] = newOrderBook
 	}
 
 	res.Status = constRes.Success

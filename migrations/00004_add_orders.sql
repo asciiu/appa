@@ -5,6 +5,7 @@ CREATE TABLE orders(
   market_name VARCHAR NOT NULL,
   side VARCHAR(4) NOT NULL,
   size decimal NOT NULL,
+  fill decimal NOT NULL,
   price decimal,
   type VARCHAR NOT NULL,
   status VARCHAR NOT NULL,
