@@ -137,6 +137,15 @@ func (book *OrderBook) FindSellOrder(sellOrder *protoOrder.Order) (index int) {
 	return
 }
 
+func (book *OrderBook) CancelOrder(order *protoOrder.Order) {
+	switch {
+	case order.Side == constOrder.Buy:
+		book.CancelBuyOrder(order)
+	case order.Side == constOrder.Sell:
+		book.CancelSellOrder(order)
+	}
+}
+
 func (book *OrderBook) CancelBuyOrder(buyOrder *protoOrder.Order) {
 	if i := book.FindBuyOrder(buyOrder); i >= 0 {
 		book.BuyOrders = append(book.BuyOrders[:i], book.BuyOrders[i+1:]...)
