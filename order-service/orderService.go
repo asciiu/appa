@@ -51,7 +51,7 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		filledOrders := book.FillOrders(&newOrder)
 		sumFilled := 0.0
 		for _, f := range filledOrders {
-			sumFilled = f.Fill
+			sumFilled += f.Fill
 		}
 		if sumFilled < newOrder.Size {
 			newOrder.Fill = sumFilled
