@@ -53,11 +53,15 @@ func (service *OrderService) AddOrder(ctx context.Context, req *protoOrder.NewOr
 		for _, f := range filledOrders {
 			sumFilled += f.Fill
 		}
+		newOrder.Fill = sumFilled
+
 		if sumFilled < newOrder.Size {
-			newOrder.Fill = sumFilled
 			newOrder.Size -= sumFilled
-			book.AddOrder(&newOrder)
+		} else if sumFilled == newOrder.Size {
+			newOrder.Size = 0.0
+			newOrder.Status = constants.Filled
 		}
+		book.AddOrder(&newOrder)
 	} else {
 		newOrderBook := models.NewOrderBook(newOrder.MarketName)
 		newOrderBook.AddOrder(&newOrder)
