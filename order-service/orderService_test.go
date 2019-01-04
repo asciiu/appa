@@ -8,6 +8,7 @@ import (
 
 	"github.com/asciiu/appa/common/db"
 	constOrder "github.com/asciiu/appa/order-service/constants"
+	"github.com/asciiu/appa/order-service/models"
 	protoOrder "github.com/asciiu/appa/order-service/proto/order"
 	repoUser "github.com/asciiu/appa/user-service/db/sql"
 	user "github.com/asciiu/appa/user-service/models"
@@ -25,7 +26,10 @@ func setupService() (*OrderService, *user.User) {
 	dbUrl := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
 	db, _ := db.NewDB(dbUrl)
 
-	orderService := OrderService{DB: db}
+	orderService := OrderService{
+		DB:         db,
+		OrderBooks: make(map[string]*models.OrderBook),
+	}
 
 	user := user.NewUser("first", "last", "test@email", "hash")
 	_, err := repoUser.InsertUser(db, user)
@@ -179,7 +183,7 @@ func TestCancelOrderWrongUserID(t *testing.T) {
 
 	res2 := protoOrder.StatusResponse{}
 	service.CancelOrder(context.Background(), &req2, &res2)
-	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
+	assert.Equal(t, "nonentity", res2.Status, "expected nonentity got: "+res2.Message)
 
 	req3 := protoOrder.OrderRequest{
 		OrderID: order.OrderID,

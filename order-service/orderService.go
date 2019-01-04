@@ -94,7 +94,7 @@ func (service *OrderService) CancelOrder(ctx context.Context, req *protoOrder.Or
 		res.Status = constRes.Error
 		res.Message = err.Error()
 	case err == nil:
-		if err := repoOrder.DeleteOrder(service.DB, req.OrderID, req.UserID); err != nil {
+		if err := repoOrder.DeleteOrder(service.DB, req.OrderID, req.UserID); err == nil {
 			book := service.OrderBooks[order.MarketName]
 			book.CancelOrder(order)
 			res.Status = constRes.Success
