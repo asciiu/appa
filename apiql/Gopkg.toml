@@ -26,16 +26,8 @@
 
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/asciiu/appa"
-
-[[constraint]]
-  name = "github.com/graphql-go/graphql"
-  version = "0.7.7"
-
-[[constraint]]
-  name = "github.com/lib/pq"
-  version = "1.0.0"
+  name = "github.com/99designs/gqlgen"
+  version = "0.7.2"
 
 [prune]
   go-tests = true
