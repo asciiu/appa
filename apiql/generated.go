@@ -42,11 +42,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateTodo func(childComplexity int, input NewTodo) int
+		CreateTodo   func(childComplexity int, input NewTodo) int
+		RegisterUser func(childComplexity int, input NewUser) int
 	}
 
 	Query struct {
 		Todos func(childComplexity int) int
+		Users func(childComplexity int) int
 	}
 
 	Todo struct {
@@ -57,19 +59,24 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Id   func(childComplexity int) int
-		Name func(childComplexity int) int
+		Id            func(childComplexity int) int
+		Username      func(childComplexity int) int
+		Email         func(childComplexity int) int
+		EmailVerified func(childComplexity int) int
+		PasswordHash  func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	CreateTodo(ctx context.Context, input NewTodo) (models.Todo, error)
+	RegisterUser(ctx context.Context, input NewUser) (models.User, error)
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]models.Todo, error)
+	Users(ctx context.Context) ([]models.User, error)
 }
 type TodoResolver interface {
-	User(ctx context.Context, obj *models.Todo) (User, error)
+	User(ctx context.Context, obj *models.Todo) (models.User, error)
 }
 
 func field_Mutation_createTodo_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -78,6 +85,21 @@ func field_Mutation_createTodo_args(rawArgs map[string]interface{}) (map[string]
 	if tmp, ok := rawArgs["input"]; ok {
 		var err error
 		arg0, err = UnmarshalNewTodo(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+
+}
+
+func field_Mutation_registerUser_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 NewUser
+	if tmp, ok := rawArgs["input"]; ok {
+		var err error
+		arg0, err = UnmarshalNewUser(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -157,12 +179,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateTodo(childComplexity, args["input"].(NewTodo)), true
 
+	case "Mutation.registerUser":
+		if e.complexity.Mutation.RegisterUser == nil {
+			break
+		}
+
+		args, err := field_Mutation_registerUser_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RegisterUser(childComplexity, args["input"].(NewUser)), true
+
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
 			break
 		}
 
 		return e.complexity.Query.Todos(childComplexity), true
+
+	case "Query.users":
+		if e.complexity.Query.Users == nil {
+			break
+		}
+
+		return e.complexity.Query.Users(childComplexity), true
 
 	case "Todo.id":
 		if e.complexity.Todo.Id == nil {
@@ -199,12 +240,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Id(childComplexity), true
 
-	case "User.name":
-		if e.complexity.User.Name == nil {
+	case "User.username":
+		if e.complexity.User.Username == nil {
 			break
 		}
 
-		return e.complexity.User.Name(childComplexity), true
+		return e.complexity.User.Username(childComplexity), true
+
+	case "User.email":
+		if e.complexity.User.Email == nil {
+			break
+		}
+
+		return e.complexity.User.Email(childComplexity), true
+
+	case "User.emailVerified":
+		if e.complexity.User.EmailVerified == nil {
+			break
+		}
+
+		return e.complexity.User.EmailVerified(childComplexity), true
+
+	case "User.passwordHash":
+		if e.complexity.User.PasswordHash == nil {
+			break
+		}
+
+		return e.complexity.User.PasswordHash(childComplexity), true
 
 	}
 	return 0, false
@@ -275,6 +337,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "registerUser":
+			out.Values[i] = ec._Mutation_registerUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -320,6 +387,40 @@ func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field grap
 	return ec._Todo(ctx, field.Selections, &res)
 }
 
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_registerUser_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RegisterUser(rctx, args["input"].(NewUser))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._User(ctx, field.Selections, &res)
+}
+
 var queryImplementors = []string{"Query"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -343,6 +444,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
 				out.Values[i] = ec._Query_todos(ctx, field)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
+		case "users":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_users(ctx, field)
 				if out.Values[i] == graphql.Null {
 					invalid = true
 				}
@@ -410,6 +520,66 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 			arr1[idx1] = func() graphql.Marshaler {
 
 				return ec._Todo(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Users(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._User(ctx, field.Selections, &res[idx1])
 			}()
 		}
 		if isLen1 {
@@ -639,7 +809,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(User)
+	res := resTmp.(models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
@@ -649,7 +819,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 var userImplementors = []string{"User"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *models.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, userImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
@@ -665,8 +835,23 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "name":
-			out.Values[i] = ec._User_name(ctx, field, obj)
+		case "username":
+			out.Values[i] = ec._User_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "email":
+			out.Values[i] = ec._User_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "emailVerified":
+			out.Values[i] = ec._User_emailVerified(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "passwordHash":
+			out.Values[i] = ec._User_passwordHash(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -682,7 +867,7 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *User) graphql.Marshaler {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *models.User) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -709,7 +894,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *User) graphql.Marshaler {
+func (ec *executionContext) _User_username(ctx context.Context, field graphql.CollectedField, obj *models.User) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -721,7 +906,88 @@ func (ec *executionContext) _User_name(ctx context.Context, field graphql.Collec
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return obj.Username, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *models.User) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "User",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _User_emailVerified(ctx context.Context, field graphql.CollectedField, obj *models.User) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "User",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EmailVerified, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _User_passwordHash(ctx context.Context, field graphql.CollectedField, obj *models.User) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "User",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PasswordHash, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2204,6 +2470,36 @@ func UnmarshalNewTodo(v interface{}) (NewTodo, error) {
 	return it, nil
 }
 
+func UnmarshalNewUser(v interface{}) (NewUser, error) {
+	var it NewUser
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "username":
+			var err error
+			it.Username, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) FieldMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver) (ret interface{}) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2243,11 +2539,15 @@ var parsedSchema = gqlparser.MustLoadSchema(
 
 type User {
   id: ID!
-  name: String!
+  username: String!
+  email: String!
+  emailVerified: Boolean!
+  passwordHash: String!
 }
 
 type Query {
   todos: [Todo!]!
+  users: [User!]!
 }
 
 input NewTodo {
@@ -2255,7 +2555,14 @@ input NewTodo {
   userId: String!
 }
 
+input NewUser {
+  username: String!
+  password: String!
+  email: String!
+}
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  registerUser(input: NewUser!): User!
 }`},
 )

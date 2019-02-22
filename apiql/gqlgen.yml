@@ -16,3 +16,5 @@ resolver:
 models:
   Todo:
     model: github.com/asciiu/appa/apiql/models.Todo
+  User:
+    model: github.com/asciiu/appa/apiql/models.User

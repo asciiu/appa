@@ -9,6 +9,7 @@ import (
 )
 
 type Resolver struct {
+	users []models.User
 	todos []models.Todo
 }
 
@@ -34,14 +35,23 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input NewTodo) (model
 	return todo, nil
 }
 
+func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (models.User, error) {
+	user := *models.NewUser(input.Username, input.Email, input.Password)
+	r.users = append(r.users, user)
+	return user, nil
+}
+
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]models.Todo, error) {
 	return r.todos, nil
 }
+func (r *queryResolver) Users(ctx context.Context) ([]models.User, error) {
+	return r.users, nil
+}
 
 type todoResolver struct{ *Resolver }
 
-func (r *todoResolver) User(ctx context.Context, obj *models.Todo) (User, error) {
-	return User{ID: obj.UserID, Name: "user " + obj.UserID}, nil
+func (r *todoResolver) User(ctx context.Context, obj *models.Todo) (models.User, error) {
+	return models.User{ID: obj.UserID}, nil
 }

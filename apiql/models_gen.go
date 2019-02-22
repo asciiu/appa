@@ -7,7 +7,8 @@ type NewTodo struct {
 	UserID string `json:"userId"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type NewUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
