@@ -2,10 +2,12 @@ package apiql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 
 	"github.com/asciiu/appa/apiql/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Resolver struct {
@@ -39,6 +41,17 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (mod
 	user := *models.NewUser(input.Username, input.Email, input.Password)
 	r.users = append(r.users, user)
 	return user, nil
+}
+
+func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (models.User, error) {
+	for _, u := range r.users {
+		if input.Email == u.Email {
+			if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(input.Password)) == nil {
+				return u, nil
+			}
+		}
+	}
+	return models.User{}, errors.New("incorrect password/email")
 }
 
 type queryResolver struct{ *Resolver }

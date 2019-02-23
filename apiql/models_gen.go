@@ -2,6 +2,11 @@
 
 package apiql
 
+type NewLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`

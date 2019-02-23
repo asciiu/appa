@@ -44,6 +44,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateTodo   func(childComplexity int, input NewTodo) int
 		RegisterUser func(childComplexity int, input NewUser) int
+		Login        func(childComplexity int, input NewLogin) int
 	}
 
 	Query struct {
@@ -70,6 +71,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateTodo(ctx context.Context, input NewTodo) (models.Todo, error)
 	RegisterUser(ctx context.Context, input NewUser) (models.User, error)
+	Login(ctx context.Context, input NewLogin) (models.User, error)
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]models.Todo, error)
@@ -100,6 +102,21 @@ func field_Mutation_registerUser_args(rawArgs map[string]interface{}) (map[strin
 	if tmp, ok := rawArgs["input"]; ok {
 		var err error
 		arg0, err = UnmarshalNewUser(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+
+}
+
+func field_Mutation_login_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 NewLogin
+	if tmp, ok := rawArgs["input"]; ok {
+		var err error
+		arg0, err = UnmarshalNewLogin(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -190,6 +207,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RegisterUser(childComplexity, args["input"].(NewUser)), true
+
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		args, err := field_Mutation_login_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(NewLogin)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -342,6 +371,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "login":
+			out.Values[i] = ec._Mutation_login(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -407,6 +441,40 @@ func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field gr
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RegisterUser(rctx, args["input"].(NewUser))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._User(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_login_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, args["input"].(NewLogin))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2446,6 +2514,30 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 	return ec.___Type(ctx, field.Selections, res)
 }
 
+func UnmarshalNewLogin(v interface{}) (NewLogin, error) {
+	var it NewLogin
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "email":
+			var err error
+			it.Email, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func UnmarshalNewTodo(v interface{}) (NewTodo, error) {
 	var it NewTodo
 	var asMap = v.(map[string]interface{})
@@ -2561,8 +2653,14 @@ input NewUser {
   email: String!
 }
 
+input NewLogin {
+  email: String!
+  password: String!
+}
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
   registerUser(input: NewUser!): User!
+  login(input: NewLogin!): User!
 }`},
 )
