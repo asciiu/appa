@@ -3,8 +3,7 @@
 -- USERS
 CREATE TABLE users(
     id uuid PRIMARY KEY,
-    first_name VARCHAR,
-    last_name VARCHAR,
+    username VARCHAR UNIQUE NOT NULL, 
     email VARCHAR UNIQUE NOT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT false,
     password_hash VARCHAR NOT NULL,
