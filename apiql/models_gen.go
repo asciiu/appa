@@ -5,15 +5,16 @@ package apiql
 type NewLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	Remember bool   `json:"remember"`
 }
 
 type NewUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+}
+
+type Token struct {
+	Jwt     *string `json:"jwt"`
+	Refresh *string `json:"refresh"`
 }

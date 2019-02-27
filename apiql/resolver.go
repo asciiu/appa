@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"math/rand"
 
 	repoUser "github.com/asciiu/appa/apiql/db/sql"
 	"github.com/asciiu/appa/apiql/models"
@@ -13,9 +12,7 @@ import (
 )
 
 type Resolver struct {
-	users []models.User
-	todos []models.Todo
-	DB    *sql.DB
+	DB *sql.DB
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -24,52 +21,38 @@ func (r *Resolver) Mutation() MutationResolver {
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
 }
-func (r *Resolver) Todo() TodoResolver {
-	return &todoResolver{r}
-}
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input NewTodo) (models.Todo, error) {
-	todo := models.Todo{
-		Text:   input.Text,
-		ID:     fmt.Sprintf("T%d", rand.Int()),
-		UserID: input.UserID,
-	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
-}
-
-func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (models.User, error) {
+func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (*models.User, error) {
 	user := models.NewUser(input.Username, input.Email, input.Password)
 	if err := repoUser.InsertUser(r.DB, user); err != nil {
-		return models.User{}, err
+		return nil, err
 	}
-	return *user, nil
+	return user, nil
 }
 
-func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (models.User, error) {
-	for _, u := range r.users {
-		if input.Email == u.Email {
-			if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(input.Password)) == nil {
-				return u, nil
-			}
-		}
+func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (*Token, error) {
+	user, err := repoUser.FindUserByEmail(r.DB, input.Email)
+	if err != nil {
+		return nil, err
 	}
-	return models.User{}, errors.New("incorrect password/email")
+
+	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)) == nil {
+		jwt := "jwt tokie"
+		refresh := fmt.Sprintf("refresh tokie %b", input.Remember)
+
+		return &Token{
+			Jwt:     &jwt,
+			Refresh: &refresh,
+		}, nil
+	}
+
+	return nil, errors.New("incorrect password/email")
 }
 
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]models.Todo, error) {
-	return r.todos, nil
-}
 func (r *queryResolver) Users(ctx context.Context) ([]models.User, error) {
-	return r.users, nil
-}
-
-type todoResolver struct{ *Resolver }
-
-func (r *todoResolver) User(ctx context.Context, obj *models.Todo) (models.User, error) {
-	return models.User{ID: obj.UserID}, nil
+	panic("not implemented")
 }

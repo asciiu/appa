@@ -1,10 +1,3 @@
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
 type User {
   id: ID!
   username: String!
@@ -13,16 +6,16 @@ type User {
   passwordHash: String!
 }
 
+type Token {
+  jwt: String 
+  refresh: String
+}
+
 type Query {
-  todos: [Todo!]!
   users: [User!]!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
+# Inputs 
 input NewUser {
   username: String!
   password: String!
@@ -32,10 +25,11 @@ input NewUser {
 input NewLogin {
   email: String!
   password: String!
+  remember: Boolean!
 }
 
+# Mutations
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
-  registerUser(input: NewUser!): User!
-  login(input: NewLogin!): User!
+  registerUser(input: NewUser!): User
+  login(input: NewLogin!): Token 
 }
