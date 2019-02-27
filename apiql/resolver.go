@@ -2,10 +2,12 @@ package apiql
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"math/rand"
 
+	repoUser "github.com/asciiu/appa/apiql/db/sql"
 	"github.com/asciiu/appa/apiql/models"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,6 +15,7 @@ import (
 type Resolver struct {
 	users []models.User
 	todos []models.Todo
+	DB    *sql.DB
 }
 
 func (r *Resolver) Mutation() MutationResolver {
@@ -38,9 +41,11 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input NewTodo) (model
 }
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (models.User, error) {
-	user := *models.NewUser(input.Username, input.Email, input.Password)
-	r.users = append(r.users, user)
-	return user, nil
+	user := models.NewUser(input.Username, input.Email, input.Password)
+	if err := repoUser.InsertUser(r.DB, user); err != nil {
+		return models.User{}, err
+	}
+	return *user, nil
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (models.User, error) {
