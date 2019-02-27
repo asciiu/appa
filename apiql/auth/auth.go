@@ -19,6 +19,12 @@ type contextKey struct {
 	name string
 }
 
+// refresh is set to 15 days
+const RefreshDuration = 360 * time.Hour
+
+//const jwtDuration = 20 * time.Minute
+const JwtDuration = 12 * time.Hour
+
 // A stand-in for our database backed user object
 type User struct {
 	Name    string
@@ -33,7 +39,7 @@ func getUserByID(db *sql.DB, userId string) User {
 	return User{}
 }
 
-func createJwtToken(userID string, duration time.Duration) (string, error) {
+func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 	claims := jwt.StandardClaims{
 		Id:        userID,
 		ExpiresAt: time.Now().Add(duration).Unix(),

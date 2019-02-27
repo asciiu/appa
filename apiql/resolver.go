@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
+	"strings"
+	"time"
 
+	"github.com/asciiu/appa/apiql/auth"
 	repoUser "github.com/asciiu/appa/apiql/db/sql"
 	"github.com/asciiu/appa/apiql/models"
 	"golang.org/x/crypto/bcrypt"
@@ -34,21 +36,34 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (*mo
 
 func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (*Token, error) {
 	user, err := repoUser.FindUserByEmail(r.DB, input.Email)
-	if err != nil {
+	switch {
+	case err != nil && strings.Contains(err.Error(), "no rows"):
+		return nil, errors.New("incorrect password/email")
+	case err != nil:
 		return nil, err
+	default:
+		if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)) == nil {
+			jwt, err := auth.CreateJwtToken(user.ID, auth.JwtDuration)
+			if err != nil {
+				return nil, err
+			}
+
+			// issue a refresh token if remember is true
+			if input.Remember {
+				refreshToken := auth.NewRefreshToken(user.ID)
+				expiresOn := time.Now().Add(auth.RefreshDuration)
+				selectAuth := refreshToken.Renew(expiresOn)
+				return &Token{
+					Jwt:     &jwt,
+					Refresh: &selectAuth,
+				}, nil
+			}
+
+			return &Token{Jwt: &jwt}, nil
+		}
+
+		return nil, errors.New("incorrect password/email")
 	}
-
-	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)) == nil {
-		jwt := "jwt tokie"
-		refresh := fmt.Sprintf("refresh tokie %b", input.Remember)
-
-		return &Token{
-			Jwt:     &jwt,
-			Refresh: &refresh,
-		}, nil
-	}
-
-	return nil, errors.New("incorrect password/email")
 }
 
 type queryResolver struct{ *Resolver }
