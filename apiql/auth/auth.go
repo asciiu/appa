@@ -1,17 +1,16 @@
 package auth
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	repoUser "github.com/asciiu/appa/apiql/db/sql"
+	"github.com/asciiu/appa/apiql/models"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -27,7 +26,7 @@ type contextKey struct {
 const RefreshDuration = 360 * time.Hour
 
 //const jwtDuration = 20 * time.Minute
-const JwtDuration = 12 * time.Hour
+const JwtDuration = 1 * time.Hour
 
 // A stand-in for our database backed user object
 type User struct {
@@ -84,65 +83,38 @@ type Req struct {
 func Secure(db *sql.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				log.Printf("Error reading body: %v", err)
-				http.Error(w, "can't read body", http.StatusBadRequest)
-				return
+			ctx := context.WithValue(r.Context(), userCtxKey, nil)
+			auth := r.Header.Get("Authorization")
+			str := strings.Replace(auth, "Bearer ", "", 1)
+
+			if str != "" {
+				tok, err := jwt.Parse(str, func(token *jwt.Token) (interface{}, error) {
+					// Don't forget to validate the alg is what you expect:
+					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+					}
+
+					// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+					return []byte(os.Getenv("appa_JWT")), nil
+				})
+
+				if tok != nil && err == nil {
+					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
+					user, _ := repoUser.FindUserByID(db, userID)
+					if user != nil {
+						ctx = context.WithValue(r.Context(), userCtxKey, user)
+					}
+				}
 			}
 
-			// forward orginal body to next chain
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-
-			var req Req
-			json.Unmarshal(body, &req)
-			switch {
-			case req.OperationName == "" || req.OperationName == "IntrospectionQuery":
-				next.ServeHTTP(w, r)
-				return
-			case req.OperationName == "Login" || req.OperationName == "SignUp":
-				next.ServeHTTP(w, r)
-				return
-			default:
-				auth := r.Header.Get("Authorization")
-				refresh := r.Header.Get("Refresh")
-				fmt.Println(auth)
-				fmt.Println(refresh)
-
-				response := `{"message": "auth required"}`
-
-				http.Error(w, response, http.StatusForbidden)
-				return
-			}
-
-			//jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			//	// Don't forget to validate the alg is what you expect:
-			//	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			//		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			//	}
-
-			//	// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			//	return []byte(os.Getenv("appa_JWT")), nil
-			//})
-
-			// get the user from the database
-			//user := getUserByID(db, userId)
-
-			//// put it in context
-			//ctx := context.WithValue(r.Context(), userCtxKey, user)
-
-			//// and call the next with our new context
-			//r = r.WithContext(ctx)
-			//next.ServeHTTP(w, r)
-			//http.Error(w, "niope", http.StatusForbidden)
-			//next.ServeHTTP(w, r)
-			//return
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
 		})
 	}
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *User {
-	raw, _ := ctx.Value(userCtxKey).(*User)
+func ForContext(ctx context.Context) *models.User {
+	raw, _ := ctx.Value(userCtxKey).(*models.User)
 	return raw
 }

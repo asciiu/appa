@@ -3,7 +3,7 @@ package apiql
 import (
 	"context"
 	"database/sql"
-	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -38,7 +38,7 @@ func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (*Token, e
 	user, err := repoUser.FindUserByEmail(r.DB, input.Email)
 	switch {
 	case err != nil && strings.Contains(err.Error(), "no rows"):
-		return nil, errors.New("incorrect password/email")
+		return nil, fmt.Errorf("incorrect password/email")
 	case err != nil:
 		return nil, err
 	default:
@@ -62,12 +62,16 @@ func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (*Token, e
 			return &Token{Jwt: &jwt}, nil
 		}
 
-		return nil, errors.New("incorrect password/email")
+		return nil, fmt.Errorf("incorrect password/email")
 	}
 }
 
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Users(ctx context.Context) ([]models.User, error) {
-	panic("not implemented")
+	if user := auth.ForContext(ctx); user == nil {
+		return []models.User{}, fmt.Errorf("Access denied")
+	}
+
+	return []models.User{}, nil
 }
