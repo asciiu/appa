@@ -15,6 +15,11 @@ type Query {
   users: [User!]!
 }
 
+type AuthPayload {
+  token: String
+  user: User
+}
+
 # Inputs 
 input NewUser {
   username: String!
@@ -30,6 +35,6 @@ input NewLogin {
 
 # Mutations
 type Mutation {
-  registerUser(input: NewUser!): User
+  signUp(input: NewUser!): User
   login(input: NewLogin!): Token 
 }

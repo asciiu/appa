@@ -26,7 +26,7 @@ func (r *Resolver) Query() QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) RegisterUser(ctx context.Context, input NewUser) (*models.User, error) {
+func (r *mutationResolver) SignUp(ctx context.Context, input NewUser) (*models.User, error) {
 	user := models.NewUser(input.Username, input.Email, input.Password)
 	if err := repoUser.InsertUser(r.DB, user); err != nil {
 		return nil, err

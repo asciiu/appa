@@ -1,9 +1,13 @@
 package auth
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -72,18 +76,44 @@ func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 // 	c.Response().Header().Set("set-refresh", selectAuth)
 // }
 
+type Req struct {
+	OperationName string `json:"operationName"`
+}
+
 // Middleware decodes the share session cookie and packs the session into context
-func Middleware(db *sql.DB) func(http.Handler) http.Handler {
+func Secure(db *sql.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			auth := r.Header.Get("Authorization")
-			fmt.Println("auth: ", auth)
-			if auth == "" {
-				http.Error(w, "Invalid cookie", http.StatusForbidden)
-				//next.ServeHTTP(w, r)
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				log.Printf("Error reading body: %v", err)
+				http.Error(w, "can't read body", http.StatusBadRequest)
 				return
 			}
-			fmt.Println(auth)
+
+			// forward orginal body to next chain
+			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+			var req Req
+			json.Unmarshal(body, &req)
+			switch {
+			case req.OperationName == "" || req.OperationName == "IntrospectionQuery":
+				next.ServeHTTP(w, r)
+				return
+			case req.OperationName == "Login" || req.OperationName == "SignUp":
+				next.ServeHTTP(w, r)
+				return
+			default:
+				auth := r.Header.Get("Authorization")
+				refresh := r.Header.Get("Refresh")
+				fmt.Println(auth)
+				fmt.Println(refresh)
+
+				response := `{"message": "auth required"}`
+
+				http.Error(w, response, http.StatusForbidden)
+				return
+			}
 
 			//jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			//	// Don't forget to validate the alg is what you expect:
@@ -104,9 +134,9 @@ func Middleware(db *sql.DB) func(http.Handler) http.Handler {
 			//// and call the next with our new context
 			//r = r.WithContext(ctx)
 			//next.ServeHTTP(w, r)
-			http.Error(w, "niope", http.StatusForbidden)
-			next.ServeHTTP(w, r)
-			return
+			//http.Error(w, "niope", http.StatusForbidden)
+			//next.ServeHTTP(w, r)
+			//return
 		})
 	}
 }

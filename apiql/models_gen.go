@@ -2,6 +2,15 @@
 
 package apiql
 
+import (
+	"github.com/asciiu/appa/apiql/models"
+)
+
+type AuthPayload struct {
+	Token *string      `json:"token"`
+	User  *models.User `json:"user"`
+}
+
 type NewLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

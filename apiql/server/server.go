@@ -8,6 +8,7 @@ import (
 
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/apiql"
+	"github.com/asciiu/appa/apiql/auth"
 	"github.com/asciiu/appa/common/db"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -20,7 +21,8 @@ func main() {
 
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
-	//router.Use(auth.Middleware(database))
+	router.Use(auth.Secure(database))
+
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
