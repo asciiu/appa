@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -50,9 +51,15 @@ func (r *mutationResolver) Login(ctx context.Context, input NewLogin) (*Token, e
 
 			// issue a refresh token if remember is true
 			if input.Remember {
-				refreshToken := auth.NewRefreshToken(user.ID)
+				refreshToken := models.NewRefreshToken(user.ID)
 				expiresOn := time.Now().Add(auth.RefreshDuration)
 				selectAuth := refreshToken.Renew(expiresOn)
+
+				// this needs to be checked
+				if _, err := repoUser.InsertRefreshToken(r.DB, refreshToken); err != nil {
+					log.Println("failed to insert refresh token: ", err)
+				}
+
 				return &Token{
 					Jwt:     &jwt,
 					Refresh: &selectAuth,

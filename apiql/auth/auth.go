@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -60,20 +61,21 @@ func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 }
 
 // Renews the refresh token and the access token in the reponse headers.
-// func renewTokens(c echo.Context, refreshToken *apiModels.RefreshToken) {
-// 	// renew access
-// 	accessToken, err := createJwtToken(refreshToken.UserID, jwtDuration)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+func renewTokens(w http.ResponseWriter, refreshToken *models.RefreshToken) {
 
-// 	// renew the refresh token
-// 	expiresOn := time.Now().Add(refreshDuration)
-// 	selectAuth := refreshToken.Renew(expiresOn)
+	// renew access
+	accessToken, err := CreateJwtToken(refreshToken.UserID, JwtDuration)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	c.Response().Header().Set("set-authorization", accessToken)
-// 	c.Response().Header().Set("set-refresh", selectAuth)
-// }
+	// renew the refresh token
+	expiresOn := time.Now().Add(RefreshDuration)
+	selectAuth := refreshToken.Renew(expiresOn)
+
+	w.Header().Set("set-authorization", accessToken)
+	w.Header().Set("set-refresh", selectAuth)
+}
 
 type Req struct {
 	OperationName string `json:"operationName"`
@@ -98,11 +100,36 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 					return []byte(os.Getenv("appa_JWT")), nil
 				})
 
+				// if valid token and no error
 				if tok != nil && err == nil {
 					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
 					user, _ := repoUser.FindUserByID(db, userID)
 					if user != nil {
 						ctx = context.WithValue(r.Context(), userCtxKey, user)
+					}
+				}
+
+				// if expired token examine refresh
+				if err != nil && r.Method != http.MethodOptions {
+					selectAuth := r.Header.Get("Refresh")
+					if selectAuth != "" {
+						sa := strings.Split(selectAuth, ":")
+						if len(sa) == 2 {
+							selector := sa[0]
+							authenticator := sa[1]
+							refreshToken, err := repoUser.FindRefreshToken(db, selector)
+							if err == nil {
+								if refreshToken.Valid(authenticator) {
+									renewTokens(w, refreshToken)
+									if _, err := repoUser.UpdateRefreshToken(db, refreshToken); err != nil {
+										log.Println(err)
+									}
+								}
+								if refreshToken.ExpiresOn.Before(time.Now()) {
+									repoUser.DeleteRefreshToken(db, refreshToken)
+								}
+							}
+						}
 					}
 				}
 			}
