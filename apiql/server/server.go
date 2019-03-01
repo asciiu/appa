@@ -38,6 +38,7 @@ func main() {
 
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
+	resolver := apiql.Resolver{DB: database}
 	router.Use(auth.Secure(database))
 
 	// Add CORS middleware around every request
@@ -49,7 +50,7 @@ func main() {
 	}).Handler)
 
 	router.Handle("/", handler.Playground("Habibi", "/query"))
-	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &apiql.Resolver{DB: database}})))
+	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver})))
 
 	go cleanDatabase(database)
 
