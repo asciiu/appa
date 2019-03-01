@@ -1,20 +1,37 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/apiql"
 	"github.com/asciiu/appa/apiql/auth"
+	repoUser "github.com/asciiu/appa/apiql/db/sql"
 	"github.com/asciiu/appa/common/db"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
 )
 
 const defaultPort = "8080"
+
+// clean up stage refresh tokens in DB every 30 minutes
+const cleanUpInterval = 30 * time.Minute
+
+// routine to clean up refresh tokens in DB
+func cleanDatabase(db *sql.DB) {
+	for {
+		time.Sleep(cleanUpInterval)
+		error := repoUser.DeleteStaleTokens(db, time.Now())
+		if error != nil {
+			log.Fatal(error)
+		}
+	}
+}
 
 func main() {
 	router := chi.NewRouter()
@@ -33,6 +50,8 @@ func main() {
 
 	router.Handle("/", handler.Playground("Habibi", "/query"))
 	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &apiql.Resolver{DB: database}})))
+
+	go cleanDatabase(database)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", defaultPort)
 	log.Fatal(http.ListenAndServe(":"+defaultPort, router))
