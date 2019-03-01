@@ -15,6 +15,12 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// refresh is set to 15 days
+const RefreshDuration = 360 * time.Hour
+
+//const jwtDuration = 20 * time.Minute
+const JwtDuration = 1 * time.Hour
+
 // A private key for context that only this package can access. This is important
 // to prevent collisions between different context uses
 var userCtxKey = &contextKey{"user"}
@@ -23,24 +29,10 @@ type contextKey struct {
 	name string
 }
 
-// refresh is set to 15 days
-const RefreshDuration = 360 * time.Hour
-
-//const jwtDuration = 20 * time.Minute
-const JwtDuration = 1 * time.Hour
-
-// A stand-in for our database backed user object
-type User struct {
-	Name    string
-	IsAdmin bool
-}
-
-func validateAndGetUserID(c *http.Cookie) (string, error) {
-	return "", nil
-}
-
-func getUserByID(db *sql.DB, userId string) User {
-	return User{}
+// ForContext finds the user from the context. REQUIRES Middleware to have run.
+func ForContext(ctx context.Context) *models.User {
+	raw, _ := ctx.Value(userCtxKey).(*models.User)
+	return raw
 }
 
 func CreateJwtToken(userID string, duration time.Duration) (string, error) {
@@ -58,27 +50,6 @@ func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 	}
 
 	return token, nil
-}
-
-// Renews the refresh token and the access token in the reponse headers.
-func renewTokens(w http.ResponseWriter, refreshToken *models.RefreshToken) {
-
-	// renew access
-	accessToken, err := CreateJwtToken(refreshToken.UserID, JwtDuration)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// renew the refresh token
-	expiresOn := time.Now().Add(RefreshDuration)
-	selectAuth := refreshToken.Renew(expiresOn)
-
-	w.Header().Set("set-authorization", accessToken)
-	w.Header().Set("set-refresh", selectAuth)
-}
-
-type Req struct {
-	OperationName string `json:"operationName"`
 }
 
 // Middleware decodes the share session cookie and packs the session into context
@@ -120,9 +91,16 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 							refreshToken, err := repoUser.FindRefreshToken(db, selector)
 							if err == nil {
 								if refreshToken.Valid(authenticator) {
-									renewTokens(w, refreshToken)
-									if _, err := repoUser.UpdateRefreshToken(db, refreshToken); err != nil {
-										log.Println(err)
+									accessToken, err := CreateJwtToken(refreshToken.UserID, JwtDuration)
+									if err == nil {
+										expiresOn := time.Now().Add(RefreshDuration)
+										selectAuth := refreshToken.Renew(expiresOn)
+
+										w.Header().Set("set-authorization", accessToken)
+										w.Header().Set("set-refresh", selectAuth)
+										if _, err := repoUser.UpdateRefreshToken(db, refreshToken); err != nil {
+											log.Println(err)
+										}
 									}
 								}
 								if refreshToken.ExpiresOn.Before(time.Now()) {
@@ -138,10 +116,4 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *models.User {
-	raw, _ := ctx.Value(userCtxKey).(*models.User)
-	return raw
 }
