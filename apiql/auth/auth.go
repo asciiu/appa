@@ -15,11 +15,11 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-// refresh is set to 15 days
-const RefreshDuration = 360 * time.Hour
+// refresh window
+const RefreshDuration = 9 * time.Hour
 
-//const jwtDuration = 20 * time.Minute
-const JwtDuration = 1 * time.Hour
+// token valid window
+const JwtDuration = 2 * time.Hour
 
 // A private key for context that only this package can access. This is important
 // to prevent collisions between different context uses
