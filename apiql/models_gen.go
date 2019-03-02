@@ -7,20 +7,8 @@ import (
 )
 
 type AuthPayload struct {
-	Token *string      `json:"token"`
-	User  *models.User `json:"user"`
-}
-
-type NewLogin struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Remember bool   `json:"remember"`
-}
-
-type NewUser struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+	Token Token       `json:"token"`
+	User  models.User `json:"user"`
 }
 
 type Token struct {

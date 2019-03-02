@@ -37,6 +37,11 @@ func GenHash(pwd []byte) string {
 	return string(hash)
 }
 
+type Order struct {
+	ID  string
+	Txt string
+}
+
 type User struct {
 	ID            string
 	Username      string

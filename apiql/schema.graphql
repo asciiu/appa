@@ -6,35 +6,30 @@ type User {
   passwordHash: String!
 }
 
+type Order {
+  id: ID!
+  txt: String!
+}
+
 type Token {
   jwt: String 
   refresh: String
 }
 
+type AuthPayload {
+  token: Token! 
+  user: User!
+}
+
+# Queries
 type Query {
   users: [User!]!
-}
-
-type AuthPayload {
-  token: String
-  user: User
-}
-
-# Inputs 
-input NewUser {
-  username: String!
-  password: String!
-  email: String!
-}
-
-input NewLogin {
-  email: String!
-  password: String!
-  remember: Boolean!
+  info: User!
+  findOrder(id: ID!): Order
 }
 
 # Mutations
 type Mutation {
-  signUp(input: NewUser!): User
-  login(input: NewLogin!): Token 
+  signup(email: String!, username: String!, password: String!): User
+  login(email: String!, password: String!, remember: Boolean!): Token 
 }

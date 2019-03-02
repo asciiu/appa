@@ -46,12 +46,19 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		SignUp func(childComplexity int, input NewUser) int
-		Login  func(childComplexity int, input NewLogin) int
+		Signup func(childComplexity int, email string, username string, password string) int
+		Login  func(childComplexity int, email string, password string, remember bool) int
+	}
+
+	Order struct {
+		Id  func(childComplexity int) int
+		Txt func(childComplexity int) int
 	}
 
 	Query struct {
-		Users func(childComplexity int) int
+		Users     func(childComplexity int) int
+		Info      func(childComplexity int) int
+		FindOrder func(childComplexity int, id string) int
 	}
 
 	Token struct {
@@ -69,39 +76,92 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	SignUp(ctx context.Context, input NewUser) (*models.User, error)
-	Login(ctx context.Context, input NewLogin) (*Token, error)
+	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
+	Login(ctx context.Context, email string, password string, remember bool) (*Token, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]models.User, error)
+	Info(ctx context.Context) (models.User, error)
+	FindOrder(ctx context.Context, id string) (*models.Order, error)
 }
 
-func field_Mutation_signUp_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func field_Mutation_signup_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 NewUser
-	if tmp, ok := rawArgs["input"]; ok {
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
 		var err error
-		arg0, err = UnmarshalNewUser(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["email"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["username"]; ok {
+		var err error
+		arg1, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["username"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["password"]; ok {
+		var err error
+		arg2, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg2
 	return args, nil
 
 }
 
 func field_Mutation_login_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 NewLogin
-	if tmp, ok := rawArgs["input"]; ok {
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
 		var err error
-		arg0, err = UnmarshalNewLogin(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["email"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["password"]; ok {
+		var err error
+		arg1, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg1
+	var arg2 bool
+	if tmp, ok := rawArgs["remember"]; ok {
+		var err error
+		arg2, err = graphql.UnmarshalBoolean(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["remember"] = arg2
+	return args, nil
+
+}
+
+func field_Query_findOrder_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalID(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 
 }
@@ -178,17 +238,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AuthPayload.User(childComplexity), true
 
-	case "Mutation.signUp":
-		if e.complexity.Mutation.SignUp == nil {
+	case "Mutation.signup":
+		if e.complexity.Mutation.Signup == nil {
 			break
 		}
 
-		args, err := field_Mutation_signUp_args(rawArgs)
+		args, err := field_Mutation_signup_args(rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SignUp(childComplexity, args["input"].(NewUser)), true
+		return e.complexity.Mutation.Signup(childComplexity, args["email"].(string), args["username"].(string), args["password"].(string)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -200,7 +260,21 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["input"].(NewLogin)), true
+		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string), args["remember"].(bool)), true
+
+	case "Order.id":
+		if e.complexity.Order.Id == nil {
+			break
+		}
+
+		return e.complexity.Order.Id(childComplexity), true
+
+	case "Order.txt":
+		if e.complexity.Order.Txt == nil {
+			break
+		}
+
+		return e.complexity.Order.Txt(childComplexity), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -208,6 +282,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity), true
+
+	case "Query.info":
+		if e.complexity.Query.Info == nil {
+			break
+		}
+
+		return e.complexity.Query.Info(childComplexity), true
+
+	case "Query.findOrder":
+		if e.complexity.Query.FindOrder == nil {
+			break
+		}
+
+		args, err := field_Query_findOrder_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FindOrder(childComplexity, args["id"].(string)), true
 
 	case "Token.jwt":
 		if e.complexity.Token.Jwt == nil {
@@ -320,8 +413,14 @@ func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = graphql.MarshalString("AuthPayload")
 		case "token":
 			out.Values[i] = ec._AuthPayload_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "user":
 			out.Values[i] = ec._AuthPayload_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -349,16 +448,16 @@ func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphq
 		return obj.Token, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(Token)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return ec._Token(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -377,17 +476,16 @@ func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql
 		return obj.User, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.User)
+	res := resTmp.(models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	if res == nil {
-		return graphql.Null
-	}
-
-	return ec._User(ctx, field.Selections, res)
+	return ec._User(ctx, field.Selections, &res)
 }
 
 var mutationImplementors = []string{"Mutation"}
@@ -408,8 +506,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "signUp":
-			out.Values[i] = ec._Mutation_signUp(ctx, field)
+		case "signup":
+			out.Values[i] = ec._Mutation_signup(ctx, field)
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
 		default:
@@ -424,11 +522,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Mutation_signUp(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+func (ec *executionContext) _Mutation_signup(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := field_Mutation_signUp_args(rawArgs)
+	args, err := field_Mutation_signup_args(rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -442,7 +540,7 @@ func (ec *executionContext) _Mutation_signUp(ctx context.Context, field graphql.
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SignUp(rctx, args["input"].(NewUser))
+		return ec.resolvers.Mutation().Signup(rctx, args["email"].(string), args["username"].(string), args["password"].(string))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -477,7 +575,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["input"].(NewLogin))
+		return ec.resolvers.Mutation().Login(rctx, args["email"].(string), args["password"].(string), args["remember"].(bool))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -491,6 +589,95 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	}
 
 	return ec._Token(ctx, field.Selections, res)
+}
+
+var orderImplementors = []string{"Order"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, obj *models.Order) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, orderImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Order")
+		case "id":
+			out.Values[i] = ec._Order_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "txt":
+			out.Values[i] = ec._Order_txt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models.Order) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Order",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Order_txt(ctx context.Context, field graphql.CollectedField, obj *models.Order) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Order",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Txt, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
 }
 
 var queryImplementors = []string{"Query"}
@@ -519,6 +706,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if out.Values[i] == graphql.Null {
 					invalid = true
 				}
+				wg.Done()
+			}(i, field)
+		case "info":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_info(ctx, field)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
+		case "findOrder":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_findOrder(ctx, field)
 				wg.Done()
 			}(i, field)
 		case "__type":
@@ -594,6 +796,69 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	wg.Wait()
 	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_info(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Info(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._User(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_findOrder(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Query_findOrder_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FindOrder(rctx, args["id"].(string))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Order)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Order(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
@@ -2375,66 +2640,6 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 	return ec.___Type(ctx, field.Selections, res)
 }
 
-func UnmarshalNewLogin(v interface{}) (NewLogin, error) {
-	var it NewLogin
-	var asMap = v.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "email":
-			var err error
-			it.Email, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-			it.Password, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "remember":
-			var err error
-			it.Remember, err = graphql.UnmarshalBoolean(v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func UnmarshalNewUser(v interface{}) (NewUser, error) {
-	var it NewUser
-	var asMap = v.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "username":
-			var err error
-			it.Username, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-			it.Password, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "email":
-			var err error
-			it.Email, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) FieldMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver) (ret interface{}) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2473,36 +2678,31 @@ var parsedSchema = gqlparser.MustLoadSchema(
   passwordHash: String!
 }
 
+type Order {
+  id: ID!
+  txt: String!
+}
+
 type Token {
   jwt: String 
   refresh: String
 }
 
+type AuthPayload {
+  token: Token! 
+  user: User!
+}
+
+# Queries
 type Query {
   users: [User!]!
-}
-
-type AuthPayload {
-  token: String
-  user: User
-}
-
-# Inputs 
-input NewUser {
-  username: String!
-  password: String!
-  email: String!
-}
-
-input NewLogin {
-  email: String!
-  password: String!
-  remember: Boolean!
+  info: User!
+  findOrder(id: ID!): Order
 }
 
 # Mutations
 type Mutation {
-  signUp(input: NewUser!): User
-  login(input: NewLogin!): Token 
+  signup(email: String!, username: String!, password: String!): User
+  login(email: String!, password: String!, remember: Boolean!): Token 
 }`},
 )
