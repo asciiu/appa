@@ -50,6 +50,7 @@ func main() {
 		AllowedOrigins:   []string{"http://localhost:8080", "http://localhost:3000"},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
+		ExposedHeaders:   []string{"set-authorization", "set-refresh"},
 		Debug:            true,
 	}).Handler)
 
