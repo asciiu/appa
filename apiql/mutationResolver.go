@@ -10,6 +10,7 @@ import (
 	"github.com/asciiu/appa/apiql/auth"
 	repoUser "github.com/asciiu/appa/apiql/db/sql"
 	"github.com/asciiu/appa/apiql/models"
+	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +28,7 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 	user, err := repoUser.FindUserByEmail(r.DB, email)
 	switch {
 	case err != nil && strings.Contains(err.Error(), "no rows"):
-		return nil, fmt.Errorf("incorrect password/email")
+		return nil, gqlerror.Errorf("incorrect password/email")
 	case err != nil:
 		return nil, err
 	default:
