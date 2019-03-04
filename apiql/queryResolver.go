@@ -27,6 +27,15 @@ func (r *queryResolver) Info(ctx context.Context) (models.User, error) {
 	return *user, nil
 }
 
+func (r *queryResolver) GetUser(ctx context.Context) (*models.User, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	return user, nil
+}
+
 func (r *queryResolver) FindOrder(ctx context.Context, id string) (*models.Order, error) {
 	user := auth.ForContext(ctx)
 	if user == nil {

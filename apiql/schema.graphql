@@ -25,6 +25,7 @@ type AuthPayload {
 type Query {
   users: [User!]!
   info: User!
+  getUser: User
   findOrder(id: ID!): Order
 }
 

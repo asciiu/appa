@@ -58,6 +58,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Users     func(childComplexity int) int
 		Info      func(childComplexity int) int
+		GetUser   func(childComplexity int) int
 		FindOrder func(childComplexity int, id string) int
 	}
 
@@ -82,6 +83,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Users(ctx context.Context) ([]models.User, error)
 	Info(ctx context.Context) (models.User, error)
+	GetUser(ctx context.Context) (*models.User, error)
 	FindOrder(ctx context.Context, id string) (*models.Order, error)
 }
 
@@ -289,6 +291,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Info(childComplexity), true
+
+	case "Query.getUser":
+		if e.complexity.Query.GetUser == nil {
+			break
+		}
+
+		return e.complexity.Query.GetUser(childComplexity), true
 
 	case "Query.findOrder":
 		if e.complexity.Query.FindOrder == nil {
@@ -717,6 +726,12 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				wg.Done()
 			}(i, field)
+		case "getUser":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_getUser(ctx, field)
+				wg.Done()
+			}(i, field)
 		case "findOrder":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -824,6 +839,35 @@ func (ec *executionContext) _Query_info(ctx context.Context, field graphql.Colle
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._User(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUser(rctx)
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._User(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
@@ -2697,6 +2741,7 @@ type AuthPayload {
 type Query {
   users: [User!]!
   info: User!
+  getUser: User
   findOrder(id: ID!): Order
 }
 
