@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/apiql"
 	"github.com/asciiu/appa/apiql/auth"
@@ -15,6 +17,7 @@ import (
 	"github.com/asciiu/appa/common/db"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
+	"github.com/vektah/gqlparser/gqlerror"
 )
 
 const defaultPort = "8080"
@@ -51,7 +54,13 @@ func main() {
 	}).Handler)
 
 	router.Handle("/", handler.Playground("Habibi", "/query"))
-	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver})))
+	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver}),
+		handler.ErrorPresenter(
+			func(ctx context.Context, e error) *gqlerror.Error {
+				return graphql.DefaultErrorPresenter(ctx, e)
+			},
+		),
+	))
 
 	go cleanDatabase(database)
 
