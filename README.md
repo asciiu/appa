@@ -34,7 +34,7 @@ psql> alter database appa_dev owner to postgres;
 3. Apply the migrations from the "migrations" directory.
 ```
 $ goose postgres "user=postgres dbname=appa_test sslmode=disable" up
-$ goose postgres "user=postgres dbname=appa_dev sslmode=disable" up
+$ goose postgres "user=postgres dbname=gammex_dev sslmode=disable" up
 ```
 
 Clean DB how-to:

@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/models"
 )
 
 func DeleteUserHard(db *sql.DB, userID string) error {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/models"
 )
 
 func FindRefreshToken(db *sql.DB, selector string) (*models.RefreshToken, error) {
