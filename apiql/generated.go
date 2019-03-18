@@ -64,8 +64,9 @@ type ComplexityRoot struct {
 	}
 
 	Story struct {
-		Id    func(childComplexity int) int
-		Title func(childComplexity int) int
+		Id      func(childComplexity int) int
+		Title   func(childComplexity int) int
+		Content func(childComplexity int) int
 	}
 
 	Token struct {
@@ -338,6 +339,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Story.Title(childComplexity), true
+
+	case "Story.content":
+		if e.complexity.Story.Content == nil {
+			break
+		}
+
+		return e.complexity.Story.Content(childComplexity), true
 
 	case "Token.jwt":
 		if e.complexity.Token.Jwt == nil {
@@ -1090,6 +1098,11 @@ func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "content":
+			out.Values[i] = ec._Story_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -1142,6 +1155,33 @@ func (ec *executionContext) _Story_title(ctx context.Context, field graphql.Coll
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Title, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Story_content(ctx context.Context, field graphql.CollectedField, obj *models.Story) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Story",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2916,6 +2956,7 @@ type Order {
 type Story {
   id: ID!
   title: String!
+  content: String!
 }
 
 type Token {
