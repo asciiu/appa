@@ -56,10 +56,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Users     func(childComplexity int) int
-		Info      func(childComplexity int) int
-		GetUser   func(childComplexity int) int
-		FindOrder func(childComplexity int, id string) int
+		Users       func(childComplexity int) int
+		Info        func(childComplexity int) int
+		GetUser     func(childComplexity int) int
+		FindOrder   func(childComplexity int, id string) int
+		ListStories func(childComplexity int) int
+	}
+
+	Story struct {
+		Id    func(childComplexity int) int
+		Title func(childComplexity int) int
 	}
 
 	Token struct {
@@ -85,6 +91,7 @@ type QueryResolver interface {
 	Info(ctx context.Context) (models.User, error)
 	GetUser(ctx context.Context) (*models.User, error)
 	FindOrder(ctx context.Context, id string) (*models.Order, error)
+	ListStories(ctx context.Context) ([]models.Story, error)
 }
 
 func field_Mutation_signup_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -310,6 +317,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FindOrder(childComplexity, args["id"].(string)), true
+
+	case "Query.listStories":
+		if e.complexity.Query.ListStories == nil {
+			break
+		}
+
+		return e.complexity.Query.ListStories(childComplexity), true
+
+	case "Story.id":
+		if e.complexity.Story.Id == nil {
+			break
+		}
+
+		return e.complexity.Story.Id(childComplexity), true
+
+	case "Story.title":
+		if e.complexity.Story.Title == nil {
+			break
+		}
+
+		return e.complexity.Story.Title(childComplexity), true
 
 	case "Token.jwt":
 		if e.complexity.Token.Jwt == nil {
@@ -738,6 +766,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				out.Values[i] = ec._Query_findOrder(ctx, field)
 				wg.Done()
 			}(i, field)
+		case "listStories":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_listStories(ctx, field)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -906,6 +943,66 @@ func (ec *executionContext) _Query_findOrder(ctx context.Context, field graphql.
 }
 
 // nolint: vetshadow
+func (ec *executionContext) _Query_listStories(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListStories(rctx)
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]models.Story)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._Story(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -967,6 +1064,95 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	}
 
 	return ec.___Schema(ctx, field.Selections, res)
+}
+
+var storyImplementors = []string{"Story"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, obj *models.Story) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, storyImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Story")
+		case "id":
+			out.Values[i] = ec._Story_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "title":
+			out.Values[i] = ec._Story_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Story_id(ctx context.Context, field graphql.CollectedField, obj *models.Story) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Story",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Story_title(ctx context.Context, field graphql.CollectedField, obj *models.Story) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Story",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
 }
 
 var tokenImplementors = []string{"Token"}
@@ -2727,6 +2913,11 @@ type Order {
   txt: String!
 }
 
+type Story {
+  id: ID!
+  title: String!
+}
+
 type Token {
   jwt: String 
   refresh: String
@@ -2743,6 +2934,7 @@ type Query {
   info: User!
   getUser: User
   findOrder(id: ID!): Order
+  listStories: [Story!]!
 }
 
 # Mutations

@@ -11,6 +11,11 @@ type Order {
   txt: String!
 }
 
+type Story {
+  id: ID!
+  title: String!
+}
+
 type Token {
   jwt: String 
   refresh: String
@@ -27,6 +32,7 @@ type Query {
   info: User!
   getUser: User
   findOrder(id: ID!): Order
+  listStories: [Story!]!
 }
 
 # Mutations

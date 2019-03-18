@@ -18,3 +18,5 @@ models:
     model: github.com/asciiu/appa/apiql/models.Order
   User:
     model: github.com/asciiu/appa/apiql/models.User
+  Story:
+    model: github.com/asciiu/appa/apiql/models.Story

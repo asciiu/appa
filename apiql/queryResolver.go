@@ -44,3 +44,13 @@ func (r *queryResolver) FindOrder(ctx context.Context, id string) (*models.Order
 
 	return &models.Order{ID: id, Txt: "yeah!"}, nil
 }
+
+func (r *queryResolver) ListStories(ctx context.Context) ([]models.Story, error) {
+	//user := auth.ForContext(ctx)
+	//if user == nil {
+	//	return []models.Story{}, fmt.Errorf("unauthorized")
+	//}
+
+	stories := []models.Story{}
+	return stories, nil
+}
