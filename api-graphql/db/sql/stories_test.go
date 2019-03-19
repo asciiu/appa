@@ -61,3 +61,31 @@ func TestListStories(t *testing.T) {
 
 	sql.DeleteUserHard(db, user.ID)
 }
+
+func TestFindStoryByID(t *testing.T) {
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
+	checkErr(err)
+	defer db.Close()
+
+	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = sql.InsertUser(db, user)
+	assert.Nil(t, err, "insert new user failed")
+
+	story1 := models.NewStory(user.ID, "one", "this is only a test")
+	err = sql.InsertStory(db, story1)
+	assert.Nil(t, err, "insert story failed")
+
+	story2 := models.NewStory(user.ID, "two", "asd;klfjf")
+	err = sql.InsertStory(db, story2)
+	assert.Nil(t, err, "insert story failed")
+
+	foundStory, err := sql.FindStoryByID(db, story2.ID)
+	assert.Nil(t, err, "find story failed")
+
+	assert.Equal(t, story2.ID, foundStory.ID, "id must match")
+	assert.Equal(t, story2.Title, foundStory.Title, "titles do not match")
+	assert.Equal(t, story2.Title, foundStory.Title, "titles do not match")
+	assert.Equal(t, story2.Content, foundStory.Content, "content do not match")
+
+	sql.DeleteUserHard(db, user.ID)
+}
