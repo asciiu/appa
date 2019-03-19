@@ -31,7 +31,7 @@ func FindStoryByID(db *sql.DB, storyID string) (*models.Story, error) {
 	return &s, nil
 }
 
-func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Story, error) {
+func StoryTitles(db *sql.DB, status string, page, pageSize uint32) (*models.PagedTitles, error) {
 	var total uint32
 	queryCount := `SELECT count(*) FROM stories WHERE status = $1`
 	err := db.QueryRow(queryCount, status).Scan(&total)
@@ -44,7 +44,7 @@ func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Sto
 	   author_id, 
 	   title
 	   FROM stories where status = $1
-	   OFFSET $2 LIMIT $3`, status, page, pageSize)
+	   ORDER BY created_on OFFSET $2 LIMIT $3`, status, page, pageSize)
 
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Sto
 
 	defer rows.Close()
 
-	stories := make([]models.Story, 0)
+	stories := make([]*models.Story, 0)
 	for rows.Next() {
 		s := new(models.Story)
 		err := rows.Scan(
@@ -63,16 +63,15 @@ func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Sto
 		if err != nil {
 			return nil, err
 		}
-		stories = append(stories, *s)
+		stories = append(stories, s)
 	}
 
-	//return &protoOrder.OrdersPage{
-	//	Page:     page,
-	//	PageSize: pageSize,
-	//	Total:    total,
-	//	Orders:   orders,
-	//}, nil
-	return stories, nil
+	return &models.PagedTitles{
+		Page:     page,
+		PageSize: pageSize,
+		Total:    total,
+		Stories:  stories,
+	}, nil
 }
 
 func InsertStory(db *sql.DB, story *models.Story) error {

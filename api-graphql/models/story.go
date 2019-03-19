@@ -14,6 +14,13 @@ type Story struct {
 	CreatedOn string `json:"createdOn"`
 }
 
+type PagedTitles struct {
+	Page     uint32   `json:"page"`
+	PageSize uint32   `json:"pageSize"`
+	Total    uint32   `json:"total"`
+	Stories  []*Story `json:"stories"`
+}
+
 func NewStory(userID, title, content string) *Story {
 	newID := uuid.New()
 

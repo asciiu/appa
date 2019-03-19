@@ -1,7 +1,6 @@
 package sql_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/asciiu/appa/api-graphql/constants"
@@ -53,11 +52,15 @@ func TestListStories(t *testing.T) {
 	err = sql.InsertStory(db, story4)
 	assert.Nil(t, err, "insert story failed")
 
-	stories, err := sql.StoryTitles(db, constants.Unpublished, 0, 10)
+	page := uint32(0)
+	pageSize := uint32(10)
+	pagedStories, err := sql.StoryTitles(db, constants.Unpublished, page, pageSize)
 
 	assert.Nil(t, err, "insert story failed")
 
-	fmt.Println(stories)
+	assert.Equal(t, page, pagedStories.Page, "page should be 0")
+	assert.Equal(t, pageSize, pagedStories.PageSize, "page size should be 10")
+	assert.Equal(t, 4, len(pagedStories.Stories), "should be 4 stories")
 
 	sql.DeleteUserHard(db, user.ID)
 }
