@@ -32,58 +32,39 @@ func FindStoryByID(db *sql.DB, storyID string) (*models.Story, error) {
 }
 
 func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Story, error) {
-	//var total uint32
-	//queryCount := `SELECT count(*) FROM orders WHERE user_id = $1 AND status like '%' || $2 || '%'`
-	//err := db.QueryRow(queryCount, userID, status).Scan(&total)
-	//if err != nil {
-	//	return nil, err
-	//}
+	var total uint32
+	queryCount := `SELECT count(*) FROM stories WHERE status = $1`
+	err := db.QueryRow(queryCount, status).Scan(&total)
+	if err != nil {
+		return nil, err
+	}
 
-	// rows, err := db.Query(`SELECT
-	//     id,
-	//     user_id,
-	//     market_name,
-	//     side,
-	// 	size,
-	// 	price,
-	// 	type,
-	// 	status,
-	// 	created_on,
-	// 	updated_on
-	// 	FROM orders WHERE user_id = $1 AND status like '%' || $2 || '%'
-	// 	OFFSET $3 LIMIT $4`, userID, status, page, pageSize)
+	rows, err := db.Query(`SELECT 
+	   id, 
+	   author_id, 
+	   title
+	   FROM stories where status = $1
+	   OFFSET $2 LIMIT $3`, status, page, pageSize)
 
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
 
-	// defer rows.Close()
+	defer rows.Close()
 
-	//orders := make([]*protoOrder.Order, 0)
-	//for rows.Next() {
-	//	var price sql.NullFloat64
-	//	o := new(protoOrder.Order)
-	//	err := rows.Scan(
-	//		&o.OrderID,
-	//		&o.UserID,
-	//		&o.MarketName,
-	//		&o.Side,
-	//		&o.Size,
-	//		&price,
-	//		&o.Type,
-	//		&o.Status,
-	//		&o.CreatedOn,
-	//		&o.UpdatedOn,
-	//	)
+	stories := make([]models.Story, 0)
+	for rows.Next() {
+		s := new(models.Story)
+		err := rows.Scan(
+			&s.ID,
+			&s.AuthorID,
+			&s.Title)
 
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	if price.Valid {
-	//		o.Price = price.Float64
-	//	}
-	//	orders = append(orders, o)
-	//}
+		if err != nil {
+			return nil, err
+		}
+		stories = append(stories, *s)
+	}
 
 	//return &protoOrder.OrdersPage{
 	//	Page:     page,
@@ -91,7 +72,7 @@ func StoryTitles(db *sql.DB, status string, page, pageSize uint32) ([]models.Sto
 	//	Total:    total,
 	//	Orders:   orders,
 	//}, nil
-	return []models.Story{}, nil
+	return stories, nil
 }
 
 func InsertStory(db *sql.DB, story *models.Story) error {
