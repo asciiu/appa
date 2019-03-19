@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/asciiu/appa/apiql/db/sql"
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/db/sql"
+	"github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/common/db"
 	"github.com/stretchr/testify/assert"
 )
