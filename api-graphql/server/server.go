@@ -11,9 +11,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
-	"github.com/asciiu/appa/apiql"
-	"github.com/asciiu/appa/apiql/auth"
-	repoUser "github.com/asciiu/appa/apiql/db/sql"
+	apiql "github.com/asciiu/appa/api-graphql"
+	"github.com/asciiu/appa/api-graphql/auth"
+	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/common/db"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"

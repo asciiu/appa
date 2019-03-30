@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/asciiu/appa/apiql/auth"
-	repoUser "github.com/asciiu/appa/apiql/db/sql"
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/auth"
+	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
+	"github.com/asciiu/appa/api-graphql/models"
 	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )

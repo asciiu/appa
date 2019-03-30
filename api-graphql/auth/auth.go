@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	repoUser "github.com/asciiu/appa/apiql/db/sql"
-	"github.com/asciiu/appa/apiql/models"
+	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
+	"github.com/asciiu/appa/api-graphql/models"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/asciiu/appa/apiql/auth"
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/auth"
+	"github.com/asciiu/appa/api-graphql/models"
 )
 
 type queryResolver struct{ *Resolver }

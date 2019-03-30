@@ -3,7 +3,7 @@
 package apiql
 
 import (
-	"github.com/asciiu/appa/apiql/models"
+	"github.com/asciiu/appa/api-graphql/models"
 )
 
 type AuthPayload struct {
