@@ -31,6 +31,9 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 		return nil, gqlerror.Errorf("incorrect password/email")
 	case err != nil:
 		return nil, err
+	case !user.EmailVerified:
+		// only verified accounts should be able to login
+		return nil, gqlerror.Errorf("email account not verified")
 	default:
 		if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) == nil {
 			jwt, err := auth.CreateJwtToken(user.ID, auth.JwtDuration)
