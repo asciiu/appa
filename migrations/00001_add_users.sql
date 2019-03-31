@@ -3,9 +3,9 @@
 -- USERS
 CREATE TABLE users(
     id uuid PRIMARY KEY,
-    username VARCHAR UNIQUE NOT NULL, 
     email VARCHAR UNIQUE NOT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT false,
+    username VARCHAR UNIQUE NOT NULL, 
     password_hash VARCHAR NOT NULL,
     created_on TIMESTAMP DEFAULT now(),
     updated_on TIMESTAMP DEFAULT current_timestamp,

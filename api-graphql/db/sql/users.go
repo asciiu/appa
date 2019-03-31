@@ -59,15 +59,15 @@ func FindUserByID(db *sql.DB, userID string) (*models.User, error) {
 func InsertUser(db *sql.DB, user *models.User) error {
 	sqlStatement := `insert into users (
 		id, 
+		email,
 		username, 
-		email, 
 		email_verified, 
 		password_hash) values ($1, $2, $3, $4, $5)`
 
 	_, err := db.Exec(sqlStatement,
 		user.ID,
-		user.Username,
 		user.Email,
+		user.Username,
 		user.EmailVerified,
 		user.PasswordHash)
 
