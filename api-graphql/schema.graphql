@@ -6,6 +6,11 @@ type User {
   passwordHash: String!
 }
 
+# defined in
+type Balance {
+  id: ID!
+}
+
 type Order {
   id: ID!
   txt: String!
@@ -30,6 +35,7 @@ type AuthPayload {
 # Queries
 type Query {
   users: [User!]!
+  balances: [Balance]
   info: User!
   getUser: User
   findOrder(id: ID!): Order

@@ -5,10 +5,21 @@ import (
 	"fmt"
 
 	"github.com/asciiu/appa/api-graphql/auth"
+	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
 )
 
 type queryResolver struct{ *Resolver }
+
+func (r *queryResolver) Balances(ctx context.Context) ([]*models.Balance, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return []*models.Balance{}, fmt.Errorf("unauthorized")
+	}
+
+	balances, err := repo.FindUserBalances(r.DB, user.ID)
+	return balances, err
+}
 
 func (r *queryResolver) Users(ctx context.Context) ([]models.User, error) {
 	if user := auth.ForContext(ctx); user == nil {
