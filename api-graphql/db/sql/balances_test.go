@@ -64,3 +64,26 @@ func TestFailInsertBalance(t *testing.T) {
 
 	sql.DeleteUserHard(db, user.ID)
 }
+
+func TestFindBalances(t *testing.T) {
+	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
+	checkErr(err)
+	defer db.Close()
+
+	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = sql.InsertUser(db, user)
+	assert.Nil(t, err, "insert new user failed")
+
+	btc := models.NewBalance(user.ID, "BTC", "Bitcoin", "", 1, 0, 12)
+	ltc := models.NewBalance(user.ID, "LTC", "Litcoin", "", 2, 0, 12)
+	err = sql.InsertBalance(db, btc)
+	assert.Nil(t, err, "insert balance failed")
+
+	err = sql.InsertBalance(db, ltc)
+	assert.Nil(t, err, "insert balance failed")
+
+	balances, err := sql.FindUserBalances(db, user.ID)
+	assert.Nil(t, err, "find balances failed")
+	assert.Equal(t, 2, len(balances), "must be 2 balances")
+	sql.DeleteUserHard(db, user.ID)
+}
