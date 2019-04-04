@@ -41,7 +41,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Balance struct {
-		Id func(childComplexity int) int
+		Id        func(childComplexity int) int
+		UserId    func(childComplexity int) int
+		Symbol    func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Amount    func(childComplexity int) int
+		Locked    func(childComplexity int) int
+		Precision func(childComplexity int) int
+		Address   func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -248,6 +255,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Balance.Id(childComplexity), true
+
+	case "Balance.userID":
+		if e.complexity.Balance.UserId == nil {
+			break
+		}
+
+		return e.complexity.Balance.UserId(childComplexity), true
+
+	case "Balance.symbol":
+		if e.complexity.Balance.Symbol == nil {
+			break
+		}
+
+		return e.complexity.Balance.Symbol(childComplexity), true
+
+	case "Balance.name":
+		if e.complexity.Balance.Name == nil {
+			break
+		}
+
+		return e.complexity.Balance.Name(childComplexity), true
+
+	case "Balance.amount":
+		if e.complexity.Balance.Amount == nil {
+			break
+		}
+
+		return e.complexity.Balance.Amount(childComplexity), true
+
+	case "Balance.locked":
+		if e.complexity.Balance.Locked == nil {
+			break
+		}
+
+		return e.complexity.Balance.Locked(childComplexity), true
+
+	case "Balance.precision":
+		if e.complexity.Balance.Precision == nil {
+			break
+		}
+
+		return e.complexity.Balance.Precision(childComplexity), true
+
+	case "Balance.address":
+		if e.complexity.Balance.Address == nil {
+			break
+		}
+
+		return e.complexity.Balance.Address(childComplexity), true
 
 	case "Mutation.signup":
 		if e.complexity.Mutation.Signup == nil {
@@ -490,6 +546,23 @@ func (ec *executionContext) _Balance(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "userID":
+			out.Values[i] = ec._Balance_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "symbol":
+			out.Values[i] = ec._Balance_symbol(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Balance_name(ctx, field, obj)
+		case "amount":
+			out.Values[i] = ec._Balance_amount(ctx, field, obj)
+		case "locked":
+			out.Values[i] = ec._Balance_locked(ctx, field, obj)
+		case "precision":
+			out.Values[i] = ec._Balance_precision(ctx, field, obj)
+		case "address":
+			out.Values[i] = ec._Balance_address(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -526,6 +599,177 @@ func (ec *executionContext) _Balance_id(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_userID(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_symbol(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Symbol, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_name(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_amount(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(models.Int64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_locked(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Locked, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(models.Int64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_precision(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Precision, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Balance_address(ctx context.Context, field graphql.CollectedField, obj *models.Balance) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Balance",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
 }
 
 var mutationImplementors = []string{"Mutation"}
@@ -3132,9 +3376,18 @@ var parsedSchema = gqlparser.MustLoadSchema(
   passwordHash: String!
 }
 
+scalar Int64 
+
 # defined in
 type Balance {
   id: ID!
+  userID: ID! 
+	symbol: String
+	name: String
+	amount: Int64
+	locked: Int64
+	precision: Int
+	address: String
 }
 
 type Order {

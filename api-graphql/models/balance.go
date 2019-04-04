@@ -1,6 +1,10 @@
 package models
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/google/uuid"
 )
 
@@ -12,8 +16,8 @@ func NewBalance(userID, symbol, name, address string, amount, locked int64, prec
 		UserID:    userID,
 		Symbol:    symbol,
 		Name:      name,
-		Amount:    amount,
-		Locked:    locked,
+		Amount:    Int64(amount),
+		Locked:    Int64(locked),
 		Precision: precision,
 		Address:   address,
 	}
@@ -25,8 +29,8 @@ type Balance struct {
 	UserID    string
 	Symbol    string
 	Name      string
-	Amount    int64
-	Locked    int64
+	Amount    Int64
+	Locked    Int64
 	Precision int
 	Address   string
 }
@@ -34,4 +38,27 @@ type Balance struct {
 type Currency struct {
 	Symbol string
 	Name   string
+}
+
+type Int64 int64
+
+func (i *Int64) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("must be strings")
+	}
+
+	n, err := strconv.ParseInt(str, 10, 64)
+	if err == nil {
+		fmt.Printf("%d of type %T", n, n)
+	}
+
+	*i = Int64(n)
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+func (i Int64) MarshalGQL(w io.Writer) {
+	s := strconv.FormatInt(int64(i), 10)
+	w.Write([]byte(s))
 }

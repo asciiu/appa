@@ -6,9 +6,18 @@ type User {
   passwordHash: String!
 }
 
+scalar Int64 
+
 # defined in
 type Balance {
   id: ID!
+  userID: ID! 
+	symbol: String
+	name: String
+	amount: Int64
+	locked: Int64
+	precision: Int
+	address: String
 }
 
 type Order {

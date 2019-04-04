@@ -3,6 +3,7 @@ package apiql
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/asciiu/appa/api-graphql/auth"
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
@@ -55,6 +56,20 @@ func (r *queryResolver) UserSummary(ctx context.Context) (*models.UserSummary, e
 	summary := models.UserSummary{
 		User: user,
 	}
+
+	balances, err := repo.FindUserBalances(r.DB, user.ID)
+	if err != nil {
+		log.Println("encountered error when pulling balances: ", err)
+	}
+
+	for _, balance := range balances {
+		if balance.Symbol == "BTC" {
+			summary.Balance = balance
+		}
+	}
+
+	// TODO when adding more currencies you'll need to determine
+	// total balance in BTC
 
 	return &summary, nil
 }

@@ -14,6 +14,8 @@ resolver:
   type: Resolver
 
 models:
+  Int64:
+    model: github.com/asciiu/appa/api-graphql/models.Int64
   Balance:
     model: github.com/asciiu/appa/api-graphql/models.Balance
   Order:
