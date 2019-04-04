@@ -2,15 +2,6 @@
 
 package apiql
 
-import (
-	"github.com/asciiu/appa/api-graphql/models"
-)
-
-type AuthPayload struct {
-	Token Token       `json:"token"`
-	User  models.User `json:"user"`
-}
-
 type Token struct {
 	Jwt     *string `json:"jwt"`
 	Refresh *string `json:"refresh"`

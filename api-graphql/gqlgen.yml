@@ -20,5 +20,7 @@ models:
     model: github.com/asciiu/appa/api-graphql/models.Order
   User:
     model: github.com/asciiu/appa/api-graphql/models.User
+  UserSummary:
+    model: github.com/asciiu/appa/api-graphql/models.UserSummary
   Story:
     model: github.com/asciiu/appa/api-graphql/models.Story

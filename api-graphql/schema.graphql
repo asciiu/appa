@@ -27,9 +27,9 @@ type Token {
   refresh: String
 }
 
-type AuthPayload {
-  token: Token! 
-  user: User!
+type UserSummary {
+  balance: Balance
+  user: User
 }
 
 # Queries
@@ -38,6 +38,7 @@ type Query {
   balances: [Balance]
   info: User!
   getUser: User
+  userSummary: UserSummary
   findOrder(id: ID!): Order
   listStories: [Story!]!
 }

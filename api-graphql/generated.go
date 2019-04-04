@@ -40,11 +40,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AuthPayload struct {
-		Token func(childComplexity int) int
-		User  func(childComplexity int) int
-	}
-
 	Balance struct {
 		Id func(childComplexity int) int
 	}
@@ -64,6 +59,7 @@ type ComplexityRoot struct {
 		Balances    func(childComplexity int) int
 		Info        func(childComplexity int) int
 		GetUser     func(childComplexity int) int
+		UserSummary func(childComplexity int) int
 		FindOrder   func(childComplexity int, id string) int
 		ListStories func(childComplexity int) int
 	}
@@ -86,6 +82,11 @@ type ComplexityRoot struct {
 		EmailVerified func(childComplexity int) int
 		PasswordHash  func(childComplexity int) int
 	}
+
+	UserSummary struct {
+		Balance func(childComplexity int) int
+		User    func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -97,6 +98,7 @@ type QueryResolver interface {
 	Balances(ctx context.Context) ([]*models.Balance, error)
 	Info(ctx context.Context) (models.User, error)
 	GetUser(ctx context.Context) (*models.User, error)
+	UserSummary(ctx context.Context) (*models.UserSummary, error)
 	FindOrder(ctx context.Context, id string) (*models.Order, error)
 	ListStories(ctx context.Context) ([]models.Story, error)
 }
@@ -240,20 +242,6 @@ func (e *executableSchema) Schema() *ast.Schema {
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
 	switch typeName + "." + field {
 
-	case "AuthPayload.token":
-		if e.complexity.AuthPayload.Token == nil {
-			break
-		}
-
-		return e.complexity.AuthPayload.Token(childComplexity), true
-
-	case "AuthPayload.user":
-		if e.complexity.AuthPayload.User == nil {
-			break
-		}
-
-		return e.complexity.AuthPayload.User(childComplexity), true
-
 	case "Balance.id":
 		if e.complexity.Balance.Id == nil {
 			break
@@ -326,6 +314,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetUser(childComplexity), true
+
+	case "Query.userSummary":
+		if e.complexity.Query.UserSummary == nil {
+			break
+		}
+
+		return e.complexity.Query.UserSummary(childComplexity), true
 
 	case "Query.findOrder":
 		if e.complexity.Query.FindOrder == nil {
@@ -416,6 +411,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.PasswordHash(childComplexity), true
 
+	case "UserSummary.balance":
+		if e.complexity.UserSummary.Balance == nil {
+			break
+		}
+
+		return e.complexity.UserSummary.Balance(childComplexity), true
+
+	case "UserSummary.user":
+		if e.complexity.UserSummary.User == nil {
+			break
+		}
+
+		return e.complexity.UserSummary.User(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -460,97 +469,6 @@ func (e *executableSchema) Subscription(ctx context.Context, op *ast.OperationDe
 type executionContext struct {
 	*graphql.RequestContext
 	*executableSchema
-}
-
-var authPayloadImplementors = []string{"AuthPayload"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionSet, obj *AuthPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, authPayloadImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AuthPayload")
-		case "token":
-			out.Values[i] = ec._AuthPayload_token(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "user":
-			out.Values[i] = ec._AuthPayload_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *AuthPayload) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "AuthPayload",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Token, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(Token)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._Token(ctx, field.Selections, &res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql.CollectedField, obj *AuthPayload) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "AuthPayload",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(models.User)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._User(ctx, field.Selections, &res)
 }
 
 var balanceImplementors = []string{"Balance"}
@@ -851,6 +769,12 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				out.Values[i] = ec._Query_getUser(ctx, field)
 				wg.Done()
 			}(i, field)
+		case "userSummary":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_userSummary(ctx, field)
+				wg.Done()
+			}(i, field)
 		case "findOrder":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -1057,6 +981,35 @@ func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.Co
 	}
 
 	return ec._User(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_userSummary(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UserSummary(rctx)
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.UserSummary)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._UserSummary(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
@@ -1607,6 +1560,93 @@ func (ec *executionContext) _User_passwordHash(ctx context.Context, field graphq
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalString(res)
+}
+
+var userSummaryImplementors = []string{"UserSummary"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _UserSummary(ctx context.Context, sel ast.SelectionSet, obj *models.UserSummary) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, userSummaryImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserSummary")
+		case "balance":
+			out.Values[i] = ec._UserSummary_balance(ctx, field, obj)
+		case "user":
+			out.Values[i] = ec._UserSummary_user(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UserSummary_balance(ctx context.Context, field graphql.CollectedField, obj *models.UserSummary) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UserSummary",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Balance, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Balance)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Balance(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _UserSummary_user(ctx context.Context, field graphql.CollectedField, obj *models.UserSummary) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "UserSummary",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._User(ctx, field.Selections, res)
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -3113,9 +3153,9 @@ type Token {
   refresh: String
 }
 
-type AuthPayload {
-  token: Token! 
-  user: User!
+type UserSummary {
+  balance: Balance
+  user: User
 }
 
 # Queries
@@ -3124,6 +3164,7 @@ type Query {
   balances: [Balance]
   info: User!
   getUser: User
+  userSummary: UserSummary
   findOrder(id: ID!): Order
   listStories: [Story!]!
 }

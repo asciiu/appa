@@ -47,6 +47,18 @@ func (r *queryResolver) GetUser(ctx context.Context) (*models.User, error) {
 	return user, nil
 }
 
+func (r *queryResolver) UserSummary(ctx context.Context) (*models.UserSummary, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+	summary := models.UserSummary{
+		User: user,
+	}
+
+	return &summary, nil
+}
+
 func (r *queryResolver) FindOrder(ctx context.Context, id string) (*models.Order, error) {
 	user := auth.ForContext(ctx)
 	if user == nil {

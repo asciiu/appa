@@ -50,14 +50,14 @@ type User struct {
 	PasswordHash  string
 }
 
-type UserInfo struct {
-	UserID   string `json:"userID"`
-	Username string `json:"username"`
+type UserSummary struct {
+	User    *User    `json:"user"`
+	Balance *Balance `json:"balance"`
 }
 
-func (user *User) Info() *UserInfo {
-	return &UserInfo{
-		UserID:   user.ID,
-		Username: user.Username,
-	}
-}
+//func (user *User) Summary() *UserSummary {
+//	return &UserSummary{
+//		User:   user,
+//		Balance:
+//	}
+//}
