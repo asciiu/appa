@@ -14,6 +14,8 @@ resolver:
   type: Resolver
 
 models:
+  AuthPayload:
+    model: github.com/asciiu/appa/api-graphql/models.AuthPayload
   Balance:
     model: github.com/asciiu/appa/api-graphql/models.Balance
   Order:
@@ -22,3 +24,5 @@ models:
     model: github.com/asciiu/appa/api-graphql/models.User
   Story:
     model: github.com/asciiu/appa/api-graphql/models.Story
+  Token:
+    model: github.com/asciiu/appa/api-graphql/models.Token

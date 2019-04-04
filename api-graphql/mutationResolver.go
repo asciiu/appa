@@ -24,7 +24,7 @@ func (r *mutationResolver) Signup(ctx context.Context, email, username, password
 	return user, nil
 }
 
-func (r *mutationResolver) Login(ctx context.Context, email, password string, remember bool) (*Token, error) {
+func (r *mutationResolver) Login(ctx context.Context, email, password string, remember bool) (*models.AuthPayload, error) {
 	user, err := repoUser.FindUserByEmail(r.DB, email)
 	switch {
 	case err != nil && strings.Contains(err.Error(), "no rows"):
@@ -41,6 +41,10 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 				return nil, err
 			}
 
+			token := models.Token{
+				Jwt: jwt,
+			}
+
 			// issue a refresh token if remember is true
 			if remember {
 				refreshToken := models.NewRefreshToken(user.ID)
@@ -52,13 +56,20 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 					log.Println("failed to insert refresh token: ", err)
 				}
 
-				return &Token{
-					Jwt:     &jwt,
-					Refresh: &selectAuth,
-				}, nil
+				token.Refresh = selectAuth
 			}
 
-			return &Token{Jwt: &jwt}, nil
+			payload := models.AuthPayload{
+				Token: &token,
+				User:  user,
+				BalanceBTC: &models.Balance{
+					Symbol:    "BTC",
+					Name:      "Bitcoin",
+					Amount:    120,
+					Precision: 12,
+				},
+			}
+			return &payload, nil
 		}
 
 		return nil, fmt.Errorf("incorrect password/email")

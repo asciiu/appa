@@ -41,8 +41,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	AuthPayload struct {
-		Token func(childComplexity int) int
-		User  func(childComplexity int) int
+		Token      func(childComplexity int) int
+		User       func(childComplexity int) int
+		BalanceBtc func(childComplexity int) int
 	}
 
 	Balance struct {
@@ -90,7 +91,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
-	Login(ctx context.Context, email string, password string, remember bool) (*Token, error)
+	Login(ctx context.Context, email string, password string, remember bool) (*models.AuthPayload, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]models.User, error)
@@ -253,6 +254,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthPayload.User(childComplexity), true
+
+	case "AuthPayload.balanceBTC":
+		if e.complexity.AuthPayload.BalanceBtc == nil {
+			break
+		}
+
+		return e.complexity.AuthPayload.BalanceBtc(childComplexity), true
 
 	case "Balance.id":
 		if e.complexity.Balance.Id == nil {
@@ -465,7 +473,7 @@ type executionContext struct {
 var authPayloadImplementors = []string{"AuthPayload"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionSet, obj *AuthPayload) graphql.Marshaler {
+func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionSet, obj *models.AuthPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, authPayloadImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
@@ -486,6 +494,11 @@ func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "balanceBTC":
+			out.Values[i] = ec._AuthPayload_balanceBTC(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -498,7 +511,7 @@ func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionS
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *AuthPayload) graphql.Marshaler {
+func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *models.AuthPayload) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -518,15 +531,22 @@ func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(Token)
+	res := resTmp.(*models.Token)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._Token(ctx, field.Selections, &res)
+	if res == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+
+	return ec._Token(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql.CollectedField, obj *AuthPayload) graphql.Marshaler {
+func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql.CollectedField, obj *models.AuthPayload) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -546,11 +566,53 @@ func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(models.User)
+	res := resTmp.(*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._User(ctx, field.Selections, &res)
+	if res == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+
+	return ec._User(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AuthPayload_balanceBTC(ctx context.Context, field graphql.CollectedField, obj *models.AuthPayload) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "AuthPayload",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BalanceBTC, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Balance)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+
+	return ec._Balance(ctx, field.Selections, res)
 }
 
 var balanceImplementors = []string{"Balance"}
@@ -702,7 +764,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*Token)
+	res := resTmp.(*models.AuthPayload)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
@@ -710,7 +772,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 
-	return ec._Token(ctx, field.Selections, res)
+	return ec._AuthPayload(ctx, field.Selections, res)
 }
 
 var orderImplementors = []string{"Order"}
@@ -1342,7 +1404,7 @@ func (ec *executionContext) _Story_content(ctx context.Context, field graphql.Co
 var tokenImplementors = []string{"Token"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, obj *Token) graphql.Marshaler {
+func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, obj *models.Token) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, tokenImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
@@ -1369,7 +1431,7 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Token_jwt(ctx context.Context, field graphql.CollectedField, obj *Token) graphql.Marshaler {
+func (ec *executionContext) _Token_jwt(ctx context.Context, field graphql.CollectedField, obj *models.Token) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1386,18 +1448,14 @@ func (ec *executionContext) _Token_jwt(ctx context.Context, field graphql.Collec
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalString(res)
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Token_refresh(ctx context.Context, field graphql.CollectedField, obj *Token) graphql.Marshaler {
+func (ec *executionContext) _Token_refresh(ctx context.Context, field graphql.CollectedField, obj *models.Token) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -1414,14 +1472,10 @@ func (ec *executionContext) _Token_refresh(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalString(res)
 }
 
 var userImplementors = []string{"User"}
@@ -3116,6 +3170,7 @@ type Token {
 type AuthPayload {
   token: Token! 
   user: User!
+  balanceBTC: Balance!
 }
 
 # Queries
@@ -3131,6 +3186,6 @@ type Query {
 # Mutations
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
-  login(email: String!, password: String!, remember: Boolean!): Token 
+  login(email: String!, password: String!, remember: Boolean!): AuthPayload
 }`},
 )

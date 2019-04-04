@@ -30,6 +30,7 @@ type Token {
 type AuthPayload {
   token: Token! 
   user: User!
+  balanceBTC: Balance!
 }
 
 # Queries
@@ -45,5 +46,5 @@ type Query {
 # Mutations
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
-  login(email: String!, password: String!, remember: Boolean!): Token 
+  login(email: String!, password: String!, remember: Boolean!): AuthPayload
 }
