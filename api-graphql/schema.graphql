@@ -16,7 +16,7 @@ type Balance {
 	name: String
 	amount: Int64
 	locked: Int64
-	precision: Int
+	precision: Float
 	address: String
 }
 

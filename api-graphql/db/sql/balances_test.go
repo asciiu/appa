@@ -23,7 +23,7 @@ func TestInsertBalance(t *testing.T) {
 	symbol := "BTC"
 	name := "Bitcoin"
 	address := "1234"
-	precision := 12
+	precision := 0.000000000001
 	balance := models.NewBalance(user.ID, symbol, name, address, amount, locked, precision)
 	err = sql.InsertBalance(db, balance)
 
@@ -34,8 +34,8 @@ func TestInsertBalance(t *testing.T) {
 	assert.Equal(t, symbol, foundBalance.Symbol, "symbol should be BTC")
 	assert.Equal(t, name, foundBalance.Name, "name should be Bitcoin")
 	assert.Equal(t, address, foundBalance.Address, "address did not match")
-	assert.Equal(t, amount, foundBalance.Amount, "amount did not match")
-	assert.Equal(t, locked, foundBalance.Locked, "locked did not match")
+	assert.Equal(t, models.Int64(amount), foundBalance.Amount, "amount did not match")
+	assert.Equal(t, models.Int64(locked), foundBalance.Locked, "locked did not match")
 	assert.Equal(t, precision, foundBalance.Precision, "precision did not match")
 
 	sql.DeleteUserHard(db, user.ID)
@@ -56,7 +56,7 @@ func TestFailInsertBalance(t *testing.T) {
 	symbol := "ABC"
 	name := "LALA"
 	address := "1234"
-	precision := 12
+	precision := 0.000000000001
 	balance := models.NewBalance(user.ID, symbol, name, address, amount, locked, precision)
 	err = sql.InsertBalance(db, balance)
 
@@ -74,8 +74,8 @@ func TestFindBalances(t *testing.T) {
 	err = sql.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
-	btc := models.NewBalance(user.ID, "BTC", "Bitcoin", "", 1, 0, 12)
-	ltc := models.NewBalance(user.ID, "LTC", "Litcoin", "", 2, 0, 12)
+	btc := models.NewBalance(user.ID, "BTC", "Bitcoin", "", 1, 0, 0.000000000001)
+	ltc := models.NewBalance(user.ID, "LTC", "Litcoin", "", 2, 0, 0.000000000001)
 	err = sql.InsertBalance(db, btc)
 	assert.Nil(t, err, "insert balance failed")
 

@@ -742,10 +742,10 @@ func (ec *executionContext) _Balance_precision(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalInt(res)
+	return graphql.MarshalFloat(res)
 }
 
 // nolint: vetshadow
@@ -3386,7 +3386,7 @@ type Balance {
 	name: String
 	amount: Int64
 	locked: Int64
-	precision: Int
+	precision: Float
 	address: String
 }
 
