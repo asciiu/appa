@@ -15,11 +15,13 @@ func FindCurrency(db *sql.DB, symbol string) (*models.Currency, error) {
 	var c models.Currency
 	err := db.QueryRow(`SELECT 
 	symbol,
-	name
+	name,
+    precision
 	FROM currencies
 	WHERE symbol = $1`, symbol).
 		Scan(&c.Symbol,
-			&c.Name)
+			&c.Name,
+			&c.Precision)
 
 	if err != nil {
 		return nil, err
@@ -36,7 +38,7 @@ func FindUserBalanceBySymbol(db *sql.DB, userID, symbol string) (*models.Balance
 	c.name,
 	b.amount,
 	b.locked,
-	b.precision,
+	c.precision,
 	b.address 
 	FROM balances b
 	JOIN currencies c ON b.symbol = c.symbol
@@ -64,8 +66,8 @@ func FindUserBalances(db *sql.DB, userID string) ([]*models.Balance, error) {
 	    b.symbol,
 	    c.name,
 	    b.amount,
-	    b.locked,
-	    b.precision,
+		b.locked,
+		c.precision,
 	    b.address 
 	    FROM balances b
 	    JOIN currencies c ON b.symbol = c.symbol
@@ -105,8 +107,7 @@ func InsertBalance(db *sql.DB, balance *models.Balance) error {
 	    symbol,
 	    amount,
 	    locked,
-	    precision,
-	    address) values ($1, $2, $3, $4, $5, $6, $7)`
+	    address) values ($1, $2, $3, $4, $5, $6)`
 
 	_, err := db.Exec(sqlStatement,
 		balance.ID,
@@ -114,7 +115,6 @@ func InsertBalance(db *sql.DB, balance *models.Balance) error {
 		balance.Symbol,
 		balance.Amount,
 		balance.Locked,
-		balance.Precision,
 		balance.Address)
 
 	return err

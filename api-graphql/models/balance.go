@@ -8,18 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
-func NewBalance(userID, symbol, name, address string, amount, locked int64, precision float64) *Balance {
+func NewBalance(userID, symbol, name, address string, amount, locked int64) *Balance {
 	newID := uuid.New()
 
 	balance := Balance{
-		ID:        newID.String(),
-		UserID:    userID,
-		Symbol:    symbol,
-		Name:      name,
-		Amount:    Int64(amount),
-		Locked:    Int64(locked),
-		Precision: precision,
-		Address:   address,
+		ID:      newID.String(),
+		UserID:  userID,
+		Symbol:  symbol,
+		Name:    name,
+		Amount:  Int64(amount),
+		Locked:  Int64(locked),
+		Address: address,
 	}
 	return &balance
 }
@@ -36,8 +35,9 @@ type Balance struct {
 }
 
 type Currency struct {
-	Symbol string
-	Name   string
+	Symbol    string
+	Name      string
+	Precision float64
 }
 
 type Int64 int64
