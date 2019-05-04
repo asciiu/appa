@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+service StoryService {
+  rpc NewStory(NewStoryRequest) returns (StoryResponse) {}
+}
+
+// Requests
+message NewStoryRequest {
+  string userID  = 1;
+  string title = 2;
+  string content = 3;
+  string rated = 4;
+  string status = 5;
+}
+
+// Responses
+message Story {
+  string storyID = 1;
+  string userID = 2;
+  string title = 3;
+  string content = 4;
+  double rated = 5;
+  string status = 8;
+  string createdOn = 10;
+  string updatedOn = 11;
+}
+
+message StoryData {
+  Story story = 1;
+}
+
+message StoryResponse {
+  string status = 1;
+  string message = 2;
+  StoryData data = 3;
+}
