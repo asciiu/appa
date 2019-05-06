@@ -58,3 +58,36 @@ func TestNewRepo(t *testing.T) {
 
 	repoUser.DeleteUserHard(service.DB, user.ID)
 }
+
+func TestDeleteRepo(t *testing.T) {
+	service, user := setupService()
+
+	defer service.DB.Close()
+
+	title := "testing 123"
+	req1 := protoStory.NewStoryRequest{
+		UserID:  user.ID,
+		Title:   title,
+		Content: "he said something",
+		Rated:   "everyone",
+		Status:  "draft",
+	}
+
+	res1 := protoStory.StoryResponse{}
+	service.NewStory(context.Background(), &req1, &res1)
+	assert.Equal(t, "success", res1.Status, "expected success got: "+res1.Message)
+
+	req2 := protoStory.DeleteStoryRequest{
+		UserID: user.ID,
+		Title:  title,
+	}
+	res2 := protoStory.StoryResponse{}
+	service.DeleteStory(context.Background(), &req2, &res2)
+	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
+
+	cmd := exec.Command("rm", "-rf", res1.Data.Story.UserID)
+	err := cmd.Run()
+	assert.Nil(t, err, "error for delete should be nil")
+
+	repoUser.DeleteUserHard(service.DB, user.ID)
+}

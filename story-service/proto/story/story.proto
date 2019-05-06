@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service StoryService {
   rpc NewStory(NewStoryRequest) returns (StoryResponse) {}
+  rpc DeleteStory(DeleteStoryRequest) returns (StoryResponse) {}
 }
 
 // Requests
@@ -11,6 +12,11 @@ message NewStoryRequest {
   string content = 3;
   string rated = 4;
   string status = 5;
+}
+
+message DeleteStoryRequest {
+  string userID  = 1;
+  string title = 2;
 }
 
 // Responses

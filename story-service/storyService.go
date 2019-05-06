@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os/exec"
 
 	commonResp "github.com/asciiu/appa/common/constants/response"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
@@ -29,6 +30,27 @@ func (service *StoryService) NewStory(ctx context.Context, req *protoStory.NewSt
 			StoryID: path,
 			UserID:  req.UserID,
 		},
+	}
+
+	return nil
+}
+
+func (service *StoryService) DeleteStory(ctx context.Context, req *protoStory.DeleteStoryRequest, res *protoStory.StoryResponse) error {
+	path := fmt.Sprintf("%s/%s", req.UserID, req.Title)
+
+	cmd := exec.Command("rm", "-rf", path)
+	err := cmd.Run()
+	if err != nil {
+		res.Status = commonResp.Error
+		res.Message = err.Error()
+	} else {
+		res.Status = commonResp.Success
+		res.Data = &protoStory.StoryData{
+			Story: &protoStory.Story{
+				StoryID: path,
+				UserID:  req.UserID,
+			},
+		}
 	}
 
 	return nil

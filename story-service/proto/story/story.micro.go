@@ -9,6 +9,7 @@ It is generated from these files:
 
 It has these top-level messages:
 	NewStoryRequest
+	DeleteStoryRequest
 	Story
 	StoryData
 	StoryResponse
@@ -45,6 +46,7 @@ var _ server.Option
 
 type StoryService interface {
 	NewStory(ctx context.Context, in *NewStoryRequest, opts ...client.CallOption) (*StoryResponse, error)
+	DeleteStory(ctx context.Context, in *DeleteStoryRequest, opts ...client.CallOption) (*StoryResponse, error)
 }
 
 type storyService struct {
@@ -75,15 +77,27 @@ func (c *storyService) NewStory(ctx context.Context, in *NewStoryRequest, opts .
 	return out, nil
 }
 
+func (c *storyService) DeleteStory(ctx context.Context, in *DeleteStoryRequest, opts ...client.CallOption) (*StoryResponse, error) {
+	req := c.c.NewRequest(c.name, "StoryService.DeleteStory", in)
+	out := new(StoryResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for StoryService service
 
 type StoryServiceHandler interface {
 	NewStory(context.Context, *NewStoryRequest, *StoryResponse) error
+	DeleteStory(context.Context, *DeleteStoryRequest, *StoryResponse) error
 }
 
 func RegisterStoryServiceHandler(s server.Server, hdlr StoryServiceHandler, opts ...server.HandlerOption) error {
 	type storyService interface {
 		NewStory(ctx context.Context, in *NewStoryRequest, out *StoryResponse) error
+		DeleteStory(ctx context.Context, in *DeleteStoryRequest, out *StoryResponse) error
 	}
 	type StoryService struct {
 		storyService
@@ -98,4 +112,8 @@ type storyServiceHandler struct {
 
 func (h *storyServiceHandler) NewStory(ctx context.Context, in *NewStoryRequest, out *StoryResponse) error {
 	return h.StoryServiceHandler.NewStory(ctx, in, out)
+}
+
+func (h *storyServiceHandler) DeleteStory(ctx context.Context, in *DeleteStoryRequest, out *StoryResponse) error {
+	return h.StoryServiceHandler.DeleteStory(ctx, in, out)
 }
