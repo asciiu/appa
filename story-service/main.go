@@ -2,11 +2,20 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"time"
 
-	"gopkg.in/libgit2/git2go.v27"
+	git "gopkg.in/libgit2/git2go.v27"
+	//"gopkg.in/libgit2/git2go.v27"
 	//"gopkg.in/src-d/go-git.v4"
 	//. "gopkg.in/src-d/go-git.v4/_examples"
 )
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
 
 // Example of an specific use case:
 // - Clone a repository in a specific path
@@ -17,14 +26,43 @@ import (
 // - Print all the commit history with commit messages, short hash and the
 // first line of the commit message
 func main() {
+
+	path := "stories/hello"
 	// init a new git repo under the web directory
-	repo, err := git.InitRepository("stories/hello", false)
+	repo, err := git.InitRepository(path, false)
 
 	//repo, err := git.Clone("git://github.com/gopheracademy/gopheracademy-web.git", "web", &git.CloneOptions{})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(repo)
+
+	filePath := fmt.Sprintf("%s/%s", path, "story.txt")
+
+	d1 := []byte("hello\ngo\n")
+	err = ioutil.WriteFile(filePath, d1, 0644)
+	check(err)
+
+	index, err := repo.Index()
+	check(err)
+
+	index.AddByPath(filePath)
+	index.Write()
+
+	author := &git.Signature{
+		Name:  "Flow",
+		Email: "flow@dog",
+		When:  time.Now(),
+	}
+
+	treeID, err := index.WriteTreeTo(repo)
+	check(err)
+	tree, err := repo.LookupTree(treeID)
+	check(err)
+
+	oid, err := repo.CreateCommit("HEAD", author, author, "Did this worky?", tree)
+
+	fmt.Println(err)
+	fmt.Println(oid)
 
 	//CheckArgs("<url> <path>")
 	//url := os.Args[1]
