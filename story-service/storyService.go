@@ -13,11 +13,12 @@ import (
 	"gopkg.in/libgit2/git2go.v27"
 )
 
+// StoryService - manages story repos
 type StoryService struct {
 	DB *sql.DB
 }
 
-// InitStory - Init new story
+// InitStory - Init new story repo
 func (service *StoryService) InitStory(ctx context.Context, req *protoStory.InitStoryRequest, res *protoStory.StoryResponse) error {
 	path := fmt.Sprintf("%s/%s", "database", req.Title)
 	repo, err := git.InitRepository(path, false)
@@ -89,6 +90,7 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 	return nil
 }
 
+// DeleteStory - delete story repo
 func (service *StoryService) DeleteStory(ctx context.Context, req *protoStory.DeleteStoryRequest, res *protoStory.StoryResponse) error {
 	path := fmt.Sprintf("%s/%s", req.UserID, req.Title)
 

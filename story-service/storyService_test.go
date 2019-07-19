@@ -21,8 +21,8 @@ func checkErr(err error) {
 }
 
 func setupService() (*StoryService, *user.User) {
-	dbUrl := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
-	db, _ := db.NewDB(dbUrl)
+	dbURL := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
+	db, _ := db.NewDB(dbURL)
 
 	storyService := StoryService{
 		DB: db,
@@ -67,13 +67,15 @@ func TestDeleteRepo(t *testing.T) {
 
 	defer service.DB.Close()
 
-	title := "testing 123"
+	title := "Forest Gump"
 	req1 := protoStory.InitStoryRequest{
-		UserID:  user.ID,
-		Title:   title,
-		Content: "he said something",
-		Rated:   0.0,
-		Status:  "draft",
+		UserID:    user.ID,
+		Username:  user.Username,
+		UserEmail: user.Email,
+		Title:     title,
+		Content:   "Run forest!",
+		Rated:     0.0,
+		Status:    "draft",
 	}
 
 	res1 := protoStory.StoryResponse{}
@@ -88,7 +90,7 @@ func TestDeleteRepo(t *testing.T) {
 	service.DeleteStory(context.Background(), &req2, &res2)
 	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
 
-	cmd := exec.Command("rm", "-rf", res1.Data.Story.UserID)
+	cmd := exec.Command("rm", "-rf", "database/"+res2.Data.Story.Title)
 	err := cmd.Run()
 	assert.Nil(t, err, "error for delete should be nil")
 
