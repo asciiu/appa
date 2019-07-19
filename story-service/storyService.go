@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"time"
 
@@ -23,9 +22,8 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 	path := fmt.Sprintf("%s/%s", "database", req.Title)
 	repo, err := git.InitRepository(path, false)
 	if err != nil {
-		msg := fmt.Sprintf("init repo error for %s: %s", req.Title, err)
-		log.Println(msg)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("init repo error for %s: %s", req.Title, err)
 		return nil
 	}
 
@@ -34,17 +32,15 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 	data := []byte(req.Content)
 	err = ioutil.WriteFile(filePath, data, 0644)
 	if err != nil {
-		msg := fmt.Sprintf("write error for %s.txt: %s", req.Title, err)
-		log.Println(msg)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("write error for %s.txt: %s", req.Title, err)
 		return nil
 	}
 
 	index, err := repo.Index()
 	if err != nil {
-		msg := fmt.Sprintf("could not obtain repo index for %s: %s", req.Title, err)
-		log.Println(msg)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("could not obtain repo index for %s: %s", req.Title, err)
 		return nil
 	}
 
@@ -59,35 +55,35 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 
 	treeID, err := index.WriteTreeTo(repo)
 	if err != nil {
-		log.Println("error on write tree: ", err)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("error on write tree: %s", err)
 		return nil
 	}
 
 	tree, err := repo.LookupTree(treeID)
 	if err != nil {
-		log.Println("error on lookup tree: ", err)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("error on lookup tree: %s", err)
 		return nil
 	}
 
 	_, err = repo.CreateCommit("HEAD", sig, sig, "Initial commit.", tree)
 	if err != nil {
-		log.Println("error on lookup tree: ", err)
 		res.Status = commonResp.Fail
+		res.Message = fmt.Sprintf("error on commit: %s", err)
 		return nil
-	} else {
-		res.Status = commonResp.Success
-		res.Data = &protoStory.StoryData{
-			Story: &protoStory.Story{
-				StoryID: filePath,
-				UserID:  req.UserID,
-				Title:   req.Title,
-				Content: req.Content,
-				Rated:   req.Rated,
-				Status:  req.Status,
-			},
-		}
+	}
+
+	res.Status = commonResp.Success
+	res.Data = &protoStory.StoryData{
+		Story: &protoStory.Story{
+			StoryID: filePath,
+			UserID:  req.UserID,
+			Title:   req.Title,
+			Content: req.Content,
+			Rated:   req.Rated,
+			Status:  req.Status,
+		},
 	}
 
 	return nil

@@ -7,7 +7,7 @@ require (
 	github.com/asciiu/appa v0.0.0-20190101034436-6bd240b361c4
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-log/log v0.1.0
-	github.com/golang/protobuf v0.0.0-20181128192352-1d3f30b51784
+	github.com/golang/protobuf v1.2.0
 	github.com/google/uuid v1.1.0
 	github.com/hashicorp/consul v1.4.0
 	github.com/hashicorp/errwrap v1.0.0
