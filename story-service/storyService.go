@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os/exec"
+	"time"
 
 	commonResp "github.com/asciiu/appa/common/constants/response"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
@@ -16,20 +18,76 @@ type StoryService struct {
 	DB *sql.DB
 }
 
-func (service *StoryService) NewStory(ctx context.Context, req *protoStory.NewStoryRequest, res *protoStory.StoryResponse) error {
-	path := fmt.Sprintf("%s/%s", req.UserID, req.Title)
-	_, err := git.InitRepository(path, false)
+// InitStory - Init new story
+func (service *StoryService) InitStory(ctx context.Context, req *protoStory.InitStoryRequest, res *protoStory.StoryResponse) error {
+	path := fmt.Sprintf("%s/%s", "database", req.Title)
+	repo, err := git.InitRepository(path, false)
 	if err != nil {
-		log.Println("init repo error: ", err)
+		msg := fmt.Sprintf("init repo error for %s: %s", req.Title, err)
+		log.Println(msg)
+		res.Status = commonResp.Fail
+		return nil
 	}
-	//fmt.Println(repo)
 
-	res.Status = commonResp.Success
-	res.Data = &protoStory.StoryData{
-		Story: &protoStory.Story{
-			StoryID: path,
-			UserID:  req.UserID,
-		},
+	filePath := fmt.Sprintf("%s/%s.txt", path, req.Title)
+
+	data := []byte(req.Content)
+	err = ioutil.WriteFile(filePath, data, 0644)
+	if err != nil {
+		msg := fmt.Sprintf("write error for %s.txt: %s", req.Title, err)
+		log.Println(msg)
+		res.Status = commonResp.Fail
+		return nil
+	}
+
+	index, err := repo.Index()
+	if err != nil {
+		msg := fmt.Sprintf("could not obtain repo index for %s: %s", req.Title, err)
+		log.Println(msg)
+		res.Status = commonResp.Fail
+		return nil
+	}
+
+	index.AddByPath(filePath)
+	index.Write()
+
+	sig := &git.Signature{
+		Name:  req.Username,
+		Email: req.UserEmail,
+		When:  time.Now(),
+	}
+
+	treeID, err := index.WriteTreeTo(repo)
+	if err != nil {
+		log.Println("error on write tree: ", err)
+		res.Status = commonResp.Fail
+		return nil
+	}
+
+	tree, err := repo.LookupTree(treeID)
+	if err != nil {
+		log.Println("error on lookup tree: ", err)
+		res.Status = commonResp.Fail
+		return nil
+	}
+
+	_, err = repo.CreateCommit("HEAD", sig, sig, "Initial commit.", tree)
+	if err != nil {
+		log.Println("error on lookup tree: ", err)
+		res.Status = commonResp.Fail
+		return nil
+	} else {
+		res.Status = commonResp.Success
+		res.Data = &protoStory.StoryData{
+			Story: &protoStory.Story{
+				StoryID: filePath,
+				UserID:  req.UserID,
+				Title:   req.Title,
+				Content: req.Content,
+				Rated:   req.Rated,
+				Status:  req.Status,
+			},
+		}
 	}
 
 	return nil

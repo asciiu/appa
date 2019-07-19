@@ -8,7 +8,7 @@ It is generated from these files:
 	proto/story/story.proto
 
 It has these top-level messages:
-	NewStoryRequest
+	InitStoryRequest
 	DeleteStoryRequest
 	Story
 	StoryData
@@ -45,7 +45,7 @@ var _ server.Option
 // Client API for StoryService service
 
 type StoryService interface {
-	NewStory(ctx context.Context, in *NewStoryRequest, opts ...client.CallOption) (*StoryResponse, error)
+	InitStory(ctx context.Context, in *InitStoryRequest, opts ...client.CallOption) (*StoryResponse, error)
 	DeleteStory(ctx context.Context, in *DeleteStoryRequest, opts ...client.CallOption) (*StoryResponse, error)
 }
 
@@ -67,8 +67,8 @@ func NewStoryService(name string, c client.Client) StoryService {
 	}
 }
 
-func (c *storyService) NewStory(ctx context.Context, in *NewStoryRequest, opts ...client.CallOption) (*StoryResponse, error) {
-	req := c.c.NewRequest(c.name, "StoryService.NewStory", in)
+func (c *storyService) InitStory(ctx context.Context, in *InitStoryRequest, opts ...client.CallOption) (*StoryResponse, error) {
+	req := c.c.NewRequest(c.name, "StoryService.InitStory", in)
 	out := new(StoryResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -90,13 +90,13 @@ func (c *storyService) DeleteStory(ctx context.Context, in *DeleteStoryRequest, 
 // Server API for StoryService service
 
 type StoryServiceHandler interface {
-	NewStory(context.Context, *NewStoryRequest, *StoryResponse) error
+	InitStory(context.Context, *InitStoryRequest, *StoryResponse) error
 	DeleteStory(context.Context, *DeleteStoryRequest, *StoryResponse) error
 }
 
 func RegisterStoryServiceHandler(s server.Server, hdlr StoryServiceHandler, opts ...server.HandlerOption) error {
 	type storyService interface {
-		NewStory(ctx context.Context, in *NewStoryRequest, out *StoryResponse) error
+		InitStory(ctx context.Context, in *InitStoryRequest, out *StoryResponse) error
 		DeleteStory(ctx context.Context, in *DeleteStoryRequest, out *StoryResponse) error
 	}
 	type StoryService struct {
@@ -110,8 +110,8 @@ type storyServiceHandler struct {
 	StoryServiceHandler
 }
 
-func (h *storyServiceHandler) NewStory(ctx context.Context, in *NewStoryRequest, out *StoryResponse) error {
-	return h.StoryServiceHandler.NewStory(ctx, in, out)
+func (h *storyServiceHandler) InitStory(ctx context.Context, in *InitStoryRequest, out *StoryResponse) error {
+	return h.StoryServiceHandler.InitStory(ctx, in, out)
 }
 
 func (h *storyServiceHandler) DeleteStory(ctx context.Context, in *DeleteStoryRequest, out *StoryResponse) error {

@@ -35,24 +35,27 @@ func setupService() (*StoryService, *user.User) {
 	return &storyService, user
 }
 
-func TestNewRepo(t *testing.T) {
+func TestInitStory(t *testing.T) {
 	service, user := setupService()
+	title := "Sling Blade"
 
 	defer service.DB.Close()
 
-	req := protoStory.NewStoryRequest{
-		UserID:  user.ID,
-		Title:   "test story",
-		Content: "he said something",
-		Rated:   "everyone",
-		Status:  "draft",
+	req := protoStory.InitStoryRequest{
+		UserID:    user.ID,
+		Username:  user.Username,
+		UserEmail: user.Email,
+		Title:     title,
+		Content:   "Shouldn't have done that to my brother. He was just a boy.",
+		Rated:     0.0,
+		Status:    "draft",
 	}
 
 	res := protoStory.StoryResponse{}
-	service.NewStory(context.Background(), &req, &res)
+	service.InitStory(context.Background(), &req, &res)
 	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
 
-	cmd := exec.Command("rm", "-rf", res.Data.Story.UserID)
+	cmd := exec.Command("rm", "-rf", "database/"+res.Data.Story.Title)
 	err := cmd.Run()
 	assert.Nil(t, err, "error for delete should be nil")
 
@@ -65,16 +68,16 @@ func TestDeleteRepo(t *testing.T) {
 	defer service.DB.Close()
 
 	title := "testing 123"
-	req1 := protoStory.NewStoryRequest{
+	req1 := protoStory.InitStoryRequest{
 		UserID:  user.ID,
 		Title:   title,
 		Content: "he said something",
-		Rated:   "everyone",
+		Rated:   0.0,
 		Status:  "draft",
 	}
 
 	res1 := protoStory.StoryResponse{}
-	service.NewStory(context.Background(), &req1, &res1)
+	service.InitStory(context.Background(), &req1, &res1)
 	assert.Equal(t, "success", res1.Status, "expected success got: "+res1.Message)
 
 	req2 := protoStory.DeleteStoryRequest{
