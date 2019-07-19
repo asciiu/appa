@@ -10,3 +10,4 @@ local-config-map.yaml
 stage-config-map.yaml
 id_rsa
 **/deployment.yml
+database
