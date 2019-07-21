@@ -10,7 +10,7 @@ import (
 // }
 
 func InsertWriter(db *sql.DB, userID, title string) error {
-	sqlStatement := `insert into authors (
+	sqlStatement := `insert into writers (
 		user_id, 
 		title) values ($1, $2)`
 	_, err := db.Exec(sqlStatement,
