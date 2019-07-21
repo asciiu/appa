@@ -2,21 +2,25 @@ package models
 
 import (
 	"log"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewUser(first, last, email, password string) *User {
+func NewUser(username, email, password string) *User {
 	newID := uuid.New()
+	now := string(pq.FormatTimestamp(time.Now().UTC()))
 
 	user := User{
 		ID:            newID.String(),
-		First:         first,
-		Last:          last,
+		Username:      username,
 		Email:         email,
 		EmailVerified: false,
 		PasswordHash:  HashAndSalt([]byte(password)),
+		CreatedOn:     now,
+		UpdatedOn:     now,
 	}
 	return &user
 }
@@ -40,26 +44,24 @@ func HashAndSalt(pwd []byte) string {
 
 type User struct {
 	ID            string
-	First         string
-	Last          string
+	Username      string
 	Email         string
 	EmailVerified bool
 	PasswordHash  string
-	Salt          string
+	CreatedOn     string
+	UpdatedOn     string
 }
 
-type UserInfo struct {
-	UserID string `json:"userID"`
-	First  string `json:"first"`
-	Last   string `json:"last"`
-	Email  string `json:"email"`
-}
-
-func (user *User) Info() *UserInfo {
-	return &UserInfo{
-		UserID: user.ID,
-		First:  user.First,
-		Last:   user.Last,
-		Email:  user.Email,
-	}
-}
+//type UserInfo struct {
+//	UserID   string `json:"userID"`
+//	Username string `json:"username"`
+//	Email    string `json:"email"`
+//}
+//
+//func (user *User) Info() *UserInfo {
+//	return &UserInfo{
+//		UserID:   user.ID,
+//		Username: user.Username,
+//		Email:    user.Email,
+//	}
+//}

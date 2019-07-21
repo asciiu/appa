@@ -4,9 +4,9 @@ go 1.12
 
 require (
 	github.com/armon/go-metrics v0.0.0-20160717043458-3df31a1ada83
-	github.com/asciiu/appa v0.0.0-20181220040715-98e6aabf57a7
+	github.com/asciiu/appa v0.0.0
 	github.com/go-log/log v0.1.0
-	github.com/golang/protobuf v0.0.0-20181128192352-1d3f30b51784
+	github.com/golang/protobuf v1.2.0
 	github.com/google/uuid v1.0.0
 	github.com/hashicorp/consul v1.3.0
 	github.com/hashicorp/errwrap v1.0.0
@@ -18,7 +18,7 @@ require (
 	github.com/hashicorp/memberlist v0.1.0
 	github.com/hashicorp/serf v0.0.0-20180809141758-19bbd39e421b
 	github.com/json-iterator/go v1.1.5
-	github.com/lib/pq v1.0.0
+	github.com/lib/pq v1.2.0
 	github.com/micro/cli v0.0.0-20180830071301-8b9d33ec2f19
 	github.com/micro/go-grpc v0.3.0
 	github.com/micro/go-log v0.0.0-20170512141327-cbfa9447f9b6
@@ -44,3 +44,5 @@ require (
 	golang.org/x/text v0.3.0
 	google.golang.org/genproto v0.0.0-20181101192439-c830210a61df
 )
+
+replace github.com/asciiu/appa => ../

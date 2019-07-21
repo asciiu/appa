@@ -1,6 +1,7 @@
 package sql_test
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -21,28 +22,28 @@ func TestInsertUser(t *testing.T) {
 	checkErr(err)
 	defer db.Close()
 
-	user := models.NewUser("first", "last", "test@email", "hash")
+	user := models.NewUser("jonni5", "test@email", "password")
 	_, error := sql.InsertUser(db, user)
 	if error != nil {
 		t.Errorf("%s", error)
 	}
-	//fmt.Printf("%#v", *user)
+	fmt.Printf("%#v", *user)
 }
 
-func TestFindUser(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
-	defer db.Close()
+// func TestFindUser(t *testing.T) {
+// 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
+// 	checkErr(err)
+// 	defer db.Close()
 
-	email := "test@email"
-	user, err := sql.FindUser(db, email)
-	if err != nil {
-		t.Errorf("%s", err)
-	}
-	if user == nil {
-		t.Errorf("user not found %s", email)
-	}
+// 	email := "test@email"
+// 	user, err := sql.FindUser(db, email)
+// 	if err != nil {
+// 		t.Errorf("%s", err)
+// 	}
+// 	if user == nil {
+// 		t.Errorf("user not found %s", email)
+// 	}
 
-	sqlStatement := `delete from users where email = $1`
-	db.Exec(sqlStatement, email)
-}
+// 	sqlStatement := `delete from users where email = $1`
+// 	db.Exec(sqlStatement, email)
+// }
