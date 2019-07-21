@@ -8,6 +8,7 @@ import (
 	"github.com/asciiu/appa/common/db"
 	"github.com/asciiu/appa/user-service/db/sql"
 	"github.com/asciiu/appa/user-service/models"
+	"github.com/stretchr/testify/assert"
 )
 
 func checkErr(err error) {
@@ -23,11 +24,21 @@ func TestInsertUser(t *testing.T) {
 	defer db.Close()
 
 	user := models.NewUser("jonni5", "test@email", "password")
-	_, error := sql.InsertUser(db, user)
-	if error != nil {
-		t.Errorf("%s", error)
+	newUser, err := sql.InsertUser(db, user)
+	assert.Nil(t, err, fmt.Sprintf("could not insert user %s", err))
+
+	if err != nil {
+		t.Errorf("%s", err)
 	}
-	fmt.Printf("%#v", *user)
+	foundUser, err := sql.FindUserByID(db, user.ID)
+	assert.Nil(t, err, fmt.Sprintf("could not find user by id %s", err))
+
+	assert.Equal(t, newUser.ID, foundUser.ID, "user ids do not match")
+	assert.Equal(t, newUser.Username, foundUser.Username, "usernames do not match")
+	assert.Equal(t, newUser.Email, foundUser.Email, "emails do not match")
+
+	err = sql.DeleteUserHard(db, user.ID)
+	assert.Nil(t, err, fmt.Sprintf("could not delete user %s", err))
 }
 
 // func TestFindUser(t *testing.T) {

@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/armon/go-metrics v0.0.0-20160717043458-3df31a1ada83
-	github.com/asciiu/appa v0.0.0
+	github.com/asciiu/appa v0.0.0-00010101000000-000000000000
 	github.com/go-log/log v0.1.0
 	github.com/golang/protobuf v1.2.0
 	github.com/google/uuid v1.0.0
@@ -38,6 +38,7 @@ require (
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
 	github.com/pkg/errors v0.8.0
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529
+	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16
 	golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc
 	golang.org/x/sys v0.0.0-20181031143558-9b800f95dbbc

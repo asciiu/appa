@@ -6,10 +6,11 @@ import (
 	"github.com/asciiu/appa/user-service/models"
 )
 
-// func DeleteUserHard(db *sql.DB, userID string) error {
-// 	_, err := db.Exec("DELETE FROM users WHERE id = $1", userID)
-// 	return err
-// }
+// DeleteUserHard - delete user from DB
+func DeleteUserHard(db *sql.DB, userID string) error {
+	_, err := db.Exec("DELETE FROM users WHERE id = $1", userID)
+	return err
+}
 
 // func DeleteUserSoft(db *sql.DB, userID string) error {
 // 	_, err := db.Exec("UPDATE users SET deleted_on = now() WHERE id = $1", userID)
@@ -40,17 +41,32 @@ import (
 // 	return &u, nil
 // }
 
-// func FindUserByID(db *sql.DB, userID string) (*models.User, error) {
-// 	var u models.User
-// 	err := db.QueryRow("SELECT id, first_name, last_name, email, email_verified, password_hash FROM users WHERE id = $1", userID).
-// 		Scan(&u.ID, &u.First, &u.Last, &u.Email, &u.EmailVerified, &u.PasswordHash)
+// FindUserByID - find users by the user id
+func FindUserByID(db *sql.DB, userID string) (*models.User, error) {
+	var u models.User
+	err := db.QueryRow(`SELECT 
+	    id, 
+	    username, 
+	    email, 
+	    email_verified, 
+	    password_hash,
+	    created_on,
+	    updated_on FROM users WHERE id = $1`, userID).
+		Scan(&u.ID,
+			&u.Username,
+			&u.Email,
+			&u.EmailVerified,
+			&u.PasswordHash,
+			&u.CreatedOn,
+			&u.UpdatedOn)
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &u, nil
-// }
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
 
+// InsertUser - insert a new user
 func InsertUser(db *sql.DB, user *models.User) (*models.User, error) {
 	sqlStatement := `insert into users (
 		id, 
