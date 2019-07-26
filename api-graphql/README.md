@@ -7,5 +7,5 @@ https://gqlgen.com/
 
 Regenerate the support files
 ```
-$ go run scripts/gqlgen.go -v
+$ go run github.com/99designs/gqlgen -v
 ```

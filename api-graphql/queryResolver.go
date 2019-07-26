@@ -22,21 +22,21 @@ func (r *queryResolver) Balances(ctx context.Context) ([]*models.Balance, error)
 	return balances, err
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]models.User, error) {
+func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	if user := auth.ForContext(ctx); user == nil {
-		return []models.User{}, fmt.Errorf("unauthorized")
+		return []*models.User{}, fmt.Errorf("unauthorized")
 	}
 
-	return []models.User{}, nil
+	return []*models.User{}, nil
 }
 
-func (r *queryResolver) Info(ctx context.Context) (models.User, error) {
+func (r *queryResolver) Info(ctx context.Context) (*models.User, error) {
 	user := auth.ForContext(ctx)
 	if user == nil {
-		return models.User{}, fmt.Errorf("unauthorized")
+		return &models.User{}, fmt.Errorf("unauthorized")
 	}
 
-	return *user, nil
+	return user, nil
 }
 
 func (r *queryResolver) GetUser(ctx context.Context) (*models.User, error) {
@@ -83,12 +83,12 @@ func (r *queryResolver) FindOrder(ctx context.Context, id string) (*models.Order
 	return &models.Order{ID: id, Txt: "yeah!"}, nil
 }
 
-func (r *queryResolver) ListStories(ctx context.Context) ([]models.Story, error) {
+func (r *queryResolver) ListStories(ctx context.Context) ([]*models.Story, error) {
 	//user := auth.ForContext(ctx)
 	//if user == nil {
 	//	return []models.Story{}, fmt.Errorf("unauthorized")
 	//}
 
-	stories := []models.Story{}
+	stories := []*models.Story{}
 	return stories, nil
 }

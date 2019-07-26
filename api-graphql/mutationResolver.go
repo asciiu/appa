@@ -64,3 +64,13 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 		return nil, fmt.Errorf("incorrect password/email")
 	}
 }
+
+func (r *mutationResolver) SaveStory(ctx context.Context, title, jsonData string) (bool, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return false, fmt.Errorf("unauthorized")
+	}
+
+	fmt.Println("Hello")
+	return true, nil
+}

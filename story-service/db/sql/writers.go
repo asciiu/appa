@@ -4,11 +4,6 @@ import (
 	"database/sql"
 )
 
-// func DeleteOrder(db *sql.DB, orderID, userID string) error {
-// 	_, err := db.Exec("DELETE FROM orders WHERE id = $1 and user_id = $2", orderID, userID)
-// 	return err
-// }
-
 func InsertWriter(db *sql.DB, userID, title string) error {
 	sqlStatement := `insert into writers (
 		user_id, 
