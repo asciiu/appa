@@ -55,9 +55,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Login     func(childComplexity int, email string, password string, remember bool) int
-		SaveStory func(childComplexity int, title string, json string) int
-		Signup    func(childComplexity int, email string, username string, password string) int
+		CreateStory func(childComplexity int, title string, json string) int
+		Login       func(childComplexity int, email string, password string, remember bool) int
+		Signup      func(childComplexity int, email string, username string, password string) int
 	}
 
 	Order struct {
@@ -103,7 +103,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
 	Login(ctx context.Context, email string, password string, remember bool) (*Token, error)
-	SaveStory(ctx context.Context, title string, json string) (bool, error)
+	CreateStory(ctx context.Context, title string, json string) (string, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
@@ -186,6 +186,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Balance.UserID(childComplexity), true
 
+	case "Mutation.createStory":
+		if e.complexity.Mutation.CreateStory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createStory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateStory(childComplexity, args["title"].(string), args["json"].(string)), true
+
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
 			break
@@ -197,18 +209,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string), args["remember"].(bool)), true
-
-	case "Mutation.saveStory":
-		if e.complexity.Mutation.SaveStory == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_saveStory_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SaveStory(childComplexity, args["title"].(string), args["json"].(string)), true
 
 	case "Mutation.signup":
 		if e.complexity.Mutation.Signup == nil {
@@ -494,13 +494,35 @@ type Query {
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
   login(email: String!, password: String!, remember: Boolean!): Token 
-  saveStory(title: String!, json: String!): Boolean!
+  createStory(title: String!, json: String!): ID!
 }`},
 )
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createStory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["title"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["title"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["json"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["json"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -529,28 +551,6 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["remember"] = arg2
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_saveStory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["title"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["title"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["json"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["json"] = arg1
 	return args, nil
 }
 
@@ -1008,7 +1008,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	return ec.marshalOToken2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚐToken(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_saveStory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_createStory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1025,7 +1025,7 @@ func (ec *executionContext) _Mutation_saveStory(ctx context.Context, field graph
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_saveStory_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_createStory_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1034,7 +1034,7 @@ func (ec *executionContext) _Mutation_saveStory(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SaveStory(rctx, args["title"].(string), args["json"].(string))
+		return ec.resolvers.Mutation().CreateStory(rctx, args["title"].(string), args["json"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1046,10 +1046,10 @@ func (ec *executionContext) _Mutation_saveStory(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models.Order) (ret graphql.Marshaler) {
@@ -3109,8 +3109,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_signup(ctx, field)
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
-		case "saveStory":
-			out.Values[i] = ec._Mutation_saveStory(ctx, field)
+		case "createStory":
+			out.Values[i] = ec._Mutation_createStory(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

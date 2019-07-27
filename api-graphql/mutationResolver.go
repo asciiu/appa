@@ -65,16 +65,16 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 	}
 }
 
-func (r *mutationResolver) SaveStory(ctx context.Context, title, jsonData string) (bool, error) {
+func (r *mutationResolver) CreateStory(ctx context.Context, title, jsonData string) (string, error) {
 	user := auth.ForContext(ctx)
 	if user == nil {
-		return false, fmt.Errorf("unauthorized")
+		return "", fmt.Errorf("unauthorized")
 	}
 
 	story := models.NewStory(user.ID, title, jsonData)
 	if err := repo.InsertStory(r.DB, story); err != nil {
-		return false, err
+		return "", err
 	}
 
-	return true, nil
+	return story.ID, nil
 }
