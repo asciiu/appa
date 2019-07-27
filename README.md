@@ -76,3 +76,6 @@ From within the /api project
 $ swagger generate spec -o ./appa-swagger.json --scan-models
 $ swagger serve -F=swagger appa-swagger.json
 ```
+
+### References 
+* https://github.com/pressly/goose

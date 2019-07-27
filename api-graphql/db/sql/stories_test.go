@@ -19,7 +19,7 @@ func TestInsertStory(t *testing.T) {
 	err = sql.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
-	story := models.NewStory(user.ID, "test", "this is only a test")
+	story := models.NewStory(user.ID, "test", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story)
 
 	assert.Nil(t, err, "insert story failed")
@@ -36,19 +36,19 @@ func TestListStories(t *testing.T) {
 	err = sql.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
-	story1 := models.NewStory(user.ID, "one", "this is only a test")
+	story1 := models.NewStory(user.ID, "one", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story1)
 	assert.Nil(t, err, "insert story failed")
 
-	story2 := models.NewStory(user.ID, "two", "this is only a test")
+	story2 := models.NewStory(user.ID, "two", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story2)
 	assert.Nil(t, err, "insert story failed")
 
-	story3 := models.NewStory(user.ID, "three", "this is only a test")
+	story3 := models.NewStory(user.ID, "three", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story3)
 	assert.Nil(t, err, "insert story failed")
 
-	story4 := models.NewStory(user.ID, "four", "this is only a test")
+	story4 := models.NewStory(user.ID, "four", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story4)
 	assert.Nil(t, err, "insert story failed")
 
@@ -74,11 +74,11 @@ func TestFindStoryByID(t *testing.T) {
 	err = sql.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
-	story1 := models.NewStory(user.ID, "one", "this is only a test")
+	story1 := models.NewStory(user.ID, "one", "{\"some\":\"json\"}")
 	err = sql.InsertStory(db, story1)
 	assert.Nil(t, err, "insert story failed")
 
-	story2 := models.NewStory(user.ID, "two", "asd;klfjf")
+	story2 := models.NewStory(user.ID, "two", "{\"some\": \"json\"}")
 	err = sql.InsertStory(db, story2)
 	assert.Nil(t, err, "insert story failed")
 
