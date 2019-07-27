@@ -91,3 +91,19 @@ func InsertStory(db *sql.DB, story *models.Story) error {
 
 	return err
 }
+
+func UpdateStory(db *sql.DB, story *models.Story) error {
+	sqlStatement := `update stories set
+		title = $1, 
+		content = $2, 
+		status = $3 
+		WHERE id = $4`
+
+	_, err := db.Exec(sqlStatement,
+		story.Title,
+		story.Content,
+		story.Status,
+		story.ID)
+
+	return err
+}
