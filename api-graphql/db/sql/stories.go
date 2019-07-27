@@ -2,6 +2,7 @@ package sql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/asciiu/appa/api-graphql/models"
 )
@@ -99,11 +100,15 @@ func UpdateStory(db *sql.DB, story *models.Story) error {
 		status = $3 
 		WHERE id = $4`
 
-	_, err := db.Exec(sqlStatement,
+	result, err := db.Exec(sqlStatement,
 		story.Title,
 		story.Content,
 		story.Status,
 		story.ID)
+
+	if count, err := result.RowsAffected(); count == 0 || err != nil {
+		return fmt.Errorf("story ID: %s not found", story.ID)
+	}
 
 	return err
 }
