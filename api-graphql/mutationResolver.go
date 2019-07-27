@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/asciiu/appa/api-graphql/auth"
-	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
+	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
 	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
@@ -18,14 +18,14 @@ type mutationResolver struct{ *Resolver }
 
 func (r *mutationResolver) Signup(ctx context.Context, email, username, password string) (*models.User, error) {
 	user := models.NewUser(username, email, password)
-	if err := repoUser.InsertUser(r.DB, user); err != nil {
+	if err := repo.InsertUser(r.DB, user); err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
 func (r *mutationResolver) Login(ctx context.Context, email, password string, remember bool) (*Token, error) {
-	user, err := repoUser.FindUserByEmail(r.DB, email)
+	user, err := repo.FindUserByEmail(r.DB, email)
 	switch {
 	case err != nil && strings.Contains(err.Error(), "no rows"):
 		return nil, gqlerror.Errorf("incorrect password/email")
@@ -48,7 +48,7 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 				selectAuth := refreshToken.Renew(expiresOn)
 
 				// this needs to be checked
-				if _, err := repoUser.InsertRefreshToken(r.DB, refreshToken); err != nil {
+				if _, err := repo.InsertRefreshToken(r.DB, refreshToken); err != nil {
 					log.Println("failed to insert refresh token: ", err)
 				}
 
@@ -71,6 +71,10 @@ func (r *mutationResolver) SaveStory(ctx context.Context, title, jsonData string
 		return false, fmt.Errorf("unauthorized")
 	}
 
-	fmt.Println("Hello")
+	story := models.NewStory(user.ID, title, jsonData)
+	if err := repo.InsertStory(r.DB, story); err != nil {
+		return false, err
+	}
+
 	return true, nil
 }
