@@ -78,3 +78,24 @@ func (r *mutationResolver) CreateStory(ctx context.Context, title, jsonData stri
 
 	return story.ID, nil
 }
+
+func (r *mutationResolver) UpdateStory(ctx context.Context, storyID, title, jsonData, status string) (bool, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return false, fmt.Errorf("unauthorized")
+	}
+
+	story := models.Story{
+		ID:       storyID,
+		AuthorID: user.ID,
+		Title:    title,
+		Content:  jsonData,
+		Status:   status,
+	}
+
+	if err := repo.UpdateStory(r.DB, &story); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

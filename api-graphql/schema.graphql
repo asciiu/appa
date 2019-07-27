@@ -57,4 +57,5 @@ type Mutation {
   signup(email: String!, username: String!, password: String!): User
   login(email: String!, password: String!, remember: Boolean!): Token 
   createStory(title: String!, json: String!): ID!
+  updateStory(id: ID!, title: String!, json: String!, status: String!): Boolean!
 }

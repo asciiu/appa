@@ -58,6 +58,7 @@ type ComplexityRoot struct {
 		CreateStory func(childComplexity int, title string, json string) int
 		Login       func(childComplexity int, email string, password string, remember bool) int
 		Signup      func(childComplexity int, email string, username string, password string) int
+		UpdateStory func(childComplexity int, id string, title string, json string, status string) int
 	}
 
 	Order struct {
@@ -104,6 +105,7 @@ type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
 	Login(ctx context.Context, email string, password string, remember bool) (*Token, error)
 	CreateStory(ctx context.Context, title string, json string) (string, error)
+	UpdateStory(ctx context.Context, id string, title string, json string, status string) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
@@ -221,6 +223,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Signup(childComplexity, args["email"].(string), args["username"].(string), args["password"].(string)), true
+
+	case "Mutation.updateStory":
+		if e.complexity.Mutation.UpdateStory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateStory(childComplexity, args["id"].(string), args["title"].(string), args["json"].(string), args["status"].(string)), true
 
 	case "Order.id":
 		if e.complexity.Order.ID == nil {
@@ -495,6 +509,7 @@ type Mutation {
   signup(email: String!, username: String!, password: String!): User
   login(email: String!, password: String!, remember: Boolean!): Token 
   createStory(title: String!, json: String!): ID!
+  updateStory(id: ID!, title: String!, json: String!, status: String!): Boolean!
 }`},
 )
 
@@ -581,6 +596,44 @@ func (ec *executionContext) field_Mutation_signup_args(ctx context.Context, rawA
 		}
 	}
 	args["password"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["title"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["title"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["json"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["json"] = arg2
+	var arg3 string
+	if tmp, ok := rawArgs["status"]; ok {
+		arg3, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["status"] = arg3
 	return args, nil
 }
 
@@ -1050,6 +1103,50 @@ func (ec *executionContext) _Mutation_createStory(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateStory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateStory_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateStory(rctx, args["id"].(string), args["title"].(string), args["json"].(string), args["status"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *models.Order) (ret graphql.Marshaler) {
@@ -3111,6 +3208,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_login(ctx, field)
 		case "createStory":
 			out.Values[i] = ec._Mutation_createStory(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateStory":
+			out.Values[i] = ec._Mutation_updateStory(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
