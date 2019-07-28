@@ -54,8 +54,8 @@ func main() {
 		Debug:            true,
 	}).Handler)
 
-	router.Handle("/", handler.Playground("Habibi", "/query"))
-	router.Handle("/query", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver}),
+	router.Handle("/", handler.Playground("gql", "/graphql"))
+	router.Handle("/graphql", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver}),
 		handler.ErrorPresenter(
 			func(ctx context.Context, e error) *gqlerror.Error {
 				return graphql.DefaultErrorPresenter(ctx, e)
