@@ -15,8 +15,8 @@ import (
 	"github.com/asciiu/appa/api-graphql/auth"
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/common/db"
-	protoStory "github.com/asciiu/appa/story-service/proto/story"
-	"github.com/derekparker/delve/service"
+	//protoStory "github.com/asciiu/appa/story-service/proto/story"
+
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/gqlerror"
@@ -44,8 +44,8 @@ func main() {
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
 	resolver := apiql.Resolver{
-		DB:          database,
-		StoryClient: protoStory.NewStoryService("stories", service.Client()),
+		DB: database,
+		//StoryClient: protoStory.NewStoryService("stories", service.Client()),
 	}
 	router.Use(auth.Secure(database))
 

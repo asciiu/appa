@@ -30,6 +30,8 @@ github.com/asciiu/appa v0.0.0-20190721221106-a8dc5b735902 h1:kjL10W9WztAzswL+8AQ
 github.com/asciiu/appa v0.0.0-20190721221106-a8dc5b735902/go.mod h1:7yQK72XH764vmxOrNA7EIBFiGjiZE+6d66KgfMOG0Tc=
 github.com/asciiu/appa v0.0.0-20190727221818-9bd0f3b1c286 h1:AqoxTXL24uhx8S86Uj9sW0rVS65vVs5burUVyFHpVlY=
 github.com/asciiu/appa/api-graphql v0.0.0-20190721031036-120c5ff3b7dd/go.mod h1:vFjGM9VbKtSuqsGj4jOIKPZa53FoIr+l7RMb5dFp6tA=
+github.com/asciiu/appa/common v0.0.1 h1:ed0ojOG9bEEI8/EhT+HL06qO/V6bd8vhmncICCvm0Tg=
+github.com/asciiu/appa/common v0.0.1/go.mod h1:jlPRbBBSObiKOiziif7MRJBMjaHbfcISDPdbU9pViRw=
 github.com/asciiu/appa/story-service v0.0.0-20190727221818-9bd0f3b1c286 h1:qEl/TQo+c0Dwawr8bcjFL9c+RJr1M5nLhu09A59I2fM=
 github.com/asciiu/appa/story-service v0.0.0-20190727221818-9bd0f3b1c286/go.mod h1:MM1gfMhdjTR8oUGCMPoIK/U3IiXXVvoUc9X/3zdzy9I=
 github.com/asciiu/appa/user-service v0.0.0-20190721031036-120c5ff3b7dd/go.mod h1:ae12/lPsdJz2VkNDAGGvLeqlIQSBl93KM4gs3KhemYU=
@@ -390,6 +392,7 @@ golang.org/x/tools v0.0.0-20190515012406-7d7faa4812bd h1:oMEQDWVXVNpceQoVd1JN3CQ
 golang.org/x/tools v0.0.0-20190515012406-7d7faa4812bd/go.mod h1:RgjU9mgBXZiqYHBnxXauZ1Gv1EHHAz9KjViQ78xBX0Q=
 golang.org/x/tools v0.0.0-20190530171427-2b03ca6e44eb/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
 golang.org/x/tools v0.0.0-20190606124116-d0a3d012864b/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
+golang.org/x/tools v0.0.0-20190620191750-1fa568393b23 h1:9u6LpPnUW5I7Ou7w6TVLJo3ut+4NgW98U5yEgg6OAgo=
 golang.org/x/tools v0.0.0-20190620191750-1fa568393b23/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=
 google.golang.org/api v0.6.0/go.mod h1:btoxGiFvQNVUZQ8W08zLtrVS08CNpINPEfxXxgJL1Q4=

@@ -7,5 +7,5 @@ https://gqlgen.com/
 
 Regenerate the support files
 ```
-$ go run github.com/99designs/gqlgen -v
+$ GO111MODULE=on go run github.com/99designs/gqlgen -v
 ```
