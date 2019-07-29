@@ -7,8 +7,6 @@ require (
     github.com/asciiu/appa/common v0.0.1 
     github.com/asciiu/story-service v0.0.1 
 	github.com/agnivade/levenshtein v1.0.1
-	github.com/asciiu/appa v0.0.0-00010101000000-000000000000
-	github.com/asciiu/appa/story-service v0.0.0-20190727221818-9bd0f3b1c286
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/google/uuid v1.1.1
