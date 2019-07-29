@@ -4,10 +4,10 @@ go 1.12
 
 require (
 	github.com/armon/go-metrics v0.0.0-20160717043458-3df31a1ada83
-	github.com/asciiu/appa v0.0.0-20181220052351-b644fed4d47e
+	github.com/asciiu/appa/common v0.0.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-log/log v0.1.0
-	github.com/golang/protobuf v0.0.0-20181128192352-1d3f30b51784
+	github.com/golang/protobuf v1.2.0
 	github.com/google/uuid v1.0.0
 	github.com/hashicorp/consul v1.3.0
 	github.com/hashicorp/errwrap v1.0.0
