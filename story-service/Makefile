@@ -1,6 +1,6 @@
 build:
-	dep ensure -update github.com/asciiu/appa
-	docker build --no-cache -t dockerowy/appa-api:dev -f ../api/Dockerfile ..
+	#dep ensure -update github.com/asciiu/appa
+	docker build -t dockerowy/appa-story-service:dev .
 
 prodo: 
 	protoc --proto_path=./ --micro_out=. --go_out=. proto/story/story.proto 

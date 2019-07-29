@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"time"
+	"log"
+	"os"
 
-	git "gopkg.in/libgit2/git2go.v27"
-	//"gopkg.in/libgit2/git2go.v27"
-	//"gopkg.in/src-d/go-git.v4"
-	//. "gopkg.in/src-d/go-git.v4/_examples"
+	"github.com/asciiu/appa/common/db"
+	protoStory "github.com/asciiu/appa/story-service/proto/story"
+	micro "github.com/micro/go-micro"
+	k8s "github.com/micro/kubernetes/go/micro"
 )
 
 func check(e error) {
@@ -17,101 +17,39 @@ func check(e error) {
 	}
 }
 
-// Example of an specific use case:
-// - Clone a repository in a specific path
-// - Get the HEAD reference
-// - Using the HEAD reference, obtain the commit this reference is pointing to
-// - Print the commit content
-// - Using the commit, iterate over all its files and print them
-// - Print all the commit history with commit messages, short hash and the
-// first line of the commit message
-func main() {
+func NewStoryService(name, dbUrl string) micro.Service {
+	// Create a new service. Include some options here.
+	srv := k8s.NewService(
+		// This name must match the package name given in your protobuf definition
+		micro.Name(name),
+		micro.Version("latest"),
+	)
 
-	path := "stories/hello"
-	// init a new git repo under the web directory
-	repo, err := git.InitRepository(path, false)
+	// Init will parse the command line flags.
+	srv.Init()
 
-	//repo, err := git.Clone("git://github.com/gopheracademy/gopheracademy-web.git", "web", &git.CloneOptions{})
+	appaDB, err := db.NewDB(dbUrl)
+
 	if err != nil {
-		panic(err)
+		log.Fatalf(err.Error())
 	}
 
-	filePath := fmt.Sprintf("%s/%s", path, "story.txt")
-
-	d1 := []byte("hello\ngo\n")
-	err = ioutil.WriteFile(filePath, d1, 0644)
-	check(err)
-
-	index, err := repo.Index()
-	check(err)
-
-	index.AddByPath(filePath)
-	index.Write()
-
-	author := &git.Signature{
-		Name:  "Flow",
-		Email: "flow@dog",
-		When:  time.Now(),
+	service := StoryService{
+		DB: appaDB,
 	}
+	// Register our service with the gRPC server, this will tie our
+	// implementation into the auto-generated interface code for our
+	// protobuf definition.
+	protoStory.RegisterStoryServiceHandler(srv.Server(), &service)
 
-	treeID, err := index.WriteTreeTo(repo)
-	check(err)
-	tree, err := repo.LookupTree(treeID)
-	check(err)
+	return srv
+}
 
-	oid, err := repo.CreateCommit("HEAD", author, author, "Did this worky?", tree)
+func main() {
+	dbUrl := fmt.Sprintf("%s", os.Getenv("DB_URL"))
+	srv := NewStoryService("stories", dbUrl)
 
-	fmt.Println(err)
-	fmt.Println(oid)
-
-	//CheckArgs("<url> <path>")
-	//url := os.Args[1]
-	//path := os.Args[2]
-
-	//// Clone the given repository, creating the remote, the local branches
-	//// and fetching the objects, exactly as:
-	//Info("git clone %s %s", url, path)
-
-	//r, err := git.PlainClone(path, false, &git.CloneOptions{URL: url})
-	//CheckIfError(err)
-
-	//// Getting the latest commit on the current branch
-	//Info("git log -1")
-
-	//// ... retrieving the branch being pointed by HEAD
-	//ref, err := r.Head()
-	//CheckIfError(err)
-
-	//// ... retrieving the commit object
-	//commit, err := r.CommitObject(ref.Hash())
-	//CheckIfError(err)
-	//fmt.Println(commit)
-
-	//// List the tree from HEAD
-	//Info("git ls-tree -r HEAD")
-
-	//// ... retrieve the tree from the commit
-	//tree, err := commit.Tree()
-	//CheckIfError(err)
-
-	//// ... get the files iterator and print the file
-	//tree.Files().ForEach(func(f *object.File) error {
-	//	fmt.Printf("100644 blob %s    %s\n", f.Hash, f.Name)
-	//	return nil
-	//})
-
-	//// List the history of the repository
-	//Info("git log --oneline")
-
-	//commitIter, err := r.Log(&git.LogOptions{From: commit.Hash})
-	//CheckIfError(err)
-
-	//err = commitIter.ForEach(func(c *object.Commit) error {
-	//	hash := c.Hash.String()
-	//	line := strings.Split(c.Message, "\n")
-	//	fmt.Println(hash[:7], line[0])
-
-	//	return nil
-	//})
-	//CheckIfError(err)
+	if err := srv.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

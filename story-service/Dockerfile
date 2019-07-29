@@ -1,27 +1,66 @@
-FROM golang:1.11.3 as builder
 
-WORKDIR /go/src/github.com/asciiu/appa/api
+# Accept the Go version for the image to be set as a build argument.
+# Default to Go 1.12
+ARG GO_VERSION=1.12
 
-ADD id_rsa /root/.ssh/id_rsa
-RUN chmod 700 /root/.ssh/id_rsa
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
+# First stage: build the executable.
+FROM golang:${GO_VERSION}-alpine AS builder
 
-ADD api /go/src/github.com/asciiu/appa/api
-CMD cd /go/src/github.com/asciiu/appa/api && go get github.com/asciiu/appa && go build -o /appa
+# Create the user and group files that will be used in the running container to
+# run the process as an unprivileged user.
+RUN mkdir /user && \
+    echo 'nobody:x:65534:65534:nobody:/:' > /user/passwd && \
+    echo 'nobody:x:65534:' > /user/group
 
-RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure -vendor-only
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o api
+# Set the working directory outside $GOPATH to enable the support for modules.
+WORKDIR /src
 
-FROM alpine:latest
+# SSH stuff to pull from private repo
+#ADD id_rsa /root/.ssh/id_rsa
+#RUN chmod 700 /root/.ssh/id_rsa
+#RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+#RUN apk add --no-cache git
+#RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
-RUN apk --no-cache add ca-certificates
+# Git is required for fetching the dependencies.
+RUN apk add --no-cache git
 
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/appa/api/api .
+# Fetch dependencies first; they are less susceptible to change on every build
+# and will therefore be cached for speeding up the next build
+# We want to populate the module cache based on the go.{mod,sum} files. 
+COPY ./go.mod .
+COPY ./go.sum .
+
+RUN go mod download
+
+# Import the code from the context.
+COPY . . 
+
+# Build the executable to `/app`. Mark the build as statically linked.
+RUN CGO_ENABLED=0 go build \
+    -installsuffix 'static' \
+    -o /app . 
+
+#RUN go get -u github.com/golang/dep/cmd/dep
+#RUN dep ensure -vendor-only
+#RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install \
+#    -a -tags netgo \
+#    -ldflags '-w -extldflags "-static"' \
+#    -o /app . 
+
+# Final stage: the running container.
+FROM scratch AS final
+
+# Import the user and group files from the first stage.
+COPY --from=builder /user/group /user/passwd /etc/
+
+# Import the compiled executable from the first stage.
+COPY --from=builder /app /app
 
 EXPOSE 9000
 
-CMD ["./api"]
+# Perform any further action as an unprivileged user.
+USER nobody:nobody
+
+# Run the compiled binary.
+ENTRYPOINT ["/app"]
