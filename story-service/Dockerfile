@@ -13,6 +13,7 @@ RUN mkdir /user && \
     echo 'nobody:x:65534:' > /user/group
 
 # Set the working directory outside $GOPATH to enable the support for modules.
+RUN mkdir /src
 WORKDIR /src
 
 # SSH stuff to pull from private repo
@@ -23,30 +24,25 @@ WORKDIR /src
 #RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
 # Git is required for fetching the dependencies.
-RUN apk add --no-cache git
+# gcc and libc-dev also required for go build
+RUN apk update
+#RUN apk add --no-cache git gcc libc-dev libgit2 libssh2 make cmake pkgconf openssl-dev 
+RUN apk add --no-cache git gcc libc-dev libgit2-0.27-dev pkgconf 
 
 # Fetch dependencies first; they are less susceptible to change on every build
 # and will therefore be cached for speeding up the next build
 # We want to populate the module cache based on the go.{mod,sum} files. 
-COPY ./go.mod .
-COPY ./go.sum .
-
+COPY ./go.mod ./go.sum ./
 RUN go mod download
 
 # Import the code from the context.
-COPY . . 
+COPY ./ ./ 
 
 # Build the executable to `/app`. Mark the build as statically linked.
-RUN CGO_ENABLED=0 go build \
+# CGO needs to be enabled because of the C bindings in libgit2
+RUN CGO_ENABLED=1 GOOS=linux go build \
     -installsuffix 'static' \
-    -o /app . 
-
-#RUN go get -u github.com/golang/dep/cmd/dep
-#RUN dep ensure -vendor-only
-#RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install \
-#    -a -tags netgo \
-#    -ldflags '-w -extldflags "-static"' \
-#    -o /app . 
+    -o /app .
 
 # Final stage: the running container.
 FROM scratch AS final
