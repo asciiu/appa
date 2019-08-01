@@ -22,10 +22,12 @@ func checkErr(err error) {
 
 func setupService() (*StoryService, *user.User) {
 	dbURL := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
+	testDir := "testdirectory"
 	db, _ := db.NewDB(dbURL)
 
 	storyService := StoryService{
-		DB: db,
+		DB:            db,
+		DataDirectory: testDir,
 	}
 
 	user := user.NewUser("chester", "test@email", "hash")

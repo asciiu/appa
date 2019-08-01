@@ -1,4 +1,4 @@
-# minikube storage class - standard is built in
+# minikube storage class - standard is built in and utilizes a dynamic provisioner
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -21,12 +21,19 @@ spec:
             "/service",
             "--selector=static"
           ]
-          envFrom:
-          - configMapRef:
-              name: appa-config
           env:
           - name: UPDATED_AT
             value: "{{ UPDATED_AT }}"
+          - name: DB_URL 
+            valueFrom:
+              configMapKeyRef:
+                name: appa-config 
+                key: DB_URL 
+          - name: DATA_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: story-config
+                key: DATA_PATH 
           ports:
           - containerPort: 9000
             name: http-port

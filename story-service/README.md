@@ -4,6 +4,11 @@
 - libgit2 v0.27
 - git2go v27
 
+### Required
+Local (i.e minikube) development required kube config maps.
+- minikube-config-map.yaml (under deployments)
+- minikube-config-map.yaml (under config/local)
+
 ### References
 - https://micro.mu/docs/deploy-docker.html
 - https://micro.mu/docs/deploy-kubernetes.html#getting-started

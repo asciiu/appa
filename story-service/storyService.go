@@ -15,12 +15,13 @@ import (
 
 // StoryService - manages story repos
 type StoryService struct {
-	DB *sql.DB
+	DB            *sql.DB
+	DataDirectory string
 }
 
 // InitStory - Init new story repo
 func (service *StoryService) InitStory(ctx context.Context, req *protoStory.InitStoryRequest, res *protoStory.StoryResponse) error {
-	path := fmt.Sprintf("%s/%s", "database", req.Title)
+	path := fmt.Sprintf("%s/%s", service.DataDirectory, req.Title)
 	repo, err := git.InitRepository(path, false)
 	if err != nil {
 		res.Status = commonResp.Fail

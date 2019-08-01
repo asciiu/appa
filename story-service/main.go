@@ -29,8 +29,10 @@ func main() {
 	appaDB, err := db.NewDB(dbURL)
 	check(err)
 
+	dataDir := fmt.Sprintf("%s", os.Getenv("DATA_PATH"))
 	service := StoryService{
-		DB: appaDB,
+		DB:            appaDB,
+		DataDirectory: dataDir,
 	}
 	protoStory.RegisterStoryServiceHandler(srv.Server(), &service)
 
