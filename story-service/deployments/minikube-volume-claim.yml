@@ -1,11 +1,13 @@
+# minikube storage class - standard is built in
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: appa-stage-api-vol
+  name: git-claim
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
+  volumeMode: Filesystem
   resources:
     requests:
-      storage: 1Gi
+      storage: 3Gi
   storageClassName: standard 

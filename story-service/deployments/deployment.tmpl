@@ -30,3 +30,10 @@ spec:
           ports:
           - containerPort: 9000
             name: http-port
+          volumeMounts:
+          - name: data-storage
+            mountPath: /data
+        volumes:
+          - name: data-storage 
+            persistentVolumeClaim:
+              claimName: git-claim 
