@@ -5,7 +5,7 @@ gqlgen
 https://github.com/99designs/gqlgen
 https://gqlgen.com/
 
-Regenerate the support files
+Regenerate the support files from graphql dir.
 ```
-$ GO111MODULE=on go run github.com/99designs/gqlgen -v
+$ go run github.com/99designs/gqlgen -v
 ```

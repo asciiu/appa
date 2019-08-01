@@ -15,12 +15,8 @@ spec:
     spec:
         containers:
         - name: api 
-          image: dockerowy/appa-api:dev 
+          image: dockerowy/appa-apiql:dev 
           imagePullPolicy: Always 
-          command: [
-            "./api",
-            "--selector=static"
-          ]
           envFrom:
           - configMapRef:
               name: appa-config

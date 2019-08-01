@@ -11,11 +11,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
-	apiql "github.com/asciiu/appa/api-graphql"
 	"github.com/asciiu/appa/api-graphql/auth"
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
+	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/common/db"
-	//protoStory "github.com/asciiu/appa/story-service/proto/story"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -43,7 +42,8 @@ func main() {
 
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
-	resolver := apiql.Resolver{
+
+	resolver := gql.Resolver{
 		DB: database,
 		//StoryClient: protoStory.NewStoryService("stories", service.Client()),
 	}
@@ -60,7 +60,7 @@ func main() {
 	}).Handler)
 
 	router.Handle("/", handler.Playground("gql", "/graphql"))
-	router.Handle("/graphql", handler.GraphQL(apiql.NewExecutableSchema(apiql.Config{Resolvers: &resolver}),
+	router.Handle("/graphql", handler.GraphQL(gql.NewExecutableSchema(gql.Config{Resolvers: &resolver}),
 		handler.ErrorPresenter(
 			func(ctx context.Context, e error) *gqlerror.Error {
 				return graphql.DefaultErrorPresenter(ctx, e)

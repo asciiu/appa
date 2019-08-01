@@ -4,9 +4,9 @@ go 1.12
 
 require (
 	github.com/99designs/gqlgen v0.9.1
-	//github.com/asciiu/appa/story-service v0.0.1
 	github.com/agnivade/levenshtein v1.0.1
 	github.com/asciiu/appa/common v0.0.1
+	github.com/asciiu/appa/story-service v0.0.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/google/uuid v1.1.1
