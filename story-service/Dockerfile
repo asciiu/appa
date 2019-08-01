@@ -8,13 +8,12 @@ FROM golang:${GO_VERSION}-alpine AS builder
 
 # Create the user and group files that will be used in the running container to
 # run the process as an unprivileged user.
-RUN mkdir /user && \
-    echo 'nobody:x:65534:65534:nobody:/:' > /user/passwd && \
-    echo 'nobody:x:65534:' > /user/group
+#RUN mkdir /user && \
+#    echo 'nobody:x:65534:65534:nobody:/:' > /user/passwd && \
+#    echo 'nobody:x:65534:' > /user/group
 
 # Set the working directory outside $GOPATH to enable the support for modules.
-RUN mkdir /src
-WORKDIR /src
+WORKDIR /
 
 # SSH stuff to pull from private repo
 #ADD id_rsa /root/.ssh/id_rsa
@@ -32,31 +31,39 @@ RUN apk add --no-cache git gcc libc-dev libgit2-0.27-dev pkgconf
 # Fetch dependencies first; they are less susceptible to change on every build
 # and will therefore be cached for speeding up the next build
 # We want to populate the module cache based on the go.{mod,sum} files. 
-COPY ./go.mod ./go.sum ./
-RUN go mod download
+#COPY ./go.mod ./go.sum ./
+#RUN go mod download
 
 # Import the code from the context.
-COPY ./ ./ 
+COPY . . 
+RUN go mod download
 
 # Build the executable to `/app`. Mark the build as statically linked.
 # CGO needs to be enabled because of the C bindings in libgit2
-RUN CGO_ENABLED=1 GOOS=linux go build \
-    -installsuffix 'static' \
-    -o /app .
+#RUN CGO_ENABLED=1 GOOS=linux go build \
+#    -installsuffix 'static' \
+#    -o /app .
+RUN CGO_ENABLED=1 GOOS=linux go build -o app 
 
 # Final stage: the running container.
-FROM scratch AS final
+#FROM scratch AS final
+FROM alpine:latest
+
+# need to have libgit2 lib in final image for service
+RUN apk add --no-cache libgit2-0.27 
 
 # Import the user and group files from the first stage.
-COPY --from=builder /user/group /user/passwd /etc/
+#COPY --from=builder /user/group /user/passwd /etc/
 
 # Import the compiled executable from the first stage.
-COPY --from=builder /app /app
+COPY --from=builder /app /service
 
 EXPOSE 9000
 
 # Perform any further action as an unprivileged user.
-USER nobody:nobody
+#USER nobody:nobody
 
 # Run the compiled binary.
-ENTRYPOINT ["/app"]
+# note: this does not work in the kube deployment - even with the command portion omitted in the deployment yml 
+ENTRYPOINT ["/service"]
+#CMD ["/service"]

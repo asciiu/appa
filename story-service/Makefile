@@ -7,7 +7,7 @@ prodo:
 push:
 	docker push dockerowy/appa-story-service:dev 
 
-run:
+start:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
 	kubectl create -f ./deployments/deployment.yml
 	kubectl create -f ./deployments/service.yml

@@ -1,24 +1,24 @@
-apiVersion: apps/v1beta1
+apiVersion: extensions/v1beta1 
 kind: Deployment
 metadata:
   namespace: default
-  name: api 
+  name: stories 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api 
+      app: stories 
   template:
     metadata:
       labels:
-        app: api 
+        app: stories 
     spec:
         containers:
-        - name: api 
-          image: dockerowy/appa-api:dev 
+        - name: stories 
+          image: dockerowy/appa-story-service:dev 
           imagePullPolicy: Always 
           command: [
-            "./api",
+            "/service",
             "--selector=static"
           ]
           envFrom:
