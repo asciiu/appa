@@ -29,7 +29,7 @@ spec:
   - metadata:
       name: postgres-persistent-storage
       annotations:
-        volume.beta.kubernetes.io/storage-class: "appa-disk"
+        volume.beta.kubernetes.io/storage-class: "postgres-storage"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
