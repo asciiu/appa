@@ -6,8 +6,8 @@ gorush.yml
 google-cred.json
 .terraform
 gorush-configmap.yml
-local-config-map.yaml
+minikube-config-map.yaml
 stage-config-map.yaml
 id_rsa
 **/deployment.yml
-database
+testdirectory
