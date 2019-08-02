@@ -1,18 +1,13 @@
 build:
-	dep ensure -update github.com/asciiu/appa
-	docker build -t dockerowy/appa-order-service:dev -f ../order-service/Dockerfile ..
+	docker build -t dockerowy/appa-order-service:dev .
 
 prodo: 
 	protoc --proto_path=${GOPATH}/src/github.com/asciiu/appa/order-service --micro_out=. --go_out=. proto/order/order.proto 
 
-
 push:
 	docker push dockerowy/appa-order-service:dev 
 
-update:
-	dep ensure -update github.com/asciiu/appa
-
-run:
+start:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
 	kubectl create -f ./deployments/deployment.yml
 	kubectl create -f ./deployments/service.yml
