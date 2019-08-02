@@ -6,12 +6,14 @@ require (
 	github.com/99designs/gqlgen v0.9.1
 	github.com/agnivade/levenshtein v1.0.1
 	github.com/asciiu/appa/common v0.0.1
-	github.com/asciiu/appa/story-service v0.0.2
+	github.com/asciiu/appa/story-service v0.0.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/golang-lru v0.5.1
+	github.com/micro/go-micro v0.25.0
+	github.com/micro/kubernetes v0.7.0
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0
 	github.com/stretchr/testify v1.3.0

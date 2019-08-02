@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -10,6 +11,8 @@ import (
 	"github.com/asciiu/appa/api-graphql/auth"
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
+	constRes "github.com/asciiu/appa/common/constants/response"
+	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -74,6 +77,33 @@ func (r *mutationResolver) CreateStory(ctx context.Context, title, jsonData stri
 	story := models.NewStory(user.ID, title, jsonData)
 	if err := repo.InsertStory(r.DB, story); err != nil {
 		return "", err
+	}
+
+	req := protoStory.InitStoryRequest{
+		StoryID:   story.ID,
+		UserID:    user.ID,
+		Username:  user.Username,
+		UserEmail: user.Email,
+		Title:     title,
+		JsonData:  jsonData,
+	}
+	res, err := r.StoryClient.InitStory(ctx, &req)
+	fmt.Println(err)
+	fmt.Println(res)
+
+	if res.Status != constRes.Success {
+		//res := &ResponseError{
+		//	Status:  r.Status,
+		//	Message: r.Message,
+		//}
+
+		//if r.Status == constRes.Fail {
+		//	return c.JSON(http.StatusBadRequest, res)
+		//}
+		//if r.Status == constRes.Error {
+		//	return c.JSON(http.StatusInternalServerError, res)
+		//}
+		return "", errors.New(res.Message)
 	}
 
 	return story.ID, nil

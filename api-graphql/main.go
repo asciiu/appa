@@ -15,6 +15,9 @@ import (
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/common/db"
+	protoStory "github.com/asciiu/appa/story-service/proto/story"
+	micro "github.com/micro/go-micro"
+	k8s "github.com/micro/kubernetes/go/micro"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -43,9 +46,12 @@ func main() {
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
 
+	service := k8s.NewService(micro.Name("graphql"))
+	service.Init()
+
 	resolver := gql.Resolver{
-		DB: database,
-		//StoryClient: protoStory.NewStoryService("stories", service.Client()),
+		DB:          database,
+		StoryClient: protoStory.NewStoryService("stories", service.Client()),
 	}
 	router.Use(auth.Secure(database))
 
@@ -69,6 +75,12 @@ func main() {
 	))
 
 	go cleanDatabase(database)
+
+	go func() {
+		if err := service.Run(); err != nil {
+			log.Println("nope! ", err)
+		}
+	}()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", defaultPort)
 	log.Fatal(http.ListenAndServe(":"+defaultPort, router))

@@ -2,11 +2,13 @@ package graphql
 
 import (
 	"database/sql"
+
+	protoStory "github.com/asciiu/appa/story-service/proto/story"
 )
 
 type Resolver struct {
-	DB *sql.DB
-	//StoryClient protoStory.StoryService
+	DB          *sql.DB
+	StoryClient protoStory.StoryService
 }
 
 func (r *Resolver) Mutation() MutationResolver {
