@@ -21,7 +21,7 @@ type StoryService struct {
 
 // InitStory - Init new story repo
 func (service *StoryService) InitStory(ctx context.Context, req *protoStory.InitStoryRequest, res *protoStory.StoryResponse) error {
-	path := fmt.Sprintf("%s/%s", service.DataDirectory, req.Title)
+	path := fmt.Sprintf("%s/%s", service.DataDirectory, req.StoryID)
 	repo, err := git.InitRepository(path, false)
 	if err != nil {
 		res.Status = commonResp.Fail
@@ -29,9 +29,9 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 		return nil
 	}
 
-	filePath := fmt.Sprintf("%s/%s.txt", path, req.Title)
+	filePath := fmt.Sprintf("%s/json", path)
 
-	data := []byte(req.Content)
+	data := []byte(req.JsonData)
 	err = ioutil.WriteFile(filePath, data, 0644)
 	if err != nil {
 		res.Status = commonResp.Fail
@@ -79,12 +79,10 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 	res.Status = commonResp.Success
 	res.Data = &protoStory.StoryData{
 		Story: &protoStory.Story{
-			StoryID: filePath,
-			UserID:  req.UserID,
-			Title:   req.Title,
-			Content: req.Content,
-			Rated:   req.Rated,
-			Status:  req.Status,
+			StoryID:  req.StoryID,
+			UserID:   req.UserID,
+			Title:    req.Title,
+			JsonData: req.JsonData,
 		},
 	}
 
@@ -93,7 +91,7 @@ func (service *StoryService) InitStory(ctx context.Context, req *protoStory.Init
 
 // DeleteStory - delete story repo
 func (service *StoryService) DeleteStory(ctx context.Context, req *protoStory.DeleteStoryRequest, res *protoStory.StoryResponse) error {
-	path := fmt.Sprintf("%s/%s", req.UserID, req.Title)
+	path := fmt.Sprintf("%s/%s", service.DataDirectory, req.StoryID)
 
 	cmd := exec.Command("rm", "-rf", path)
 	err := cmd.Run()

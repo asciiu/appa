@@ -7,18 +7,17 @@ service StoryService {
 
 // Requests
 message InitStoryRequest {
-  string userID  = 1;
-  string username = 2;
-  string userEmail = 3;
-  string title = 4;
-  string content = 5;
-  double rated = 6;
-  string status = 7;
+  string storyID = 1;
+  string userID  = 2;
+  string username = 3;
+  string userEmail = 4;
+  string title = 5;
+  string jsonData = 6;
 }
 
 message DeleteStoryRequest {
-  string userID  = 1;
-  string title = 2;
+  string storyID = 1;
+  string userID  = 2;
 }
 
 // Responses
@@ -26,11 +25,9 @@ message Story {
   string storyID = 1;
   string userID = 2;
   string title = 3;
-  string content = 4;
-  double rated = 5;
-  string status = 8;
-  string createdOn = 10;
-  string updatedOn = 11;
+  string jsonData = 4;
+  string createdOn = 5;
+  string updatedOn = 6;
 }
 
 message StoryData {

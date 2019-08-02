@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os/exec"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/common/db"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,9 +22,11 @@ func checkErr(err error) {
 	}
 }
 
+var TEST_DIR = "trash"
+
 func setupService() (*StoryService, *user.User) {
 	dbURL := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
-	testDir := "testdirectory"
+	testDir := TEST_DIR
 	db, _ := db.NewDB(dbURL)
 
 	storyService := StoryService{
@@ -43,21 +47,23 @@ func TestInitStory(t *testing.T) {
 
 	defer service.DB.Close()
 
+	storyID := uuid.New()
+
 	req := protoStory.InitStoryRequest{
+		StoryID:   storyID.String(),
 		UserID:    user.ID,
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Title:     title,
-		Content:   "Shouldn't have done that to my brother. He was just a boy.",
-		Rated:     0.0,
-		Status:    "draft",
+		JsonData:  "Shouldn't have done that to my brother. He was just a boy.",
 	}
 
 	res := protoStory.StoryResponse{}
 	service.InitStory(context.Background(), &req, &res)
 	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
 
-	cmd := exec.Command("rm", "-rf", "database/"+res.Data.Story.Title)
+	path := fmt.Sprintf("%s/%s", TEST_DIR, req.StoryID)
+	cmd := exec.Command("rm", "-rf", path)
 	err := cmd.Run()
 	assert.Nil(t, err, "error for delete should be nil")
 
@@ -69,15 +75,15 @@ func TestDeleteRepo(t *testing.T) {
 
 	defer service.DB.Close()
 
+	storyID := uuid.New()
 	title := "Forest Gump"
 	req1 := protoStory.InitStoryRequest{
+		StoryID:   storyID.String(),
 		UserID:    user.ID,
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Title:     title,
-		Content:   "Run forest!",
-		Rated:     0.0,
-		Status:    "draft",
+		JsonData:  "Run forest!",
 	}
 
 	res1 := protoStory.StoryResponse{}
@@ -85,16 +91,12 @@ func TestDeleteRepo(t *testing.T) {
 	assert.Equal(t, "success", res1.Status, "expected success got: "+res1.Message)
 
 	req2 := protoStory.DeleteStoryRequest{
-		UserID: user.ID,
-		Title:  title,
+		StoryID: res1.Data.Story.StoryID,
+		UserID:  user.ID,
 	}
 	res2 := protoStory.StoryResponse{}
 	service.DeleteStory(context.Background(), &req2, &res2)
 	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
-
-	cmd := exec.Command("rm", "-rf", "database/"+res2.Data.Story.Title)
-	err := cmd.Run()
-	assert.Nil(t, err, "error for delete should be nil")
 
 	repoUser.DeleteUserHard(service.DB, user.ID)
 }
