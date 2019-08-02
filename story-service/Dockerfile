@@ -58,12 +58,9 @@ RUN apk add --no-cache libgit2-0.27
 # Import the compiled executable from the first stage.
 COPY --from=builder /app /service
 
-EXPOSE 9000
-
 # Perform any further action as an unprivileged user.
 #USER nobody:nobody
 
 # Run the compiled binary.
-# note: this does not work in the kube deployment - even with the command portion omitted in the deployment yml 
-ENTRYPOINT ["/service"]
-#CMD ["/service"]
+#ENTRYPOINT ["/service", "--selector=static", "--server_address=:8080", "--broker_address=:10001"]
+CMD ["/service"]

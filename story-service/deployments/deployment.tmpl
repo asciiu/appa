@@ -19,7 +19,9 @@ spec:
           imagePullPolicy: Always 
           command: [
             "/service",
-            "--selector=static"
+            "--selector=static",
+		        "--server_address=0.0.0.0:8080",
+		        "--broker_address=0.0.0.0:10001"
           ]
           env:
           - name: UPDATED_AT
@@ -35,7 +37,7 @@ spec:
                 name: story-config
                 key: DATA_PATH 
           ports:
-          - containerPort: 9000
+          - containerPort: 8080
             name: http-port
           volumeMounts:
           - name: data-storage
