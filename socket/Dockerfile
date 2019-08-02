@@ -1,14 +1,20 @@
-FROM golang:1.11.3 as builder
+ARG GO_VERSION=1.12
 
-WORKDIR /go/src/github.com/asciiu/appa/socket
+# First stage: build the executable.
+FROM golang:${GO_VERSION}-alpine AS builder
+
+WORKDIR /
+
+RUN apk add --no-cache git
+
 COPY . .
-RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o socket
+
+RUN go mod download 
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o socket
+
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /go/src/github.com/asciiu/appa/socket/socket .
+
+COPY --from=builder /socket .
 
 CMD ["./socket"]
