@@ -16,9 +16,8 @@ func TestOrderBook(t *testing.T) {
 		OrderID:    "#1",
 		MarketName: "test-btc",
 		Side:       constOrder.Buy,
-		Size:       1,
+		Amount:     1,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 	}
 	book.AddOrder(&order)
 
@@ -32,9 +31,8 @@ func TestOrderBookWrongMarketName(t *testing.T) {
 		OrderID:    uuid.New().String(),
 		MarketName: "bch-btc",
 		Side:       constOrder.Buy,
-		Size:       1,
+		Amount:     1,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 	}
 	book.AddBuyOrder(&order)
 
@@ -49,9 +47,8 @@ func TestOrderBookRejectBuyOrder(t *testing.T) {
 		OrderID:    uuid.New().String(),
 		MarketName: "test-btc",
 		Side:       constOrder.Buy,
-		Size:       1,
+		Amount:     1,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 	}
 	book.AddSellOrder(&order)
 
@@ -65,9 +62,8 @@ func TestOrderBookRejectSellOrder(t *testing.T) {
 		OrderID:    uuid.New().String(),
 		MarketName: "test-btc",
 		Side:       constOrder.Sell,
-		Size:       1,
+		Amount:     1,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 	}
 	book.AddBuyOrder(&order)
 
@@ -82,16 +78,15 @@ func TestOrderBookMatchSellOrder(t *testing.T) {
 		OrderID:    "#0",
 		MarketName: "test-btc",
 		Side:       constOrder.Sell,
-		Size:       1,
+		Amount:     1,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 		CreatedOn:  now.String(),
 	}
 	order1 := &protoOrder.Order{
 		OrderID:    "#1",
 		MarketName: "test-btc",
 		Price:      0.01,
-		Size:       1.2,
+		Amount:     1.2,
 		Side:       constOrder.Sell,
 		CreatedOn:  now.Add(time.Second * 10).String(),
 	}
@@ -99,7 +94,7 @@ func TestOrderBookMatchSellOrder(t *testing.T) {
 		OrderID:    "#2",
 		MarketName: "test-btc",
 		Price:      0.007,
-		Size:       0.2,
+		Amount:     0.2,
 		Side:       constOrder.Sell,
 		CreatedOn:  now.Add(time.Second * 1).String(),
 	}
@@ -117,7 +112,7 @@ func TestOrderBookMatchSellOrder(t *testing.T) {
 		OrderID:    "#buyer",
 		MarketName: "test-btc",
 		Price:      0.01,
-		Size:       0.9,
+		Amount:     0.9,
 		Side:       "buy",
 	}
 	//fmt.Printf("buy order %+v\n", buyOrder)
@@ -148,15 +143,14 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#0",
 		MarketName: "test-btc",
 		Side:       constOrder.Buy,
-		Size:       1.0,
+		Amount:     1.0,
 		Price:      0.01,
-		Type:       constOrder.LimitOrder,
 	}
 	order1 := &protoOrder.Order{
 		OrderID:    "#1",
 		MarketName: "test-btc",
 		Price:      0.01,
-		Size:       1.2,
+		Amount:     1.2,
 		Side:       "buy",
 		CreatedOn:  now.String(),
 	}
@@ -164,7 +158,7 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#2",
 		MarketName: "test-btc",
 		Price:      0.007,
-		Size:       0.2,
+		Amount:     0.2,
 		Side:       "buy",
 		CreatedOn:  now.Add(time.Second * 1).String(),
 	}
@@ -172,7 +166,7 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#4",
 		MarketName: "test-btc",
 		Price:      0.007,
-		Size:       2.7,
+		Amount:     2.7,
 		Side:       "buy",
 		CreatedOn:  now.Add(time.Second * 20).String(),
 	}
@@ -180,7 +174,7 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#3",
 		MarketName: "test-btc",
 		Price:      0.007,
-		Size:       0.9,
+		Amount:     0.9,
 		Side:       "buy",
 		CreatedOn:  now.Add(time.Second * 2).String(),
 	}
@@ -188,7 +182,7 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#5",
 		MarketName: "test-btc",
 		Price:      0.00034,
-		Size:       0.9,
+		Amount:     0.9,
 		Side:       "buy",
 		CreatedOn:  now.Add(time.Second * 100).String(),
 	}
@@ -205,7 +199,7 @@ func TestOrderBookMatchBuyOrder(t *testing.T) {
 		OrderID:    "#sell",
 		MarketName: "test-btc",
 		Price:      0.007,
-		Size:       1.9,
+		Amount:     1.9,
 		Side:       "sell",
 	}
 	//fmt.Printf("sell order %+v\n", sellOrder)

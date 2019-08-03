@@ -68,15 +68,15 @@ func (book *OrderBook) FillBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*
 	}
 
 	buyOrders = make([]*protoOrder.Order, 0)
-	sellSize := sellOrder.Size
+	sellSize := sellOrder.Amount
 	for i := len(book.BuyOrders) - 1; i >= 0; i-- {
 		buy := book.BuyOrders[i]
 		if buy.Price >= sellOrder.Price && sellSize > 0 {
-			buySize := buy.Size
+			buySize := buy.Amount
 
 			if sellSize < buySize {
 				buy.Fill = sellSize
-				buy.Size -= sellSize
+				buy.Amount -= sellSize
 				sellSize = 0
 			} else {
 				buy.Fill = buySize
@@ -99,14 +99,14 @@ func (book *OrderBook) FillSellOrders(buyOrder *protoOrder.Order) (sellOrders []
 	}
 
 	sellOrders = make([]*protoOrder.Order, 0)
-	buySize := buyOrder.Size
+	buySize := buyOrder.Amount
 	for i, sell := range book.SellOrders {
 		if sell.Price <= buyOrder.Price && buySize > 0 {
-			sellSize := sell.Size
+			sellSize := sell.Amount
 
 			if buySize < sellSize {
 				sell.Fill = buySize
-				sell.Size -= buySize
+				sell.Amount -= buySize
 				buySize = 0
 			} else {
 				sell.Fill = sellSize

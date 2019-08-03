@@ -24,9 +24,8 @@ message NewOrderRequest {
   string userID  = 1;
   string marketName = 2;
   string side = 3;
-  double size = 4;
+  double amount = 4;
   double price = 5;
-  string type = 6;
 }
 
 // Responses
@@ -35,13 +34,12 @@ message Order {
   string userID = 2;
   string marketName = 3;
   string side = 4;
-  double size = 5;
+  double amount = 5;
   double price = 6;
-  string type = 7;
-  string status = 8;
-  double fill = 9;
-  string createdOn = 10;
-  string updatedOn = 11;
+  string status = 7;
+  double fill = 8;
+  string createdOn = 9;
+  string updatedOn = 10;
 }
 
 message OrderData {
