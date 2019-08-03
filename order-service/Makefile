@@ -2,7 +2,7 @@ build:
 	docker build -t dockerowy/appa-order-service:dev .
 
 prodo: 
-	protoc --proto_path=${GOPATH}/src/github.com/asciiu/appa/order-service --micro_out=. --go_out=. proto/order/order.proto 
+	protoc --proto_path=./ --micro_out=. --go_out=. proto/order/order.proto 
 
 push:
 	docker push dockerowy/appa-order-service:dev 
