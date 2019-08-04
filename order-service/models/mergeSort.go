@@ -49,7 +49,7 @@ func merge(left, right []*protoOrder.Order) []*protoOrder.Order {
 }
 
 // should return index where Order.Price == price
-func binarySearch(a []*protoOrder.Order, price float64) (index int) {
+func binarySearch(a []*protoOrder.Order, price uint64) (index int) {
 	mid := len(a) / 2
 	switch {
 	case len(a) == 0:
@@ -66,7 +66,7 @@ func binarySearch(a []*protoOrder.Order, price float64) (index int) {
 }
 
 // returns first index where Order.Price <= price
-func searchLessThan(sorted []*protoOrder.Order, price float64) (index int) {
+func searchLessThan(sorted []*protoOrder.Order, price uint64) (index int) {
 	idx := binarySearch(sorted, price)
 	index = -1
 	if idx < 0 {
@@ -86,7 +86,7 @@ func searchLessThan(sorted []*protoOrder.Order, price float64) (index int) {
 }
 
 // returns first index where Order.Price > price
-func searchGreaterThan(sorted []*protoOrder.Order, price float64) (index int) {
+func searchGreaterThan(sorted []*protoOrder.Order, price uint64) (index int) {
 	idx := binarySearch(sorted, price)
 	slice := sorted[idx:]
 	index = idx

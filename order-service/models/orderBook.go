@@ -50,50 +50,90 @@ func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
 	}
 }
 
-func (book *OrderBook) FillOrders(order *protoOrder.Order) (filledOrders []*protoOrder.Order) {
-	filledOrders = make([]*protoOrder.Order, 0)
-	switch {
-	case order.Side == constOrder.Buy:
-		filledOrders = book.FillSellOrders(order)
-	case order.Side == constOrder.Sell:
-		filledOrders = book.FillBuyOrders(order)
-	}
-	return
-}
+// func (book *OrderBook) FillOrders(order *protoOrder.Order) (filledOrders []*protoOrder.Order) {
+// 	filledOrders = make([]*protoOrder.Order, 0)
+// 	switch {
+// 	case order.Side == constOrder.Buy:
+// 		filledOrders = book.FillSellOrders(order)
+// 	case order.Side == constOrder.Sell:
+// 		filledOrders = book.FillBuyOrders(order)
+// 	}
+// 	return
+// }
 
 // get all buy orders that can fill a sell order
-func (book *OrderBook) FillBuyOrders(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
+func (book *OrderBook) ProcessSellOrder(sellOrder *protoOrder.Order) (buyOrders []*protoOrder.Order) {
 	if sellOrder.Side != constOrder.Sell {
 		return
 	}
+	if sellOrder.Amount <= 0 {
+		// sell order amount should always be > 0
+		return
+	}
 
-	buyOrders = make([]*protoOrder.Order, 0)
-	sellSize := sellOrder.Amount
+	filledOrders := make([]*protoOrder.Order, 0)
+	sellAmount := sellOrder.Amount
+
+	// buy orders are presorted by price from low to high
+	// start with buy orders with the highest price
 	for i := len(book.BuyOrders) - 1; i >= 0; i-- {
-		buy := book.BuyOrders[i]
-		if buy.Price >= sellOrder.Price && sellSize > 0 {
-			buySize := buy.Amount
+		buyOrder := book.BuyOrders[i]
 
-			if sellSize < buySize {
-				buy.Fill = sellSize
-				buy.Amount -= sellSize
-				sellSize = 0
-			} else {
-				buy.Fill = buySize
-				sellSize -= buySize
-				// remove filled orders
-				book.BuyOrders = book.BuyOrders[:i]
-			}
-
-			buyOrders = append(buyOrders, buy)
+		// lower buy prices should be be filled by a higher price
+		if buyOrder.Price < sellOrder.Price {
+			break
 		}
+
+		// fill buy orders with a higher price than the sell
+		// the sell price is at the seller's price since it is lower
+		//trade := Trade{
+		//	MakerOrderID: buyOrder.OrderID,
+		//	TakerOrderID: sellOrder.OrderID,
+		//	Price:        sellOrder.Price,
+		//	Side:         constants.Sell,
+		//}
+
+		// if the sell amount is less than the buy order amount
+		if sellAmount >= buyOrder.Amount {
+			// fill the entire buy order
+			buyOrder.Fill = buyOrder.Amount
+			// subtract the bought amount from the running sellAmount
+			sellOrder.Amount -= buyOrder.Amount
+			// remove filled orders
+			book.BuyOrders = book.BuyOrders[:i]
+		} else {
+			// Trade{
+			// 	MakerOrderID: buyOrder.OrderID,
+			// 	TakerOrderID: sellOrder.OrderID,
+			// 	Amount:       sellAmount,
+			// 	Price:        sellOrder.Price,
+			// 	Side:         constants.Sell,
+			// }
+
+			// TODO update buy order fill column
+			// set order status to filled
+			buyOrder.Fill = sellAmount
+
+			// all sold out
+			sellOrder.Amount = 0
+			break
+		}
+		filledOrders = append(filledOrders, buyOrder)
+	}
+
+	// TODO
+	// update filled orders
+
+	// add the remaining sell order amount
+	if sellOrder.Amount > 0 {
+		book.AddSellOrder(sellOrder)
 	}
 
 	return
 }
 
 // get all sell orders that a buy order can fill
-func (book *OrderBook) FillSellOrders(buyOrder *protoOrder.Order) (sellOrders []*protoOrder.Order) {
+func (book *OrderBook) ProcessBuyOrder(buyOrder *protoOrder.Order) (sellOrders []*protoOrder.Order) {
 	if buyOrder.Side != constOrder.Buy {
 		return
 	}
