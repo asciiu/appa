@@ -5,6 +5,7 @@ import (
 )
 
 // OrderBook has a market
+// The only public method should be Process.
 type OrderBook struct {
 	MarketName string
 	LastPrice  uint64
@@ -22,21 +23,6 @@ func NewOrderBook(marketName string) *OrderBook {
 		SellOrders: make([]*Order, 0),
 	}
 }
-
-// AddOrder will add the order to either buy or sells.
-// Orders with a different market name will not be added.
-//func (book *OrderBook) AddOrder(order *Order) {
-//	if order.MarketName != book.MarketName {
-//		return
-//	}
-//
-//	switch {
-//	case order.Side == constOrder.Buy:
-//		book.addBuyOrder(order)
-//	case order.Side == constOrder.Sell:
-//		book.addSellOrder(order)
-//	}
-//}
 
 // buy orders will be kept sorted in acending price order
 // the last order should be the highest priced order
@@ -165,48 +151,80 @@ func (book *OrderBook) processLimitBuy(order *Order) []*Trade {
 }
 
 // Process a limit sell order
-func (book *OrderBook) processLimitSell(order *Order) []*Trade {
+func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 	trades := make([]*Trade, 0, 1)
-	n := len(book.BuyOrders)
-	// check if we have at least one matching order
-	if n > 0 && book.BuyOrders[n-1].Price >= order.Price {
-		// traverse all orders that match
-		for i := n - 1; i >= 0; i-- {
+	numBuyOrders := len(book.BuyOrders)
+
+	if numBuyOrders > 0 {
+		i1 := 0
+		i2 := numBuyOrders - 1
+
+		// loop through buy orders beginning with
+		// orders with the highest price. Find index of
+		// first buy order that can fill the sell order - i1.
+		// The second index within BuyOrders where the price can
+		// fill the sell order will be known as i2. Buy orders
+		// should be filled from i1 -> i2.
+		for i := numBuyOrders - 1; i >= 0; i-- {
 			buyOrder := book.BuyOrders[i]
-			if buyOrder.Price < order.Price {
+			if buyOrder.Price < sellOrder.Price {
+				i1 = i + 1
 				break
 			}
+			if buyOrder.Price <= sellOrder.Price {
+				i2 = i
+			}
+		}
+
+		for j := i1; sellOrder.Amount > 0 && j <= i2; j++ {
+			buyOrder := book.BuyOrders[j]
 
 			trade := &Trade{
-				TakerOrderID: order.ID,
+				TakerOrderID: sellOrder.ID,
 				MakerOrderID: buyOrder.ID,
 				Price:        buyOrder.Price,
-				Side:         order.Side,
+				Side:         sellOrder.Side,
 			}
 			book.LastPrice = buyOrder.Price
-			book.LastSide = order.Side
+			book.LastSide = sellOrder.Side
 
-			// fill the entire order
-			if buyOrder.Amount >= order.Amount {
-				trade.Amount = order.Amount
+			// fill the entire sell order
+			if buyOrder.Amount >= sellOrder.Amount {
+				// buy order amount >= sell amount therefore,
+				// the entire sell order will be filled with
+				// a single buy order. The amount traded will
+				// be the seller's amount.
+				trade.Amount = sellOrder.Amount
 				trades = append(trades, trade)
-				buyOrder.Amount -= order.Amount
+
+				// update new buy order amount
+				buyOrder.Amount -= sellOrder.Amount
+
+				// if the buy order amount == 0 then the buy
+				// order has been filled - remove it
 				if buyOrder.Amount == 0 {
-					book.removeBuyOrder(i)
+					book.removeBuyOrder(j)
 				}
 				return trades
 			}
-			// fill a partial order and continue
-			if buyOrder.Amount < order.Amount {
-				trade.Amount = buyOrder.Amount
-				trades = append(trades, trade)
-				order.Amount -= buyOrder.Amount
-				book.removeBuyOrder(i)
-				continue
-			}
+
+			// the entire buy order will be filled by this sell
+			// order because the sell amount > buy amount.
+			trade.Amount = buyOrder.Amount
+			trades = append(trades, trade)
+
+			// update new sell order amount
+			sellOrder.Amount -= buyOrder.Amount
+
+			// buy order should be removed
+			book.removeBuyOrder(j)
 		}
 	}
-	// finally add the remaining order to the list
-	book.addSellOrder(order)
+
+	// add remaining sell amount to our sell orders
+	if sellOrder.Amount > 0 {
+		book.addSellOrder(sellOrder)
+	}
+
 	return trades
 }
