@@ -157,67 +157,81 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 
 	if numBuyOrders > 0 {
 		i1 := 0
-		i2 := numBuyOrders - 1
+		i2 := 0
+		count := 0
 
 		// loop through buy orders beginning with
-		// orders with the highest price. Find index of
-		// first buy order that can fill the sell order - i1.
-		// The second index within BuyOrders where the price can
-		// fill the sell order will be known as i2. Buy orders
-		// should be filled from i1 -> i2.
+		// orders with the highest price. Find index
+		// range (i1, i2) within sorted buy orders.
+		// These are the orders that can fill the sell
+		// order and should be filled from i1 -> i2
 		for i := numBuyOrders - 1; i >= 0; i-- {
 			buyOrder := book.BuyOrders[i]
+
+			// a lower buy price cannot fill a higher sell price
 			if buyOrder.Price < sellOrder.Price {
+				// the first buy order index should be the next order
+				// after this one
 				i1 = i + 1
 				break
 			}
-			if buyOrder.Price <= sellOrder.Price {
-				i2 = i
+
+			// any buy order with a higher asking price should
+			// fill a sell order with a lower asking price
+			if buyOrder.Price >= sellOrder.Price {
+				count++
+				if i2 == 0 {
+					i2 = i
+				}
 			}
 		}
 
-		for j := i1; sellOrder.Amount > 0 && j <= i2; j++ {
-			buyOrder := book.BuyOrders[j]
+		if count > 0 {
 
-			trade := &Trade{
-				TakerOrderID: sellOrder.ID,
-				MakerOrderID: buyOrder.ID,
-				Price:        buyOrder.Price,
-				Side:         sellOrder.Side,
-			}
-			book.LastPrice = buyOrder.Price
-			book.LastSide = sellOrder.Side
+			// fills orders from i1 -> i2.
+			for j := i1; sellOrder.Amount > 0 && j <= i2; j++ {
+				buyOrder := book.BuyOrders[j]
 
-			// fill the entire sell order
-			if buyOrder.Amount >= sellOrder.Amount {
-				// buy order amount >= sell amount therefore,
-				// the entire sell order will be filled with
-				// a single buy order. The amount traded will
-				// be the seller's amount.
-				trade.Amount = sellOrder.Amount
+				trade := &Trade{
+					TakerOrderID: sellOrder.ID,
+					MakerOrderID: buyOrder.ID,
+					Price:        buyOrder.Price,
+					Side:         sellOrder.Side,
+				}
+				book.LastPrice = buyOrder.Price
+				book.LastSide = sellOrder.Side
+
+				// fill the entire sell order
+				if buyOrder.Amount >= sellOrder.Amount {
+					// buy order amount >= sell amount therefore,
+					// the entire sell order will be filled with
+					// a single buy order. The amount traded will
+					// be the seller's amount.
+					trade.Amount = sellOrder.Amount
+					trades = append(trades, trade)
+
+					// update new buy order amount
+					buyOrder.Amount -= sellOrder.Amount
+
+					// if the buy order amount == 0 then the buy
+					// order has been filled - remove it
+					if buyOrder.Amount == 0 {
+						book.removeBuyOrder(j)
+					}
+					return trades
+				}
+
+				// the entire buy order will be filled by this sell
+				// order because the sell amount > buy amount.
+				trade.Amount = buyOrder.Amount
 				trades = append(trades, trade)
 
-				// update new buy order amount
-				buyOrder.Amount -= sellOrder.Amount
+				// update new sell order amount
+				sellOrder.Amount -= buyOrder.Amount
 
-				// if the buy order amount == 0 then the buy
-				// order has been filled - remove it
-				if buyOrder.Amount == 0 {
-					book.removeBuyOrder(j)
-				}
-				return trades
+				// buy order should be removed
+				book.removeBuyOrder(j)
 			}
-
-			// the entire buy order will be filled by this sell
-			// order because the sell amount > buy amount.
-			trade.Amount = buyOrder.Amount
-			trades = append(trades, trade)
-
-			// update new sell order amount
-			sellOrder.Amount -= buyOrder.Amount
-
-			// buy order should be removed
-			book.removeBuyOrder(j)
 		}
 	}
 
