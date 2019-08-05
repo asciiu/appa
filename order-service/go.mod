@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
-	github.com/asciiu/appa v0.0.0-20190101034436-6bd240b361c4
+	github.com/asciiu/appa/common v0.0.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-log/log v0.1.0
 	github.com/golang/protobuf v1.2.0
@@ -21,7 +21,7 @@ require (
 	github.com/hashicorp/memberlist v0.1.0
 	github.com/hashicorp/serf v0.8.1
 	github.com/json-iterator/go v1.1.5
-	github.com/lib/pq v1.0.0
+	github.com/lib/pq v1.2.0
 	github.com/micro/cli v0.0.0-20180830071301-8b9d33ec2f19
 	github.com/micro/go-grpc v0.6.0
 	github.com/micro/go-log v0.0.0-20170512141327-cbfa9447f9b6
