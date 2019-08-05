@@ -17,7 +17,7 @@ func TestOrderBook(t *testing.T) {
 		Amount:     1024,
 		Price:      1000,
 	}
-	book.AddOrder(&order)
+	book.Process(&order)
 
 	assert.Equal(t, 1, len(book.BuyOrders), "should be 1 order in buys")
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")

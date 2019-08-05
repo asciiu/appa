@@ -25,18 +25,18 @@ func NewOrderBook(marketName string) *OrderBook {
 
 // AddOrder will add the order to either buy or sells.
 // Orders with a different market name will not be added.
-func (book *OrderBook) AddOrder(order *Order) {
-	if order.MarketName != book.MarketName {
-		return
-	}
-
-	switch {
-	case order.Side == constOrder.Buy:
-		book.addBuyOrder(order)
-	case order.Side == constOrder.Sell:
-		book.addSellOrder(order)
-	}
-}
+//func (book *OrderBook) AddOrder(order *Order) {
+//	if order.MarketName != book.MarketName {
+//		return
+//	}
+//
+//	switch {
+//	case order.Side == constOrder.Buy:
+//		book.addBuyOrder(order)
+//	case order.Side == constOrder.Sell:
+//		book.addSellOrder(order)
+//	}
+//}
 
 // buy orders will be kept sorted in acending price order
 // the last order should be the highest priced order
@@ -67,6 +67,12 @@ func (book *OrderBook) addBuyOrder(order *Order) {
 // the last order should the lowest priced order
 func (book *OrderBook) addSellOrder(order *Order) {
 	n := len(book.SellOrders)
+
+	if n == 0 {
+		book.SellOrders = append(book.SellOrders, order)
+		return
+	}
+
 	var i int
 	for i := n - 1; i >= 0; i-- {
 		sellOrder := book.SellOrders[i]
@@ -114,7 +120,7 @@ func (book *OrderBook) processLimitBuy(order *Order) []*Trade {
 	trades := make([]*Trade, 0, 1)
 	n := len(book.SellOrders)
 	// check if we have at least one matching order
-	if n != 0 || book.SellOrders[n-1].Price <= order.Price {
+	if n > 0 && book.SellOrders[n-1].Price <= order.Price {
 		// traverse all sell orders that match
 		for i := n - 1; i >= 0; i-- {
 			sellOrder := book.SellOrders[i]
