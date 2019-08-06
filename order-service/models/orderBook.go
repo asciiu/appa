@@ -29,7 +29,7 @@ func NewOrderBook(marketName string) *OrderBook {
 func (book *OrderBook) addBuyOrder(order *Order) {
 	n := len(book.BuyOrders)
 
-	if n == 0 {
+	if n == 0 || book.BuyOrders[n-1].Price > order.Price {
 		book.BuyOrders = append(book.BuyOrders, order)
 		return
 	}
@@ -38,15 +38,14 @@ func (book *OrderBook) addBuyOrder(order *Order) {
 	for i := n - 1; i >= 0; i-- {
 		buyOrder := book.BuyOrders[i]
 		if buyOrder.Price < order.Price {
+			i++
 			break
 		}
 	}
-	if i == n-1 {
-		book.BuyOrders = append(book.BuyOrders, order)
-	} else {
-		copy(book.BuyOrders[i+1:], book.BuyOrders[i:])
-		book.BuyOrders[i] = order
-	}
+
+	book.BuyOrders = append(book.BuyOrders, order)
+	copy(book.BuyOrders[i+1:], book.BuyOrders[i:])
+	book.BuyOrders[i] = order
 }
 
 // sell orders will be kept sorted in descending price order
@@ -205,7 +204,7 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 		// orders with the highest price. Find index
 		// range (i1, i2) within sorted buy orders.
 		// These are the orders that can fill the sell
-		// order and should be filled from i1 -> i2
+		// order and should be filled from i2 -> i1
 		for i := numBuyOrders - 1; i >= 0; i-- {
 			buyOrder := book.BuyOrders[i]
 
@@ -228,9 +227,8 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 		}
 
 		if count > 0 {
-
 			// fills orders from i1 -> i2.
-			for j := i1; sellOrder.Amount > 0 && j <= i2; j++ {
+			for j := i2; sellOrder.Amount > 0 && j >= i1; j-- {
 				buyOrder := book.BuyOrders[j]
 
 				trade := &Trade{

@@ -189,6 +189,40 @@ func TestPartialBuy(t *testing.T) {
 	assert.Equal(t, book.BuyOrders[0].Amount, amount, "remaining buy amount is incorrect")
 }
 
+func TestBuySortOrder(t *testing.T) {
+
+	buyOrders := []*Order{
+		&Order{
+			ID:         uuid.New().String(),
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     100,
+			Price:      1000,
+		},
+		&Order{
+			ID:         uuid.New().String(),
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     204,
+			Price:      2000,
+		},
+		&Order{
+			ID:         uuid.New().String(),
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     400,
+			Price:      1000,
+		},
+	}
+	book := NewOrderBook("test-btc")
+
+	for _, order := range buyOrders {
+		book.Process(order)
+	}
+
+	assert.Equal(t, 3, len(book.BuyOrders), "should be 3 orders")
+}
+
 // Test first in first out buy. Buy orders at the same price should be FIFO
 func TestFIFOBuyOrders(t *testing.T) {
 	book := NewOrderBook("test-btc")
@@ -231,8 +265,8 @@ func TestFIFOBuyOrders(t *testing.T) {
 	assert.Equal(t, sell.ID, trades[0].TakerOrderID, "taker should be sell order ID")
 	assert.Equal(t, buy1.ID, trades[0].MakerOrderID, "maker should be buy order I")
 	assert.Equal(t, buy1.Price, trades[0].Price, "price not at sell order price")
-	assert.Equal(t, book.BuyOrders[0].Amount, amount, "remaining buy amount is incorrect")
-	assert.Equal(t, buy1.ID, book.BuyOrders[0].ID, "first buy order is incorrect")
+	assert.Equal(t, book.BuyOrders[1].Amount, amount, "remaining buy amount is incorrect")
+	assert.Equal(t, buy1.ID, book.BuyOrders[1].ID, "first buy order is incorrect")
 }
 
 func TestFIFOSellOrders(t *testing.T) {
