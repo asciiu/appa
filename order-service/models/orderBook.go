@@ -27,9 +27,10 @@ func NewOrderBook(marketName string) *OrderBook {
 // buy orders will be kept sorted in acending price order
 // the last order should be the highest priced order
 func (book *OrderBook) addBuyOrder(order *Order) {
+	order.Status = constOrder.Pending
 	n := len(book.BuyOrders)
 
-	if n == 0 || book.BuyOrders[n-1].Price > order.Price {
+	if n == 0 || book.BuyOrders[n-1].Price < order.Price {
 		book.BuyOrders = append(book.BuyOrders, order)
 		return
 	}
@@ -51,6 +52,7 @@ func (book *OrderBook) addBuyOrder(order *Order) {
 // sell orders will be kept sorted in descending price order
 // the last order should the lowest priced order
 func (book *OrderBook) addSellOrder(order *Order) {
+	order.Status = constOrder.Pending
 	n := len(book.SellOrders)
 
 	if n == 0 || book.SellOrders[n-1].Price > order.Price {

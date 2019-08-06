@@ -193,21 +193,21 @@ func TestBuySortOrder(t *testing.T) {
 
 	buyOrders := []*Order{
 		&Order{
-			ID:         uuid.New().String(),
+			ID:         "1",
 			MarketName: "test-btc",
 			Side:       constOrder.Buy,
 			Amount:     100,
 			Price:      1000,
 		},
 		&Order{
-			ID:         uuid.New().String(),
+			ID:         "2",
 			MarketName: "test-btc",
 			Side:       constOrder.Buy,
 			Amount:     204,
 			Price:      2000,
 		},
 		&Order{
-			ID:         uuid.New().String(),
+			ID:         "0",
 			MarketName: "test-btc",
 			Side:       constOrder.Buy,
 			Amount:     400,
@@ -215,12 +215,54 @@ func TestBuySortOrder(t *testing.T) {
 		},
 	}
 	book := NewOrderBook("test-btc")
-
 	for _, order := range buyOrders {
 		book.Process(order)
 	}
 
+	// for _, order := range book.BuyOrders {
+	// 	fmt.Printf("%+v\n", order)
+	// }
+
 	assert.Equal(t, 3, len(book.BuyOrders), "should be 3 orders")
+	assert.Equal(t, buyOrders[1].ID, book.BuyOrders[2].ID, "highest price buy should be last")
+	assert.Equal(t, buyOrders[0].ID, book.BuyOrders[1].ID, "first added order should be second")
+	assert.Equal(t, buyOrders[2].ID, book.BuyOrders[0].ID, "last added order should be first")
+}
+
+func TestSellSortOrder(t *testing.T) {
+
+	sellOrders := []*Order{
+		&Order{
+			ID:         "1",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     100,
+			Price:      1000,
+		},
+		&Order{
+			ID:         "2",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     400,
+			Price:      200,
+		},
+		&Order{
+			ID:         "0",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     204,
+			Price:      1000,
+		},
+	}
+	book := NewOrderBook("test-btc")
+	for _, order := range sellOrders {
+		book.Process(order)
+	}
+
+	assert.Equal(t, 3, len(book.SellOrders), "should be 3 orders")
+	assert.Equal(t, sellOrders[1].ID, book.SellOrders[2].ID, "lowest price sell should be last")
+	assert.Equal(t, sellOrders[0].ID, book.SellOrders[1].ID, "first added order should be second")
+	assert.Equal(t, sellOrders[2].ID, book.SellOrders[0].ID, "last added order should be first")
 }
 
 // Test first in first out buy. Buy orders at the same price should be FIFO
