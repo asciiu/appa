@@ -1,11 +1,11 @@
 build:
-	docker build -t dockerowy/appa-order-service:dev .
+	docker build -t dockerowy/appa-trade-engine:dev .
 
 prodo: 
-	protoc --proto_path=./ --micro_out=. --go_out=. proto/order/order.proto 
+	protoc --proto_path=./ --micro_out=. --go_out=. proto/trade/trade.proto 
 
 push:
-	docker push dockerowy/appa-order-service:dev 
+	docker push dockerowy/appa-trade-engine:dev 
 
 start:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml

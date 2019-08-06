@@ -15,7 +15,7 @@
   packages = [
     "common/constants/response",
     "common/db",
-    "order-service/proto/order",
+    "trade-engine/proto/order",
     "user-service/db/sql",
     "user-service/models",
     "user-service/proto/user",
@@ -509,7 +509,7 @@
   input-imports = [
     "github.com/asciiu/appa/common/constants/response",
     "github.com/asciiu/appa/common/db",
-    "github.com/asciiu/appa/order-service/proto/order",
+    "github.com/asciiu/appa/trade-engine/proto/order",
     "github.com/asciiu/appa/user-service/db/sql",
     "github.com/asciiu/appa/user-service/models",
     "github.com/asciiu/appa/user-service/proto/user",

@@ -1,20 +1,20 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: orders 
+  name: trades 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orders 
+      app: trades 
   template:
     metadata:
       labels:
-        app: orders 
+        app: trades 
     spec:
         containers:
-        - name: order-service 
-          image: dockerowy/appa-order-service:dev 
+        - name: trade-engine 
+          image: dockerowy/appa-trade-engine:dev 
           imagePullPolicy: Always 
           command: [
             "./service",

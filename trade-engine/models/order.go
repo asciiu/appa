@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/asciiu/appa/order-service/constants"
+	"github.com/asciiu/appa/trade-engine/constants"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )

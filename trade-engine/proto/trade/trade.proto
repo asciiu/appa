@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-service OrderService {
+service TradeEngine {
   rpc AddOrder(NewOrderRequest) returns (OrderResponse) {}
   rpc CancelOrder(OrderRequest) returns (StatusResponse) {}
   rpc FindOrder(OrderRequest) returns (OrderResponse) {}

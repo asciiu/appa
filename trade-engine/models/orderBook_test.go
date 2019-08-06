@@ -3,7 +3,7 @@ package models
 import (
 	"testing"
 
-	constOrder "github.com/asciiu/appa/order-service/constants"
+	constants "github.com/asciiu/appa/trade-engine/constants"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +13,7 @@ func TestProcessBuyOrder(t *testing.T) {
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -29,7 +29,7 @@ func TestProcessSellOrder(t *testing.T) {
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -45,7 +45,7 @@ func TestWrongMarketName(t *testing.T) {
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-bch",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -61,7 +61,7 @@ func TestSellFill(t *testing.T) {
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -70,7 +70,7 @@ func TestSellFill(t *testing.T) {
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     700,
 		Price:      1010,
 	}
@@ -82,7 +82,7 @@ func TestSellFill(t *testing.T) {
 	assert.Equal(t, 1, len(book.SellOrders), "should be 1 order in sells")
 	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, buy.Amount, trades[0].Amount, "trade amount shold be full buy amount")
-	assert.Equal(t, constOrder.Buy, trades[0].Side, "side should be buy")
+	assert.Equal(t, constants.Buy, trades[0].Side, "side should be buy")
 	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker is buy order")
 	assert.Equal(t, sell.ID, trades[0].MakerOrderID, "maker is sell order")
 	assert.Equal(t, sell.Price, trades[0].Price, "price not at sell order price")
@@ -94,7 +94,7 @@ func TestPartialSell(t *testing.T) {
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     400,
 		Price:      9000,
 	}
@@ -103,7 +103,7 @@ func TestPartialSell(t *testing.T) {
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     600,
 		Price:      8999,
 	}
@@ -115,7 +115,7 @@ func TestPartialSell(t *testing.T) {
 	assert.Equal(t, 1, len(book.SellOrders), "should be 1 order in sells")
 	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, buy.Amount, trades[0].Amount, "trade amount shold be full buy amount")
-	assert.Equal(t, constOrder.Sell, trades[0].Side, "side should be sell")
+	assert.Equal(t, constants.Sell, trades[0].Side, "side should be sell")
 	assert.Equal(t, sell.ID, trades[0].TakerOrderID, "taker is sell order")
 	assert.Equal(t, buy.ID, trades[0].MakerOrderID, "maker is buy order")
 	assert.Equal(t, buy.Price, trades[0].Price, "price not at buy order price")
@@ -127,7 +127,7 @@ func TestBuyFill(t *testing.T) {
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     400,
 		Price:      9000,
 	}
@@ -136,7 +136,7 @@ func TestBuyFill(t *testing.T) {
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     300,
 		Price:      8999,
 	}
@@ -148,7 +148,7 @@ func TestBuyFill(t *testing.T) {
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, sell.Amount, trades[0].Amount, "trade amount shold be full sell amount")
-	assert.Equal(t, constOrder.Sell, trades[0].Side, "side should be sell")
+	assert.Equal(t, constants.Sell, trades[0].Side, "side should be sell")
 	assert.Equal(t, sell.ID, trades[0].TakerOrderID, "taker is sell order")
 	assert.Equal(t, buy.ID, trades[0].MakerOrderID, "maker is buy order")
 	assert.Equal(t, buy.Price, trades[0].Price, "price not at buy order price")
@@ -160,7 +160,7 @@ func TestPartialBuy(t *testing.T) {
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -169,7 +169,7 @@ func TestPartialBuy(t *testing.T) {
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     1050,
 		Price:      1010,
 	}
@@ -182,7 +182,7 @@ func TestPartialBuy(t *testing.T) {
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, sell.Amount, trades[0].Amount, "trade amount shold be full sell amount")
-	assert.Equal(t, constOrder.Buy, trades[0].Side, "side should be buy")
+	assert.Equal(t, constants.Buy, trades[0].Side, "side should be buy")
 	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker is buy order")
 	assert.Equal(t, sell.ID, trades[0].MakerOrderID, "maker is sell order")
 	assert.Equal(t, sell.Price, trades[0].Price, "price not at sell order price")
@@ -195,21 +195,21 @@ func TestBuySortOrder(t *testing.T) {
 		&Order{
 			ID:         "1",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     100,
 			Price:      1000,
 		},
 		&Order{
 			ID:         "2",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     204,
 			Price:      2000,
 		},
 		&Order{
 			ID:         "0",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     400,
 			Price:      1000,
 		},
@@ -235,21 +235,21 @@ func TestSellSortOrder(t *testing.T) {
 		&Order{
 			ID:         "1",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     100,
 			Price:      1000,
 		},
 		&Order{
 			ID:         "2",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     400,
 			Price:      200,
 		},
 		&Order{
 			ID:         "0",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     204,
 			Price:      1000,
 		},
@@ -271,7 +271,7 @@ func TestFIFOBuyOrders(t *testing.T) {
 	buy1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     1024,
 		Price:      1000,
 	}
@@ -281,7 +281,7 @@ func TestFIFOBuyOrders(t *testing.T) {
 	buy2 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     200,
 		Price:      1000,
 	}
@@ -291,7 +291,7 @@ func TestFIFOBuyOrders(t *testing.T) {
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     800,
 		Price:      900,
 	}
@@ -303,7 +303,7 @@ func TestFIFOBuyOrders(t *testing.T) {
 	assert.Equal(t, 2, len(book.BuyOrders), "should be 2 order in buys")
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 	assert.Equal(t, sell.Amount, trades[0].Amount, "trade amount shold be full sell amount")
-	assert.Equal(t, constOrder.Sell, trades[0].Side, "side should be sell")
+	assert.Equal(t, constants.Sell, trades[0].Side, "side should be sell")
 	assert.Equal(t, sell.ID, trades[0].TakerOrderID, "taker should be sell order ID")
 	assert.Equal(t, buy1.ID, trades[0].MakerOrderID, "maker should be buy order I")
 	assert.Equal(t, buy1.Price, trades[0].Price, "price not at sell order price")
@@ -316,7 +316,7 @@ func TestFIFOSellOrders(t *testing.T) {
 	sell1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     1024,
 		Price:      850,
 	}
@@ -326,7 +326,7 @@ func TestFIFOSellOrders(t *testing.T) {
 	sell2 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Sell,
+		Side:       constants.Sell,
 		Amount:     200,
 		Price:      850,
 	}
@@ -336,7 +336,7 @@ func TestFIFOSellOrders(t *testing.T) {
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
-		Side:       constOrder.Buy,
+		Side:       constants.Buy,
 		Amount:     800,
 		Price:      900,
 	}
@@ -349,7 +349,7 @@ func TestFIFOSellOrders(t *testing.T) {
 	assert.Equal(t, 0, len(book.BuyOrders), "should be 0 order in buys")
 	assert.Equal(t, buy.Amount, trades[0].Amount, "trade amount shold be full buy amount")
 
-	assert.Equal(t, constOrder.Buy, trades[0].Side, "side should be buy")
+	assert.Equal(t, constants.Buy, trades[0].Side, "side should be buy")
 	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker should be buy order ID")
 	assert.Equal(t, sell1.ID, trades[0].MakerOrderID, "maker should be sell order I")
 
@@ -364,21 +364,21 @@ func TestCancelSellOrder(t *testing.T) {
 		&Order{
 			ID:         "1",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     100,
 			Price:      1000,
 		},
 		&Order{
 			ID:         "2",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     400,
 			Price:      200,
 		},
 		&Order{
 			ID:         "0",
 			MarketName: "test-btc",
-			Side:       constOrder.Sell,
+			Side:       constants.Sell,
 			Amount:     204,
 			Price:      1000,
 		},
@@ -403,21 +403,21 @@ func TestCancelBuyOrder(t *testing.T) {
 		&Order{
 			ID:         "1",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     100,
 			Price:      1000,
 		},
 		&Order{
 			ID:         "2",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     204,
 			Price:      2000,
 		},
 		&Order{
 			ID:         "0",
 			MarketName: "test-btc",
-			Side:       constOrder.Buy,
+			Side:       constants.Buy,
 			Amount:     400,
 			Price:      1000,
 		},

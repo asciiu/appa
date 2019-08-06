@@ -1,12 +1,12 @@
 package main
 
 import (
-	constOrder "github.com/asciiu/appa/order-service/constants"
+	"github.com/asciiu/appa/trade-engine/constants"
 )
 
 func ValidateSide(side string) bool {
 	switch side {
-	case constOrder.Buy, constOrder.Sell:
+	case constants.Buy, constants.Sell:
 		return true
 	default:
 		return false
@@ -15,7 +15,7 @@ func ValidateSide(side string) bool {
 
 func ValidateType(typ string) bool {
 	switch typ {
-	case constOrder.LimitOrder:
+	case constants.LimitOrder:
 		return true
 	default:
 		return false

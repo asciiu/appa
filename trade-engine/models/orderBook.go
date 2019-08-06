@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	constOrder "github.com/asciiu/appa/order-service/constants"
+	constOrder "github.com/asciiu/appa/trade-engine/constants"
 )
 
 // OrderBook has a market

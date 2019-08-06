@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	constRes "github.com/asciiu/appa/common/constants/response"
-	protoOrder "github.com/asciiu/appa/order-service/proto/order"
+	protoOrder "github.com/asciiu/appa/trade-engine/proto/order"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"

@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/asciiu/appa/order-service/models"
+	"github.com/asciiu/appa/trade-engine/models"
 )
 
 func DeleteOrder(db *sql.DB, orderID, userID string) error {
