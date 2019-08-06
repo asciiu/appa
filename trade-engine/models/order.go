@@ -51,4 +51,19 @@ type Trade struct {
 	Amount       uint64 `json:"amount"`
 	Price        uint64 `json:"price"`
 	Side         string `json:"side"`
+	CreatedOn    string `json:"createdOn"`
+	UpdatedOn    string `json:"updatedOn"`
+}
+
+func NewTrade(taker, maker, side string, amount, price uint64) *Trade {
+	now := string(pq.FormatTimestamp(time.Now().UTC()))
+	return &Trade{
+		TakerOrderID: taker,
+		MakerOrderID: maker,
+		Side:         side,
+		Amount:       amount,
+		Price:        price,
+		CreatedOn:    now,
+		UpdatedOn:    now,
+	}
 }
