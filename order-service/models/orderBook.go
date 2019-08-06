@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	constOrder "github.com/asciiu/appa/order-service/constants"
 )
 
@@ -25,7 +27,9 @@ func NewOrderBook(marketName string) *OrderBook {
 }
 
 // buy orders will be kept sorted in acending price order
-// the last order should be the highest priced order
+// the last order should be the highest priced order.
+// When the price is equal the older order should come
+// after the newer order.
 func (book *OrderBook) addBuyOrder(order *Order) {
 	order.Status = constOrder.Pending
 	n := len(book.BuyOrders)
@@ -72,6 +76,48 @@ func (book *OrderBook) addSellOrder(order *Order) {
 	book.SellOrders = append(book.SellOrders, order)
 	copy(book.SellOrders[i+1:], book.SellOrders[i:])
 	book.SellOrders[i] = order
+}
+
+// Cancel a buy order.
+func (book *OrderBook) cancelBuyOrder(orderID string) error {
+	for i, o := range book.BuyOrders {
+		if o.ID == orderID {
+			// TODO update status of persisted order to "cancelled"
+			// need to do this after the orders are persisted
+			// persisted orders will eventually load at startup using
+			// status == pending
+			book.removeBuyOrder(i)
+			return nil
+		}
+	}
+	return fmt.Errorf("orderID: %s not found", orderID)
+}
+
+// Cancel a sell order.
+func (book *OrderBook) cancelSellOrder(orderID string) error {
+	for i, o := range book.SellOrders {
+		if o.ID == orderID {
+			// TODO update status of persisted order to "cancelled"
+			// need to do this after the orders are persisted
+			// persisted orders will eventually load at startup using
+			// status == pending
+			book.removeSellOrder(i)
+			return nil
+		}
+	}
+	return fmt.Errorf("orderID: %s not found", orderID)
+}
+
+// Cancel a limit order
+func (book *OrderBook) Cancel(order *Order) error {
+	if order.MarketName != book.MarketName {
+		return fmt.Errorf("market name for order should be %s got %s", book.MarketName, order.MarketName)
+	}
+
+	if order.Side == constOrder.Sell {
+		return book.cancelSellOrder(order.ID)
+	}
+	return book.cancelBuyOrder(order.ID)
 }
 
 // Remove a buy order from the order book at a given index

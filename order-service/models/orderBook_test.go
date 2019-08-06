@@ -357,3 +357,83 @@ func TestFIFOSellOrders(t *testing.T) {
 	assert.Equal(t, book.SellOrders[1].Amount, amount, "remaining sell amount of first order is incorrect")
 	assert.Equal(t, sell1.ID, book.SellOrders[1].ID, "first selll order is incorrect")
 }
+
+func TestCancelSellOrder(t *testing.T) {
+
+	sellOrders := []*Order{
+		&Order{
+			ID:         "1",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     100,
+			Price:      1000,
+		},
+		&Order{
+			ID:         "2",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     400,
+			Price:      200,
+		},
+		&Order{
+			ID:         "0",
+			MarketName: "test-btc",
+			Side:       constOrder.Sell,
+			Amount:     204,
+			Price:      1000,
+		},
+	}
+	book := NewOrderBook("test-btc")
+	for _, order := range sellOrders {
+		book.Process(order)
+	}
+	err := book.Cancel(sellOrders[2])
+
+	assert.Nil(t, err, "error from cancel should be nil")
+	assert.Equal(t, 2, len(book.SellOrders), "should be 2 orders")
+
+	assert.Equal(t, sellOrders[0].ID, book.SellOrders[0].ID, "first sell order should have highest price")
+	assert.Equal(t, sellOrders[1].ID, book.SellOrders[1].ID, "last sell order should have lowest price")
+}
+
+func TestCancelBuyOrder(t *testing.T) {
+
+	// these buy orders will be sorted by acending price
+	buyOrders := []*Order{
+		&Order{
+			ID:         "1",
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     100,
+			Price:      1000,
+		},
+		&Order{
+			ID:         "2",
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     204,
+			Price:      2000,
+		},
+		&Order{
+			ID:         "0",
+			MarketName: "test-btc",
+			Side:       constOrder.Buy,
+			Amount:     400,
+			Price:      1000,
+		},
+	}
+
+	book := NewOrderBook("test-btc")
+	for _, order := range buyOrders {
+		book.Process(order)
+	}
+
+	// remove the highest priced order at with ID #2
+	err := book.Cancel(buyOrders[1])
+	assert.Nil(t, err, "error was not nil for cancel order")
+
+	assert.Equal(t, 2, len(book.BuyOrders), "should be 2 orders")
+
+	assert.Equal(t, buyOrders[2].ID, book.BuyOrders[0].ID, "first buy order is incorrect")
+	assert.Equal(t, buyOrders[0].ID, book.BuyOrders[1].ID, "last buy order is incorrect")
+}
