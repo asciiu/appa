@@ -1,15 +1,24 @@
 package models
 
 import (
+	"database/sql"
 	"testing"
 
+	"github.com/asciiu/appa/common/db"
 	constants "github.com/asciiu/appa/trade-engine/constants"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
+func setup() *sql.DB {
+	dbURL := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
+	db, _ := db.NewDB(dbURL)
+	return db
+}
 func TestProcessBuyOrder(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+
+	book := NewOrderBook("test-btc", db)
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -25,7 +34,8 @@ func TestProcessBuyOrder(t *testing.T) {
 }
 
 func TestProcessSellOrder(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -41,7 +51,8 @@ func TestProcessSellOrder(t *testing.T) {
 }
 
 func TestWrongMarketName(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-bch",
@@ -57,7 +68,8 @@ func TestWrongMarketName(t *testing.T) {
 }
 
 func TestSellFill(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -90,7 +102,8 @@ func TestSellFill(t *testing.T) {
 }
 
 func TestPartialSell(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -123,7 +136,8 @@ func TestPartialSell(t *testing.T) {
 }
 
 func TestBuyFill(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -156,7 +170,8 @@ func TestBuyFill(t *testing.T) {
 }
 
 func TestPartialBuy(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -214,7 +229,8 @@ func TestBuySortOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	for _, order := range buyOrders {
 		book.Process(order)
 	}
@@ -254,7 +270,8 @@ func TestSellSortOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	for _, order := range sellOrders {
 		book.Process(order)
 	}
@@ -267,7 +284,8 @@ func TestSellSortOrder(t *testing.T) {
 
 // Test first in first out buy. Buy orders at the same price should be FIFO
 func TestFIFOBuyOrders(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	buy1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -312,7 +330,8 @@ func TestFIFOBuyOrders(t *testing.T) {
 }
 
 func TestFIFOSellOrders(t *testing.T) {
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	sell1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -383,7 +402,8 @@ func TestCancelSellOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	for _, order := range sellOrders {
 		book.Process(order)
 	}
@@ -423,7 +443,8 @@ func TestCancelBuyOrder(t *testing.T) {
 		},
 	}
 
-	book := NewOrderBook("test-btc")
+	db := setup()
+	book := NewOrderBook("test-btc", db)
 	for _, order := range buyOrders {
 		book.Process(order)
 	}

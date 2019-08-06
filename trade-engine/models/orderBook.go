@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 
 	constOrder "github.com/asciiu/appa/trade-engine/constants"
@@ -9,6 +10,7 @@ import (
 // OrderBook has a market
 // The only public method should be Process.
 type OrderBook struct {
+	DB         *sql.DB
 	MarketName string
 	LastPrice  uint64
 	LastSide   string
@@ -18,8 +20,9 @@ type OrderBook struct {
 
 // NewOrderBook will create a new instance of an order
 // book for a market.
-func NewOrderBook(marketName string) *OrderBook {
+func NewOrderBook(marketName string, db *sql.DB) *OrderBook {
 	return &OrderBook{
+		DB:         db,
 		MarketName: marketName,
 		BuyOrders:  make([]*Order, 0),
 		SellOrders: make([]*Order, 0),
