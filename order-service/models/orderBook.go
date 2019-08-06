@@ -184,47 +184,6 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) []*Trade {
 		}
 	}
 
-	// check if we have at least one matching order
-	// if n > 0 && book.SellOrders[n-1].Price <= order.Price {
-	// 	// traverse all sell orders that match
-	// 	for i := n - 1; i >= 0; i-- {
-	// 		sellOrder := book.SellOrders[i]
-	// 		if sellOrder.Price > order.Price {
-	// 			break
-	// 		}
-	// 		trade := &Trade{
-	// 			TakerOrderID: order.ID,
-	// 			MakerOrderID: sellOrder.ID,
-	// 			Price:        sellOrder.Price,
-	// 			Side:         order.Side,
-	// 		}
-	// 		book.LastPrice = sellOrder.Price
-	// 		book.LastSide = order.Side
-
-	// 		// fill the entire buy order
-	// 		if sellOrder.Amount >= order.Amount {
-	// 			trade.Amount = order.Amount
-	// 			trades = append(trades, trade)
-
-	// 			// update sell order remaining amount
-	// 			sellOrder.Amount -= order.Amount
-	// 			if sellOrder.Amount == 0 {
-	// 				book.removeSellOrder(i)
-	// 			}
-	// 			return trades
-	// 		}
-
-	// 		// fill a partial order and continue
-	// 		if sellOrder.Amount < order.Amount {
-	// 			trade.Amount = sellOrder.Amount
-	// 			trades = append(trades, trade)
-	// 			order.Amount -= sellOrder.Amount
-	// 			book.removeSellOrder(i)
-	// 			continue
-	// 		}
-	// 	}
-	// }
-
 	if buyOrder.Amount > 0 {
 		book.addBuyOrder(buyOrder)
 	}
