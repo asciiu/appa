@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	protoOrder "github.com/asciiu/appa/order-service/proto/order"
+	"github.com/asciiu/appa/order-service/models"
 )
 
 func DeleteOrder(db *sql.DB, orderID, userID string) error {
@@ -11,30 +11,28 @@ func DeleteOrder(db *sql.DB, orderID, userID string) error {
 	return err
 }
 
-func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
-	var o protoOrder.Order
-	var price sql.NullFloat64
-	var fill sql.NullFloat64
+func FindOrderByID(db *sql.DB, orderID string) (*models.Order, error) {
+	o := new(models.Order)
 	err := db.QueryRow(`SELECT 
 	    id, 
 	    user_id, 
 	    market_name, 
 	    side, 
-		size, 
-		fill,
+		amount, 
+		filled,
 		price,
 		type,
 		status,
 		created_on,
 		updated_on
-	    FROM orders WHERE id = $1 and user_id = $2`, orderID, userID).Scan(
-		&o.OrderID,
+	    FROM orders WHERE id = $1`, orderID).Scan(
+		&o.ID,
 		&o.UserID,
 		&o.MarketName,
 		&o.Side,
-		&o.Size,
-		&fill,
-		&price,
+		&o.Amount,
+		&o.Filled,
+		&o.Price,
 		&o.Type,
 		&o.Status,
 		&o.CreatedOn,
@@ -44,19 +42,19 @@ func FindOrder(db *sql.DB, orderID, userID string) (*protoOrder.Order, error) {
 	if err != nil {
 		return nil, err
 	}
-	if price.Valid {
-		o.Price = price.Float64
-	}
-	if fill.Valid {
-		o.Fill = fill.Float64
-	}
-	return &o, nil
+	return o, nil
 }
 
-func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*protoOrder.OrdersPage, error) {
-	var total uint32
-	queryCount := `SELECT count(*) FROM orders WHERE user_id = $1 AND status like '%' || $2 || '%'`
-	err := db.QueryRow(queryCount, userID, status).Scan(&total)
+func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*models.OrdersPage, error) {
+	pagedOrders := &models.OrdersPage{
+		Page:     page,
+		PageSize: pageSize,
+		Orders:   make([]*models.Order, 0),
+	}
+
+	queryCount := `SELECT count(*) FROM orders 
+	               WHERE user_id = $1 AND status like '%' || $2 || '%'`
+	err := db.QueryRow(queryCount, userID, status).Scan(&pagedOrders.Total)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +64,8 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 	    user_id, 
 	    market_name, 
 	    side, 
-		size, 
+		amount, 
+		filled,
 		price,
 		type,
 		status,
@@ -81,16 +80,16 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 
 	defer rows.Close()
 
-	orders := make([]*protoOrder.Order, 0)
 	for rows.Next() {
-		var price sql.NullFloat64
-		o := new(protoOrder.Order)
+		var price sql.NullInt64
+		o := new(models.Order)
 		err := rows.Scan(
-			&o.OrderID,
+			&o.ID,
 			&o.UserID,
 			&o.MarketName,
 			&o.Side,
-			&o.Size,
+			&o.Amount,
+			&o.Filled,
 			&price,
 			&o.Type,
 			&o.Status,
@@ -101,40 +100,32 @@ func FindUserOrders(db *sql.DB, userID, status string, page, pageSize uint32) (*
 		if err != nil {
 			return nil, err
 		}
-		if price.Valid {
-			o.Price = price.Float64
-		}
-		orders = append(orders, o)
+		pagedOrders.Orders = append(pagedOrders.Orders, o)
 	}
 
-	return &protoOrder.OrdersPage{
-		Page:     page,
-		PageSize: pageSize,
-		Total:    total,
-		Orders:   orders,
-	}, nil
+	return pagedOrders, nil
 }
 
-func InsertOrder(db *sql.DB, order *protoOrder.Order) error {
+func InsertOrder(db *sql.DB, order *models.Order) error {
 	sqlStatement := `insert into orders (
 		id, 
 		user_id, 
 		market_name, 
 		side, 
-		size, 
-		fill,
+		amount, 
+		filled,
 		price,
 		type,
 		status,
 		created_on, 
 		updated_on) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 	_, err := db.Exec(sqlStatement,
-		order.OrderID,
+		order.ID,
 		order.UserID,
 		order.MarketName,
 		order.Side,
-		order.Size,
-		order.Fill,
+		order.Amount,
+		order.Filled,
 		order.Price,
 		order.Type,
 		order.Status,

@@ -4,11 +4,12 @@ go 1.12
 
 require (
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
+	github.com/asciiu/appa/api-graphql v0.0.5
 	github.com/asciiu/appa/common v0.0.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-log/log v0.1.0
 	github.com/golang/protobuf v1.2.0
-	github.com/google/uuid v1.1.0
+	github.com/google/uuid v1.1.1
 	github.com/hashicorp/consul v1.4.0
 	github.com/hashicorp/errwrap v1.0.0
 	github.com/hashicorp/go-cleanhttp v0.5.0
@@ -17,7 +18,7 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/go-rootcerts v0.0.0-20160503143440-6bb64b370b90
 	github.com/hashicorp/go-sockaddr v0.0.0-20180320115054-6d291a969b86
-	github.com/hashicorp/golang-lru v0.5.0
+	github.com/hashicorp/golang-lru v0.5.1
 	github.com/hashicorp/memberlist v0.1.0
 	github.com/hashicorp/serf v0.8.1
 	github.com/json-iterator/go v1.1.5
@@ -39,13 +40,13 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
-	github.com/pkg/errors v0.8.0
+	github.com/pkg/errors v0.8.1
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529
-	github.com/stretchr/testify v1.2.2
-	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
-	golang.org/x/net v0.0.0-20181213202711-891ebc4b82d6
-	golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06
+	github.com/stretchr/testify v1.3.0
+	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
+	golang.org/x/sys v0.0.0-20190412213103-97732733099d
 	golang.org/x/text v0.3.0
 	google.golang.org/genproto v0.0.0-20181202183823-bd91e49a0898
 	google.golang.org/grpc v1.17.0

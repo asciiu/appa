@@ -2,15 +2,15 @@ package constants
 
 const (
 	// order sides
-	Buy  string = "buy"
-	Sell string = "sell"
+	Buy  string = "BUY"
+	Sell string = "SELL"
 
 	// order types
-	LimitOrder  string = "limit"
-	MarketOrder string = "market"
+	LimitOrder  string = "LIMIT"
+	MarketOrder string = "MARKET"
 
 	// order status
-	Filled  string = "filled"
-	Partial string = "partial"
-	Pending string = "pending"
+	Cancelled string = "CANCELLED"
+	Completed string = "COMPLETED"
+	Pending   string = "PENDING"
 )
