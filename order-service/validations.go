@@ -15,7 +15,7 @@ func ValidateSide(side string) bool {
 
 func ValidateType(typ string) bool {
 	switch typ {
-	case constOrder.LimitOrder, constOrder.MarketOrder:
+	case constOrder.LimitOrder:
 		return true
 	default:
 		return false
