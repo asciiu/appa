@@ -190,7 +190,7 @@ func TestPartialBuy(t *testing.T) {
 }
 
 // Test first in first out buy. Buy orders at the same price should be FIFO
-func TestFIFOBuy(t *testing.T) {
+func TestFIFOBuyOrders(t *testing.T) {
 	book := NewOrderBook("test-btc")
 	buy1 := Order{
 		ID:         uuid.New().String(),
@@ -233,4 +233,51 @@ func TestFIFOBuy(t *testing.T) {
 	assert.Equal(t, buy1.Price, trades[0].Price, "price not at sell order price")
 	assert.Equal(t, book.BuyOrders[0].Amount, amount, "remaining buy amount is incorrect")
 	assert.Equal(t, buy1.ID, book.BuyOrders[0].ID, "first buy order is incorrect")
+}
+
+func TestFIFOSellOrders(t *testing.T) {
+	book := NewOrderBook("test-btc")
+	sell1 := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Amount:     1024,
+		Price:      850,
+	}
+	trades := book.Process(&sell1)
+	assert.Equal(t, 0, len(trades), "should be 0 trades")
+
+	sell2 := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constOrder.Sell,
+		Amount:     200,
+		Price:      850,
+	}
+	trades = book.Process(&sell2)
+	assert.Equal(t, 0, len(trades), "should be 0 trades")
+
+	buy := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constOrder.Buy,
+		Amount:     800,
+		Price:      900,
+	}
+	// remaining sell1 amount after buy
+	amount := sell1.Amount - buy.Amount
+	trades = book.Process(&buy)
+	assert.Equal(t, 1, len(trades), "should be 1 trade")
+
+	assert.Equal(t, 2, len(book.SellOrders), "should be 2 order in sells")
+	assert.Equal(t, 0, len(book.BuyOrders), "should be 0 order in buys")
+	assert.Equal(t, buy.Amount, trades[0].Amount, "trade amount shold be full buy amount")
+
+	assert.Equal(t, constOrder.Buy, trades[0].Side, "side should be buy")
+	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker should be buy order ID")
+	assert.Equal(t, sell1.ID, trades[0].MakerOrderID, "maker should be sell order I")
+
+	assert.Equal(t, sell1.Price, trades[0].Price, "price not at sell order price")
+	assert.Equal(t, book.SellOrders[1].Amount, amount, "remaining sell amount of first order is incorrect")
+	assert.Equal(t, sell1.ID, book.SellOrders[1].ID, "first selll order is incorrect")
 }
