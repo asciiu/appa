@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
+	"testing"
 
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/common/db"
-	"github.com/asciiu/appa/trade-engine/models"
+	"github.com/asciiu/appa/trade-engine/constants"
+	"github.com/asciiu/appa/trade-engine/proto/trade"
+	"github.com/stretchr/testify/assert"
 )
 
 func checkErr(err error) {
@@ -16,41 +20,38 @@ func checkErr(err error) {
 	}
 }
 
-func setupService() (*TradeEngine, *user.User) {
+func setupEngine() (*TradeEngine, *user.User) {
 	dbUrl := "postgres://postgres@localhost:5432/appa_test?&sslmode=disable"
 	db, _ := db.NewDB(dbUrl)
-
-	engine := TradeEngine{
-		DB:         db,
-		OrderBooks: make(map[string]*models.OrderBook),
-	}
+	engine := NewTradeEngine(db)
 
 	user := user.NewUser("testy", "test@email", "hash")
 	err := repo.InsertUser(db, user)
 	checkErr(err)
 
-	return &engine, user
+	return engine, user
 }
 
-//func TestAddOrder(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	req := trade.NewOrderRequest{
-//		UserID:     user.ID,
-//		MarketName: "test-btc",
-//		Side:       constants.Sell,
-//		Size:       1.0,
-//		Type:       constants.LimitOrder,
-//	}
-//
-//	res := trade.OrderResponse{}
-//	service.AddOrder(context.Background(), &req, &res)
-//	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
+func TestProcessOrder(t *testing.T) {
+	engine, user := setupEngine()
+
+	defer engine.DB.Close()
+
+	req := trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Sell,
+		Amount:     1.0,
+		Price:      200,
+	}
+
+	res := trade.OrderResponse{}
+	engine.Process(context.Background(), &req, &res)
+	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
+
+	repo.DeleteUserHard(engine.DB, user.ID)
+}
+
 //
 //func TestFindOrder(t *testing.T) {
 //	service, user := setupService()

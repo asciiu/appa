@@ -49,8 +49,8 @@ var _ server.Option
 // Client API for TradeEngine service
 
 type TradeEngineService interface {
-	AddOrder(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error)
-	CancelOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error)
+	Process(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error)
+	Cancel(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error)
 	FindOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error)
 	FindUserOrders(ctx context.Context, in *UserOrdersRequest, opts ...client.CallOption) (*OrdersPageResponse, error)
 }
@@ -73,8 +73,8 @@ func NewTradeEngineService(name string, c client.Client) TradeEngineService {
 	}
 }
 
-func (c *tradeEngineService) AddOrder(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error) {
-	req := c.c.NewRequest(c.name, "TradeEngine.AddOrder", in)
+func (c *tradeEngineService) Process(ctx context.Context, in *NewOrderRequest, opts ...client.CallOption) (*OrderResponse, error) {
+	req := c.c.NewRequest(c.name, "TradeEngine.Process", in)
 	out := new(OrderResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -83,8 +83,8 @@ func (c *tradeEngineService) AddOrder(ctx context.Context, in *NewOrderRequest, 
 	return out, nil
 }
 
-func (c *tradeEngineService) CancelOrder(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error) {
-	req := c.c.NewRequest(c.name, "TradeEngine.CancelOrder", in)
+func (c *tradeEngineService) Cancel(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*StatusResponse, error) {
+	req := c.c.NewRequest(c.name, "TradeEngine.Cancel", in)
 	out := new(StatusResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -116,16 +116,16 @@ func (c *tradeEngineService) FindUserOrders(ctx context.Context, in *UserOrdersR
 // Server API for TradeEngine service
 
 type TradeEngineHandler interface {
-	AddOrder(context.Context, *NewOrderRequest, *OrderResponse) error
-	CancelOrder(context.Context, *OrderRequest, *StatusResponse) error
+	Process(context.Context, *NewOrderRequest, *OrderResponse) error
+	Cancel(context.Context, *OrderRequest, *StatusResponse) error
 	FindOrder(context.Context, *OrderRequest, *OrderResponse) error
 	FindUserOrders(context.Context, *UserOrdersRequest, *OrdersPageResponse) error
 }
 
 func RegisterTradeEngineHandler(s server.Server, hdlr TradeEngineHandler, opts ...server.HandlerOption) error {
 	type tradeEngine interface {
-		AddOrder(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error
-		CancelOrder(ctx context.Context, in *OrderRequest, out *StatusResponse) error
+		Process(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error
+		Cancel(ctx context.Context, in *OrderRequest, out *StatusResponse) error
 		FindOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error
 		FindUserOrders(ctx context.Context, in *UserOrdersRequest, out *OrdersPageResponse) error
 	}
@@ -140,12 +140,12 @@ type tradeEngineHandler struct {
 	TradeEngineHandler
 }
 
-func (h *tradeEngineHandler) AddOrder(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error {
-	return h.TradeEngineHandler.AddOrder(ctx, in, out)
+func (h *tradeEngineHandler) Process(ctx context.Context, in *NewOrderRequest, out *OrderResponse) error {
+	return h.TradeEngineHandler.Process(ctx, in, out)
 }
 
-func (h *tradeEngineHandler) CancelOrder(ctx context.Context, in *OrderRequest, out *StatusResponse) error {
-	return h.TradeEngineHandler.CancelOrder(ctx, in, out)
+func (h *tradeEngineHandler) Cancel(ctx context.Context, in *OrderRequest, out *StatusResponse) error {
+	return h.TradeEngineHandler.Cancel(ctx, in, out)
 }
 
 func (h *tradeEngineHandler) FindOrder(ctx context.Context, in *OrderRequest, out *OrderResponse) error {

@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/asciiu/appa/common/db"
-	"github.com/asciiu/appa/trade-engine/models"
 	"github.com/asciiu/appa/trade-engine/proto/trade"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
@@ -31,14 +30,11 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	engine := TradeEngine{
-		DB:         appaDB,
-		OrderBooks: make(map[string]*models.OrderBook),
-	}
+	engine := NewTradeEngine(appaDB)
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	trade.RegisterTradeEngineHandler(srv.Server(), &engine)
+	trade.RegisterTradeEngineHandler(srv.Server(), engine)
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

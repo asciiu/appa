@@ -7,7 +7,8 @@ import (
 	"log"
 
 	"github.com/asciiu/appa/common/constants/response"
-	tradeRepo "github.com/asciiu/appa/trade-engine/db/sql"
+	"github.com/asciiu/appa/trade-engine/constants"
+	repo "github.com/asciiu/appa/trade-engine/db/sql"
 	"github.com/asciiu/appa/trade-engine/models"
 	"github.com/asciiu/appa/trade-engine/proto/trade"
 )
@@ -17,31 +18,23 @@ type TradeEngine struct {
 	OrderBooks map[string]*models.OrderBook
 }
 
-func (service *TradeEngine) AddOrder(ctx context.Context, req *trade.NewOrderRequest, res *trade.OrderResponse) error {
-	newOrder := models.NewOrder(req.UserID, req.MarketName, req.Side, req.Amount, req.Price)
-	//now := string(pq.FormatTimestamp(time.Now().UTC()))
-
-	// newOrder := trade.Order{
-	// 	OrderID:    uuid.New().String(),
-	// 	UserID:     req.UserID,
-	// 	MarketName: req.MarketName,
-	// 	Side:       req.Side,
-	// 	Amount:     req.Amount,
-	// 	Price:      req.Price,
-	// 	Status:     constants.Pending,
-	// 	CreatedOn:  now,
-	// 	UpdatedOn:  now,
-	// }
-
-	if err := tradeRepo.InsertOrder(service.DB, newOrder); err != nil {
-		msg := fmt.Sprintf("insert order failed %s", err.Error())
-		log.Println(msg)
-
-		res.Status = response.Error
-		res.Message = msg
-		return nil
+func NewTradeEngine(db *sql.DB) *TradeEngine {
+	return &TradeEngine{
+		DB:         db,
+		OrderBooks: make(map[string]*models.OrderBook),
 	}
+}
 
+func (service *TradeEngine) Process(ctx context.Context, req *trade.NewOrderRequest, res *trade.OrderResponse) error {
+	newOrder := models.NewOrder(
+		req.UserID,
+		req.MarketName,
+		req.Side,
+		req.Amount,
+		req.Price,
+	)
+
+	// validate the order
 	switch {
 	case !ValidateSide(newOrder.Side):
 		res.Status = response.Fail
@@ -53,26 +46,45 @@ func (service *TradeEngine) AddOrder(ctx context.Context, req *trade.NewOrderReq
 		return nil
 	}
 
-	//if book, ok := service.OrderBooks[newOrder.MarketName]; ok {
-	//	filledOrders := book.FillOrders(&newOrder)
-	//	sumFilled := 0.0
-	//	for _, f := range filledOrders {
-	//		sumFilled += f.Fill
-	//	}
-	//	newOrder.Fill = sumFilled
+	book, ok := service.OrderBooks[newOrder.MarketName]
+	if !ok {
+		// new order book for market name
+		book = models.NewOrderBook(newOrder.MarketName)
+		service.OrderBooks[newOrder.MarketName] = book
+	}
+	// process the new order
+	filledOrders, trades := book.Process(newOrder)
 
-	//	if sumFilled < newOrder.Size {
-	//		newOrder.Size -= sumFilled
-	//	} else if sumFilled == newOrder.Size {
-	//		newOrder.Size = 0.0
-	//		newOrder.Status = constants.Filled
-	//	}
-	//	book.AddOrder(&newOrder)
-	//} else {
-	//	newOrderBook := models.NewOrderBook(newOrder.MarketName)
-	//	newOrderBook.AddOrder(&newOrder)
-	//	service.OrderBooks[newOrder.MarketName] = newOrderBook
-	//}
+	if err := repo.InsertOrder(service.DB, newOrder); err != nil {
+		msg := fmt.Sprintf("insert order failed %s", err.Error())
+		log.Println(msg)
+
+		res.Status = response.Error
+		res.Message = msg
+		return nil
+	}
+
+	for _, trade := range trades {
+		if err := repo.InsertTrade(service.DB, trade); err != nil {
+			msg := fmt.Sprintf("insert order failed %s", err.Error())
+			log.Println(msg)
+
+			res.Status = response.Error
+			res.Message = msg
+			return nil
+		}
+	}
+
+	for _, filled := range filledOrders {
+		if err := repo.UpdateOrder(service.DB, filled); err != nil {
+			msg := fmt.Sprintf("update order failed %s", err.Error())
+			log.Println(msg)
+
+			res.Status = response.Error
+			res.Message = msg
+			return nil
+		}
+	}
 
 	res.Status = response.Success
 	res.Data = &trade.OrderData{
@@ -91,8 +103,8 @@ func (service *TradeEngine) AddOrder(ctx context.Context, req *trade.NewOrderReq
 	return nil
 }
 
-func (service *TradeEngine) CancelOrder(ctx context.Context, req *trade.OrderRequest, res *trade.StatusResponse) error {
-	_, err := tradeRepo.FindOrderByID(service.DB, req.OrderID)
+func (service *TradeEngine) Cancel(ctx context.Context, req *trade.OrderRequest, res *trade.StatusResponse) error {
+	order, err := repo.FindOrderByID(service.DB, req.OrderID)
 	switch {
 	case err == sql.ErrNoRows:
 		res.Status = response.Nonentity
@@ -100,23 +112,38 @@ func (service *TradeEngine) CancelOrder(ctx context.Context, req *trade.OrderReq
 	case err != nil:
 		res.Status = response.Error
 		res.Message = err.Error()
-		//case err == nil:
-		//	if err := tradeRepo.DeleteOrder(service.DB, req.OrderID, req.UserID); err == nil {
-		//		book := service.OrderBooks[order.MarketName]
-		//		book.CancelOrder(order)
-		//		res.Status = response.Success
+	case err == nil:
+		order.Status = constants.Cancelled
+		if err := repo.UpdateOrder(service.DB, order); err != nil {
+			msg := fmt.Sprintf("update order failed %s", err.Error())
+			log.Println(msg)
 
-		//	} else {
-		//		res.Status = response.Error
-		//		res.Message = err.Error()
-		//	}
+			res.Status = response.Error
+			res.Message = msg
+			return nil
+		}
+
+		book, ok := service.OrderBooks[order.MarketName]
+		if !ok {
+			res.Status = response.Error
+			res.Message = fmt.Sprintf("order book not found for %s", order.MarketName)
+			return nil
+		}
+
+		if err = book.Cancel(order); err != nil {
+			res.Status = response.Error
+			res.Message = fmt.Sprintf("could not cancel order %s", err.Error())
+			return nil
+		}
+
+		res.Status = response.Success
 	}
 
 	return nil
 }
 
 func (service *TradeEngine) FindOrder(ctx context.Context, req *trade.OrderRequest, res *trade.OrderResponse) error {
-	_, err := tradeRepo.FindOrderByID(service.DB, req.OrderID)
+	order, err := repo.FindOrderByID(service.DB, req.OrderID)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -127,22 +154,50 @@ func (service *TradeEngine) FindOrder(ctx context.Context, req *trade.OrderReque
 		res.Message = err.Error()
 	case err == nil:
 		res.Status = response.Success
-		//	res.Data = &trade.OrderData{
-		//		Order: order,
-		//	}
+		res.Data = &trade.OrderData{
+			Order: &trade.Order{
+				OrderID:    order.ID,
+				UserID:     order.UserID,
+				MarketName: order.MarketName,
+				Side:       order.Side,
+				Amount:     order.Amount,
+				Price:      order.Price,
+				Status:     order.Status,
+				CreatedOn:  order.CreatedOn,
+				UpdatedOn:  order.UpdatedOn,
+			},
+		}
 	}
 
 	return nil
 }
 
 func (service *TradeEngine) FindUserOrders(ctx context.Context, req *trade.UserOrdersRequest, res *trade.OrdersPageResponse) error {
-	_, err := tradeRepo.FindUserOrders(service.DB, req.UserID, req.Status, req.Page, req.PageSize)
+	page, err := repo.FindUserOrders(service.DB, req.UserID, req.Status, req.Page, req.PageSize)
 
 	if err == nil {
+		orders := make([]*trade.Order, len(page.Orders))
+		for _, o := range page.Orders {
+			orders = append(orders, &trade.Order{
+				OrderID:    o.ID,
+				UserID:     o.UserID,
+				MarketName: o.MarketName,
+				Side:       o.Side,
+				Amount:     o.Amount,
+				Price:      o.Price,
+				Status:     o.Status,
+				CreatedOn:  o.CreatedOn,
+				UpdatedOn:  o.UpdatedOn,
+			})
+		}
+
 		res.Status = response.Success
-		//res.Data = trades.OrderPage{
-		//}
-		//	res.Data = ordersPage
+		res.Data = &trade.OrdersPage{
+			Page:     page.Page,
+			PageSize: page.PageSize,
+			Total:    page.Total,
+			Orders:   orders,
+		}
 	} else {
 		res.Status = response.Error
 		res.Message = err.Error()
