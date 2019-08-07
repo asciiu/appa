@@ -1,16 +1,14 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 
-	constOrder "github.com/asciiu/appa/trade-engine/constants"
+	constants "github.com/asciiu/appa/trade-engine/constants"
 )
 
 // OrderBook has a market
 // The only public method should be Process.
 type OrderBook struct {
-	DB         *sql.DB
 	MarketName string
 	LastPrice  uint64
 	LastSide   string
@@ -20,9 +18,8 @@ type OrderBook struct {
 
 // NewOrderBook will create a new instance of an order
 // book for a market.
-func NewOrderBook(marketName string, db *sql.DB) *OrderBook {
+func NewOrderBook(marketName string) *OrderBook {
 	return &OrderBook{
-		DB:         db,
 		MarketName: marketName,
 		BuyOrders:  make([]*Order, 0),
 		SellOrders: make([]*Order, 0),
@@ -34,7 +31,7 @@ func NewOrderBook(marketName string, db *sql.DB) *OrderBook {
 // When the price is equal the older order should come
 // after the newer order.
 func (book *OrderBook) addBuyOrder(order *Order) {
-	order.Status = constOrder.Pending
+	order.Status = constants.Pending
 	n := len(book.BuyOrders)
 
 	if n == 0 || book.BuyOrders[n-1].Price < order.Price {
@@ -59,7 +56,7 @@ func (book *OrderBook) addBuyOrder(order *Order) {
 // sell orders will be kept sorted in descending price order
 // the last order should the lowest priced order
 func (book *OrderBook) addSellOrder(order *Order) {
-	order.Status = constOrder.Pending
+	order.Status = constants.Pending
 	n := len(book.SellOrders)
 
 	if n == 0 || book.SellOrders[n-1].Price > order.Price {
@@ -117,7 +114,7 @@ func (book *OrderBook) Cancel(order *Order) error {
 		return fmt.Errorf("market name for order should be %s got %s", book.MarketName, order.MarketName)
 	}
 
-	if order.Side == constOrder.Sell {
+	if order.Side == constants.Sell {
 		return book.cancelSellOrder(order.ID)
 	}
 	return book.cancelBuyOrder(order.ID)
@@ -141,18 +138,20 @@ func (book *OrderBook) Process(order *Order) []*Trade {
 
 	trades := []*Trade{}
 	switch {
-	case order.Side == constOrder.Buy:
-		trades = book.processLimitBuy(order)
-	case order.Side == constOrder.Sell:
-		trades = book.processLimitSell(order)
+	case order.Side == constants.Buy:
+		_, trades = book.processLimitBuy(order)
+	case order.Side == constants.Sell:
+		_, trades = book.processLimitSell(order)
 	}
 
 	return trades
 }
 
 // Process a limit buy order
-func (book *OrderBook) processLimitBuy(buyOrder *Order) []*Trade {
+func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 	trades := make([]*Trade, 0, 1)
+	orders := make([]*Order, 0, 1)
+
 	numSellOrders := len(book.SellOrders)
 
 	if numSellOrders > 0 {
@@ -211,13 +210,21 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) []*Trade {
 
 					// update new sell order amount
 					sellOrder.Amount -= buyOrder.Amount
+					sellOrder.Filled += buyOrder.Amount
+
+					buyOrder.Filled += buyOrder.Amount
+					buyOrder.Amount = 0
+					buyOrder.Status = constants.Completed
 
 					// if the sell order amount == 0 then the sell
 					// order has been filled - remove it
 					if sellOrder.Amount == 0 {
+						sellOrder.Status = constants.Completed
 						book.removeSellOrder(j)
 					}
-					return trades
+					orders = append(orders, sellOrder)
+
+					return orders, trades
 				}
 
 				// the entire limit sell order will be filled by this buy
@@ -227,6 +234,15 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) []*Trade {
 
 				// update buy order amount
 				buyOrder.Amount -= sellOrder.Amount
+				buyOrder.Filled += sellOrder.Amount
+				if buyOrder.Amount == 0 {
+					buyOrder.Status = constants.Completed
+				}
+
+				sellOrder.Filled = sellOrder.Amount
+				sellOrder.Amount = 0
+				sellOrder.Status = constants.Completed
+				orders = append(orders, sellOrder)
 
 				// buy order should be removed
 				book.removeSellOrder(j)
@@ -238,12 +254,14 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) []*Trade {
 		book.addBuyOrder(buyOrder)
 	}
 
-	return trades
+	return orders, trades
 }
 
 // Process a limit sell order
-func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
+func (book *OrderBook) processLimitSell(sellOrder *Order) ([]*Order, []*Trade) {
+	orders := make([]*Order, 0, 1)
 	trades := make([]*Trade, 0, 1)
+
 	numBuyOrders := len(book.BuyOrders)
 
 	if numBuyOrders > 0 {
@@ -302,13 +320,21 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 
 					// update new buy order amount
 					buyOrder.Amount -= sellOrder.Amount
+					buyOrder.Filled += sellOrder.Amount
+
+					sellOrder.Filled += sellOrder.Amount
+					sellOrder.Amount = 0
+					sellOrder.Status = constants.Completed
 
 					// if the buy order amount == 0 then the buy
 					// order has been filled - remove it
 					if buyOrder.Amount == 0 {
+						buyOrder.Status = constants.Completed
 						book.removeBuyOrder(j)
 					}
-					return trades
+					orders = append(orders, buyOrder)
+
+					return orders, trades
 				}
 
 				// the entire buy order will be filled by this sell
@@ -318,6 +344,14 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 
 				// update new sell order amount
 				sellOrder.Amount -= buyOrder.Amount
+				sellOrder.Filled += buyOrder.Amount
+				if sellOrder.Amount == 0 {
+					sellOrder.Status = constants.Completed
+				}
+
+				buyOrder.Filled = buyOrder.Amount
+				buyOrder.Amount = 0
+				orders = append(orders, buyOrder)
 
 				// buy order should be removed
 				book.removeBuyOrder(j)
@@ -330,5 +364,5 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) []*Trade {
 		book.addSellOrder(sellOrder)
 	}
 
-	return trades
+	return orders, trades
 }

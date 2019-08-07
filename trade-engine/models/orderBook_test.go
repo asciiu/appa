@@ -16,9 +16,8 @@ func setup() *sql.DB {
 	return db
 }
 func TestProcessBuyOrder(t *testing.T) {
-	db := setup()
 
-	book := NewOrderBook("test-btc", db)
+	book := NewOrderBook("test-btc")
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -34,8 +33,8 @@ func TestProcessBuyOrder(t *testing.T) {
 }
 
 func TestProcessSellOrder(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -51,8 +50,8 @@ func TestProcessSellOrder(t *testing.T) {
 }
 
 func TestWrongMarketName(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	order := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-bch",
@@ -68,8 +67,8 @@ func TestWrongMarketName(t *testing.T) {
 }
 
 func TestSellFill(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -102,8 +101,8 @@ func TestSellFill(t *testing.T) {
 }
 
 func TestPartialSell(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -136,8 +135,8 @@ func TestPartialSell(t *testing.T) {
 }
 
 func TestBuyFill(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	buy := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -170,8 +169,7 @@ func TestBuyFill(t *testing.T) {
 }
 
 func TestPartialBuy(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+	book := NewOrderBook("test-btc")
 	sell := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -229,8 +227,7 @@ func TestBuySortOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+	book := NewOrderBook("test-btc")
 	for _, order := range buyOrders {
 		book.Process(order)
 	}
@@ -270,8 +267,8 @@ func TestSellSortOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	for _, order := range sellOrders {
 		book.Process(order)
 	}
@@ -284,8 +281,8 @@ func TestSellSortOrder(t *testing.T) {
 
 // Test first in first out buy. Buy orders at the same price should be FIFO
 func TestFIFOBuyOrders(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	buy1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -330,8 +327,8 @@ func TestFIFOBuyOrders(t *testing.T) {
 }
 
 func TestFIFOSellOrders(t *testing.T) {
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	sell1 := Order{
 		ID:         uuid.New().String(),
 		MarketName: "test-btc",
@@ -402,8 +399,8 @@ func TestCancelSellOrder(t *testing.T) {
 			Price:      1000,
 		},
 	}
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+
+	book := NewOrderBook("test-btc")
 	for _, order := range sellOrders {
 		book.Process(order)
 	}
@@ -443,8 +440,7 @@ func TestCancelBuyOrder(t *testing.T) {
 		},
 	}
 
-	db := setup()
-	book := NewOrderBook("test-btc", db)
+	book := NewOrderBook("test-btc")
 	for _, order := range buyOrders {
 		book.Process(order)
 	}
