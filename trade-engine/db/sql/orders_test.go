@@ -93,7 +93,7 @@ func TestFindUserOrders(t *testing.T) {
 	repoUser.DeleteUserHard(db, user.ID)
 }
 
-func TestUpdateOrderStatus(t *testing.T) {
+func TestUpdateOrder(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
 	checkErr(err)
 	defer db.Close()
@@ -106,38 +106,19 @@ func TestUpdateOrderStatus(t *testing.T) {
 	err = repoOrder.InsertOrder(db, newOrder)
 	assert.Equal(t, nil, err, "err should be nil")
 
-	repoOrder.UpdateOrderStatus(db, newOrder.ID, constants.Cancelled)
+	newOrder.Amount = 0
+	newOrder.Filled = 2
+	newOrder.Status = constants.Completed
+
+	repoOrder.UpdateOrder(db, newOrder)
 
 	findOrder, err := repoOrder.FindOrderByID(db, newOrder.ID)
 	assert.Equal(t, nil, err, "err should be nil")
 
 	assert.Equal(t, newOrder.ID, findOrder.ID, "order ids not equal")
-	assert.Equal(t, constants.Cancelled, findOrder.Status, "status should be cancelled")
-
-	repoUser.DeleteUserHard(db, user.ID)
-}
-
-func TestUpdateOrderAmounts(t *testing.T) {
-	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
-	defer db.Close()
-
-	user := user.NewUser("testy2", "test@email", "pass")
-	err = repoUser.InsertUser(db, user)
-	assert.Nil(t, err, "insert new user should be nil")
-
-	newOrder := models.NewOrder(user.ID, "test-btc", constants.Buy, 2, 100)
-	err = repoOrder.InsertOrder(db, newOrder)
-	assert.Equal(t, nil, err, "err should be nil")
-
-	repoOrder.UpdateOrderAmounts(db, newOrder.ID, 1, 1)
-
-	findOrder, err := repoOrder.FindOrderByID(db, newOrder.ID)
-	assert.Equal(t, nil, err, "err should be nil")
-
-	assert.Equal(t, newOrder.ID, findOrder.ID, "order ids not equal")
-	assert.Equal(t, uint64(1), findOrder.Amount, "should be 1 for amount")
-	assert.Equal(t, uint64(1), findOrder.Filled, "should be 1 for filled")
+	assert.Equal(t, uint64(0), findOrder.Amount, "should be 1 for amount")
+	assert.Equal(t, uint64(2), findOrder.Filled, "should be 2 for filled")
+	assert.Equal(t, constants.Completed, findOrder.Status, "should be completed")
 
 	repoUser.DeleteUserHard(db, user.ID)
 }

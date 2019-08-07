@@ -136,16 +136,16 @@ func InsertOrder(db *sql.DB, order *models.Order) error {
 	return err
 }
 
-func UpdateOrderStatus(db *sql.DB, orderID, status string) error {
-	_, err := db.Exec("UPDATE orders SET status = $1 WHERE id = $2",
-		status, orderID)
+// func UpdateOrderStatus(db *sql.DB, orderID, status string) error {
+// 	_, err := db.Exec("UPDATE orders SET status = $1 WHERE id = $2",
+// 		status, orderID)
 
-	return err
-}
+// 	return err
+// }
 
-func UpdateOrderAmounts(db *sql.DB, orderID string, amount, filled uint64) error {
-	_, err := db.Exec("UPDATE orders SET amount = $1, filled = $2 WHERE id = $3",
-		amount, filled, orderID)
+func UpdateOrder(db *sql.DB, order *models.Order) error {
+	_, err := db.Exec("UPDATE orders SET amount = $1, filled = $2, status = $3 WHERE id = $4",
+		order.Amount, order.Filled, order.Status, order.ID)
 
 	return err
 }
