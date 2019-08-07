@@ -131,20 +131,21 @@ func (book *OrderBook) removeSellOrder(index int) {
 }
 
 // Process an order and return the trades generated before adding the remaining amount to the market
-func (book *OrderBook) Process(order *Order) []*Trade {
+// returns the orders that were filled and the trades associated with the orders
+func (book *OrderBook) Process(order *Order) ([]*Order, []*Trade) {
 	if order.MarketName != book.MarketName {
-		return []*Trade{}
+		return []*Order{}, []*Trade{}
 	}
 
-	trades := []*Trade{}
 	switch {
 	case order.Side == constants.Buy:
-		_, trades = book.processLimitBuy(order)
+		return book.processLimitBuy(order)
 	case order.Side == constants.Sell:
-		_, trades = book.processLimitSell(order)
+		return book.processLimitSell(order)
 	}
 
-	return trades
+	// side no recognized will result in no filled orders and trades
+	return []*Order{}, []*Trade{}
 }
 
 // Process a limit buy order
