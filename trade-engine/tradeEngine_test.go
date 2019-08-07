@@ -7,8 +7,10 @@ import (
 
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
+	"github.com/asciiu/appa/common/constants/response"
 	"github.com/asciiu/appa/common/db"
 	"github.com/asciiu/appa/trade-engine/constants"
+	tradeRepo "github.com/asciiu/appa/trade-engine/db/sql"
 	"github.com/asciiu/appa/trade-engine/proto/trade"
 	"github.com/stretchr/testify/assert"
 )
@@ -47,182 +49,87 @@ func TestProcessOrder(t *testing.T) {
 
 	res := trade.OrderResponse{}
 	engine.Process(context.Background(), &req, &res)
-	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
+
+	// assert response
+	assert.Equal(t, response.Success, res.Status, "expected success got: "+res.Message)
+	assert.Equal(t, req.Side, res.Data.Order.Side, "side incorrect")
+	assert.Equal(t, req.Amount, res.Data.Order.Amount, "amounts should be the same")
+	assert.Equal(t, uint64(0), res.Data.Order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Pending, res.Data.Order.Status, "status incorrect")
+
+	// assert db data
+	order, err := tradeRepo.FindOrderByID(engine.DB, res.Data.Order.OrderID)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t, order.ID, res.Data.Order.OrderID, "id mismatch")
+	assert.Equal(t, req.Amount, order.Amount, "amounts should be the same")
+	assert.Equal(t, uint64(0), order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Pending, order.Status, "status incorrect")
 
 	repo.DeleteUserHard(engine.DB, user.ID)
 }
 
-//
-//func TestFindOrder(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	req := trade.NewOrderRequest{
-//		UserID:     user.ID,
-//		MarketName: "test-btc",
-//		Side:       constants.Sell,
-//		Size:       1.0,
-//		Type:       constants.LimitOrder,
-//	}
-//
-//	res := trade.OrderResponse{}
-//	service.AddOrder(context.Background(), &req, &res)
-//	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//	order := res.Data.Order
-//
-//	req2 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  user.ID,
-//	}
-//
-//	res2 := trade.OrderResponse{}
-//	service.FindOrder(context.Background(), &req2, &res2)
-//	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
-//	assert.Equal(t, order.OrderID, res2.Data.Order.OrderID, "order ID in find does not match")
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
-//
-//func TestFindOrderWrongUserID(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	req := trade.NewOrderRequest{
-//		UserID:     user.ID,
-//		MarketName: "test-btc",
-//		Side:       constants.Sell,
-//		Size:       1.0,
-//		Type:       constants.LimitOrder,
-//	}
-//
-//	res := trade.OrderResponse{}
-//	service.AddOrder(context.Background(), &req, &res)
-//	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//	order := res.Data.Order
-//
-//	req2 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  "a1c0e0dd-0c73-4b5e-ac5b-a2ac8378427d",
-//	}
-//
-//	res2 := trade.OrderResponse{}
-//	service.FindOrder(context.Background(), &req2, &res2)
-//	assert.Equal(t, "nonentity", res2.Status, "expected nonentity got: "+res2.Message)
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
-//
-//func TestCancelOrder(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	req := trade.NewOrderRequest{
-//		UserID:     user.ID,
-//		MarketName: "test-btc",
-//		Side:       constants.Sell,
-//		Size:       1.0,
-//		Type:       constants.LimitOrder,
-//	}
-//
-//	res := trade.OrderResponse{}
-//	service.AddOrder(context.Background(), &req, &res)
-//	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//	order := res.Data.Order
-//
-//	req2 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  user.ID,
-//	}
-//
-//	res2 := trade.StatusResponse{}
-//	service.CancelOrder(context.Background(), &req2, &res2)
-//	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
-//
-//	req3 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  user.ID,
-//	}
-//
-//	res3 := trade.OrderResponse{}
-//	service.FindOrder(context.Background(), &req3, &res3)
-//	assert.Equal(t, "nonentity", res3.Status, "expected nonentity got: "+res3.Message)
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
-//
-//func TestCancelOrderWrongUserID(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	req := trade.NewOrderRequest{
-//		UserID:     user.ID,
-//		MarketName: "test-btc",
-//		Side:       constants.Sell,
-//		Size:       1.0,
-//		Type:       constants.LimitOrder,
-//	}
-//
-//	res := trade.OrderResponse{}
-//	service.AddOrder(context.Background(), &req, &res)
-//	assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//	order := res.Data.Order
-//
-//	req2 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  "a1c0e0dd-0c73-4b5e-ac5b-a2ac8378427d",
-//	}
-//
-//	res2 := trade.StatusResponse{}
-//	service.CancelOrder(context.Background(), &req2, &res2)
-//	assert.Equal(t, "nonentity", res2.Status, "expected nonentity got: "+res2.Message)
-//
-//	req3 := trade.OrderRequest{
-//		OrderID: order.OrderID,
-//		UserID:  user.ID,
-//	}
-//
-//	res3 := trade.OrderResponse{}
-//	service.FindOrder(context.Background(), &req3, &res3)
-//	assert.Equal(t, "success", res3.Status, "expected success got: "+res3.Message)
-//	assert.Equal(t, order.OrderID, res3.Data.Order.OrderID, "order IDs do not match")
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
-//
-//func TestFindUserOrders(t *testing.T) {
-//	service, user := setupService()
-//
-//	defer service.DB.Close()
-//
-//	for i := 0; i < 10; i++ {
-//		req := trade.NewOrderRequest{
-//			UserID:     user.ID,
-//			MarketName: "test-btc",
-//			Side:       constants.Sell,
-//			Size:       1.0,
-//			Type:       constants.LimitOrder,
-//		}
-//
-//		res := trade.OrderResponse{}
-//		service.AddOrder(context.Background(), &req, &res)
-//		assert.Equal(t, "success", res.Status, "expected success got: "+res.Message)
-//	}
-//
-//	req2 := trade.UserOrdersRequest{
-//		UserID:   user.ID,
-//		Page:     0,
-//		PageSize: 20,
-//		Status:   "",
-//	}
-//
-//	res2 := trade.OrdersPageResponse{}
-//	service.FindUserOrders(context.Background(), &req2, &res2)
-//	assert.Equal(t, "success", res2.Status, "expected success got: "+res2.Message)
-//	assert.Equal(t, 10, len(res2.Data.Orders), fmt.Sprintf("must be 10 orders got %d", len(res2.Data.Orders)))
-//
-//	sql.DeleteUserHard(service.DB, user.ID)
-//}
+func TestProcessTrade(t *testing.T) {
+	engine, user := setupEngine()
+
+	defer engine.DB.Close()
+
+	or1 := &trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Sell,
+		Amount:     12.0,
+		Price:      10000000,
+	}
+	or2 := &trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Sell,
+		Amount:     20.0,
+		Price:      1000000,
+	}
+	or3 := &trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Sell,
+		Amount:     7.0,
+		Price:      100000,
+	}
+	or4 := &trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Sell,
+		Amount:     2.0,
+		Price:      100000,
+	}
+	buy := &trade.NewOrderRequest{
+		UserID:     user.ID,
+		MarketName: "btc-usd",
+		Side:       constants.Buy,
+		Amount:     8.0,
+		Price:      100010,
+	}
+
+	sellReqs := []*trade.NewOrderRequest{or1, or2, or3, or4}
+	res := &trade.OrderResponse{}
+	for _, req := range sellReqs {
+		engine.Process(context.Background(), req, res)
+	}
+
+	engine.Process(context.Background(), buy, res)
+
+	// assert response
+	assert.Equal(t, response.Success, res.Status, "expected success got: "+res.Message)
+	assert.Equal(t, buy.Side, res.Data.Order.Side, "side incorrect")
+	assert.Equal(t, uint64(0), res.Data.Order.Amount, "amounts should be 0")
+	assert.Equal(t, buy.Amount, res.Data.Order.Filled, "fill should be entire amount")
+	assert.Equal(t, constants.Completed, res.Data.Order.Status, "status incorrect")
+
+	// assert db data
+	order, err := tradeRepo.FindOrderByID(engine.DB, res.Data.Order.OrderID)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t, uint64(0), order.Amount, "amount should be 0")
+	assert.Equal(t, buy.Amount, order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Completed, order.Status, "status incorrect")
+
+	repo.DeleteUserHard(engine.DB, user.ID)
+}

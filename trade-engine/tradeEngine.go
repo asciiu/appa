@@ -94,6 +94,7 @@ func (service *TradeEngine) Process(ctx context.Context, req *trade.NewOrderRequ
 			MarketName: newOrder.MarketName,
 			Side:       newOrder.Side,
 			Amount:     newOrder.Amount,
+			Filled:     newOrder.Filled,
 			Price:      newOrder.Price,
 			Status:     newOrder.Status,
 			CreatedOn:  newOrder.CreatedOn,

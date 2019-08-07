@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 
 	"github.com/asciiu/appa/common/db"
@@ -282,9 +281,9 @@ func TestBuySortOrder(t *testing.T) {
 		book.Process(order)
 	}
 
-	for _, order := range book.BuyOrders {
-		fmt.Printf("%+v\n", order)
-	}
+	//for _, order := range book.BuyOrders {
+	//	fmt.Printf("%+v\n", order)
+	//}
 
 	assert.Equal(t, 4, len(book.BuyOrders), "should be 3 orders")
 	assert.Equal(t, or2.ID, book.BuyOrders[3].ID, "highest price buy should be last")
