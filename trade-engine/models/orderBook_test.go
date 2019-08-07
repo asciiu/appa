@@ -355,8 +355,8 @@ func TestFIFOBuyOrders(t *testing.T) {
 	remainingBuy1Amount := buy1.Amount - sell.Amount
 	boughtAmount := sell.Amount
 	filledOrders, trades := book.Process(&sell)
-	assert.Equal(t, 1, len(trades), "should be 1 trade")
 
+	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, 2, len(book.BuyOrders), "should be 2 order in buys")
 	assert.Equal(t, 0, len(book.SellOrders), "should be 0 order in sells")
 	assert.Equal(t, 1, len(filledOrders), "should be 1 order filled")
@@ -371,9 +371,14 @@ func TestFIFOBuyOrders(t *testing.T) {
 	assert.Equal(t, sell.ID, trades[0].TakerOrderID, "taker should be sell order ID")
 	assert.Equal(t, buy1.ID, trades[0].MakerOrderID, "maker should be buy order I")
 	assert.Equal(t, buy1.Price, trades[0].Price, "price not at sell order price")
+
 	assert.Equal(t, remainingBuy1Amount, book.BuyOrders[1].Amount, "remaining buy amount is incorrect")
 	assert.Equal(t, boughtAmount, book.BuyOrders[1].Filled, "buy filled amount is incorrect")
 	assert.Equal(t, buy1.ID, book.BuyOrders[1].ID, "first buy order is incorrect")
+
+	assert.Equal(t, uint64(0), sell.Amount, "sell amount should be 0")
+	assert.Equal(t, boughtAmount, sell.Filled, "sell fill is wrong")
+	assert.Equal(t, constants.Completed, sell.Status, "sell should be complete")
 }
 
 func TestFIFOSellOrders(t *testing.T) {
@@ -386,8 +391,9 @@ func TestFIFOSellOrders(t *testing.T) {
 		Amount:     1024,
 		Price:      850,
 	}
-	_, trades := book.Process(&sell1)
+	filledOrders, trades := book.Process(&sell1)
 	assert.Equal(t, 0, len(trades), "should be 0 trades")
+	assert.Equal(t, 0, len(filledOrders), "should be 0 filled orders")
 
 	sell2 := Order{
 		ID:         uuid.New().String(),
@@ -396,8 +402,9 @@ func TestFIFOSellOrders(t *testing.T) {
 		Amount:     200,
 		Price:      850,
 	}
-	_, trades = book.Process(&sell2)
+	filledOrders, trades = book.Process(&sell2)
 	assert.Equal(t, 0, len(trades), "should be 0 trades")
+	assert.Equal(t, 0, len(filledOrders), "should be 0 filled orders")
 
 	buy := Order{
 		ID:         uuid.New().String(),
@@ -409,7 +416,7 @@ func TestFIFOSellOrders(t *testing.T) {
 	// remaining sell1 amount after buy
 	remainingSell1Amount := sell1.Amount - buy.Amount
 	boughtAmount := buy.Amount
-	filledOrders, trades := book.Process(&buy)
+	filledOrders, trades = book.Process(&buy)
 
 	assert.Equal(t, 1, len(trades), "should be 1 trade")
 	assert.Equal(t, 1, len(filledOrders), "should be 1 order filled")
@@ -426,9 +433,97 @@ func TestFIFOSellOrders(t *testing.T) {
 	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker should be buy order ID")
 	assert.Equal(t, sell1.ID, trades[0].MakerOrderID, "maker should be sell order I")
 
+	assert.Equal(t, uint64(0), buy.Amount, "buy amount should be 0")
+	assert.Equal(t, boughtAmount, buy.Filled, "buy filled amount wrong")
+	assert.Equal(t, constants.Completed, buy.Status, "buy status should be complete")
+
 	assert.Equal(t, sell1.Price, trades[0].Price, "price not at sell order price")
 	assert.Equal(t, remainingSell1Amount, book.SellOrders[1].Amount, "remaining sell amount of first order is incorrect")
 	assert.Equal(t, sell1.ID, book.SellOrders[1].ID, "first selll order is incorrect")
+}
+
+func TestMultiSellOrderFill(t *testing.T) {
+
+	book := NewOrderBook("test-btc")
+	sell1 := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     1024,
+		Price:      850,
+	}
+	filledOrders, trades := book.Process(&sell1)
+	assert.Equal(t, 0, len(trades), "should be 0 trades")
+	assert.Equal(t, 0, len(filledOrders), "should be 0 filled orders")
+
+	sell2 := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     200,
+		Price:      850,
+	}
+	filledOrders, trades = book.Process(&sell2)
+	assert.Equal(t, 0, len(trades), "should be 0 trades")
+	assert.Equal(t, 0, len(filledOrders), "should be 0 filled orders")
+
+	sell3 := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     200,
+		Price:      910,
+	}
+	filledOrders, trades = book.Process(&sell3)
+	assert.Equal(t, 0, len(trades), "should be 0 trades")
+	assert.Equal(t, 0, len(filledOrders), "should be 0 filled orders")
+
+	buy := Order{
+		ID:         uuid.New().String(),
+		MarketName: "test-btc",
+		Side:       constants.Buy,
+		Amount:     1500,
+		Price:      900,
+	}
+
+	sell1Amount := sell1.Amount
+	sell2Amount := sell2.Amount
+	remainingBuyAmount := buy.Amount - sell1.Amount - sell2.Amount
+	boughtAmount := sell1.Amount + sell2.Amount
+
+	filledOrders, trades = book.Process(&buy)
+
+	assert.Equal(t, 2, len(trades), "should be 2 trades")
+	assert.Equal(t, 2, len(filledOrders), "should be 2 orders filled")
+
+	// filled orders tests
+	assert.Equal(t, uint64(0), filledOrders[0].Amount, "remaining amount of filled order is wrong")
+	assert.Equal(t, sell1Amount, filledOrders[0].Filled, "filled amount is wrong")
+	assert.Equal(t, sell1.Side, filledOrders[0].Side, "filled order side incorrect")
+	assert.Equal(t, uint64(0), filledOrders[1].Amount, "remaining amount of filled order is wrong")
+	assert.Equal(t, sell2Amount, filledOrders[1].Filled, "filled amount is wrong")
+	assert.Equal(t, sell2.Side, filledOrders[1].Side, "filled order side incorrect")
+
+	assert.Equal(t, 1, len(book.SellOrders), "should be 2 order in sells")
+	assert.Equal(t, 1, len(book.BuyOrders), "should be 0 order in buys")
+
+	// trade tests
+	assert.Equal(t, sell1Amount, trades[0].Amount, "trade amount should be full sell 1 amount")
+	assert.Equal(t, constants.Buy, trades[0].Side, "side should be buy")
+	assert.Equal(t, buy.ID, trades[0].TakerOrderID, "taker should be buy order ID")
+	assert.Equal(t, sell1.ID, trades[0].MakerOrderID, "maker should be sell order I")
+	assert.Equal(t, sell2Amount, trades[1].Amount, "trade amount should be full sell 2 amount")
+	assert.Equal(t, constants.Buy, trades[1].Side, "side should be buy")
+	assert.Equal(t, buy.ID, trades[1].TakerOrderID, "taker should be buy order ID")
+	assert.Equal(t, sell2.ID, trades[1].MakerOrderID, "maker should be sell order I")
+
+	// buy order
+	assert.Equal(t, remainingBuyAmount, buy.Amount, "buy amount wrong")
+	assert.Equal(t, boughtAmount, buy.Filled, "buy filled amount wrong")
+	assert.Equal(t, constants.Pending, buy.Status, "buy status should be pending")
+	assert.Equal(t, remainingBuyAmount, book.BuyOrders[0].Amount, "buy amount wrong")
+	assert.Equal(t, boughtAmount, book.BuyOrders[0].Filled, "buy filled wrong")
+	assert.Equal(t, constants.Pending, book.BuyOrders[0].Status, "buy status should be pending")
 }
 
 func TestCancelSellOrder(t *testing.T) {
