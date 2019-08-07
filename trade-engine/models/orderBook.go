@@ -191,12 +191,14 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 			for j := i2; buyOrder.Amount > 0 && j >= i1; j-- {
 				sellOrder := book.SellOrders[j]
 
-				trade := &Trade{
-					TakerOrderID: buyOrder.ID,
-					MakerOrderID: sellOrder.ID,
-					Price:        sellOrder.Price,
-					Side:         buyOrder.Side,
-				}
+				trade := NewTrade(
+					buyOrder.ID,
+					sellOrder.ID,
+					buyOrder.Side,
+					0,
+					sellOrder.Price,
+				)
+
 				book.LastPrice = sellOrder.Price
 				book.LastSide = buyOrder.Side
 
@@ -301,12 +303,14 @@ func (book *OrderBook) processLimitSell(sellOrder *Order) ([]*Order, []*Trade) {
 			for j := i2; sellOrder.Amount > 0 && j >= i1; j-- {
 				buyOrder := book.BuyOrders[j]
 
-				trade := &Trade{
-					TakerOrderID: sellOrder.ID,
-					MakerOrderID: buyOrder.ID,
-					Price:        buyOrder.Price,
-					Side:         sellOrder.Side,
-				}
+				trade := NewTrade(
+					sellOrder.ID,
+					buyOrder.ID,
+					sellOrder.Side,
+					0,
+					buyOrder.Price,
+				)
+
 				book.LastPrice = buyOrder.Price
 				book.LastSide = sellOrder.Side
 
