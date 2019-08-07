@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"testing"
 
 	"github.com/asciiu/appa/common/db"
@@ -245,79 +246,94 @@ func TestPartialBuy(t *testing.T) {
 
 func TestBuySortOrder(t *testing.T) {
 
-	buyOrders := []*Order{
-		&Order{
-			ID:         "1",
-			MarketName: "test-btc",
-			Side:       constants.Buy,
-			Amount:     100,
-			Price:      1000,
-		},
-		&Order{
-			ID:         "2",
-			MarketName: "test-btc",
-			Side:       constants.Buy,
-			Amount:     204,
-			Price:      2000,
-		},
-		&Order{
-			ID:         "0",
-			MarketName: "test-btc",
-			Side:       constants.Buy,
-			Amount:     400,
-			Price:      1000,
-		},
+	or1 := &Order{
+		ID:         "2",
+		MarketName: "test-btc",
+		Side:       constants.Buy,
+		Amount:     100,
+		Price:      1000,
 	}
+	or2 := &Order{
+		ID:         "3",
+		MarketName: "test-btc",
+		Side:       constants.Buy,
+		Amount:     204,
+		Price:      2000,
+	}
+	or3 := &Order{
+		ID:         "1",
+		MarketName: "test-btc",
+		Side:       constants.Buy,
+		Amount:     400,
+		Price:      1000,
+	}
+	or4 := &Order{
+		ID:         "0",
+		MarketName: "test-btc",
+		Side:       constants.Buy,
+		Amount:     400,
+		Price:      1000,
+	}
+
+	buyOrders := []*Order{or1, or2, or3, or4}
+
 	book := NewOrderBook("test-btc")
 	for _, order := range buyOrders {
 		book.Process(order)
 	}
 
-	// for _, order := range book.BuyOrders {
-	// 	fmt.Printf("%+v\n", order)
-	// }
+	for _, order := range book.BuyOrders {
+		fmt.Printf("%+v\n", order)
+	}
 
-	assert.Equal(t, 3, len(book.BuyOrders), "should be 3 orders")
-	assert.Equal(t, buyOrders[1].ID, book.BuyOrders[2].ID, "highest price buy should be last")
-	assert.Equal(t, buyOrders[0].ID, book.BuyOrders[1].ID, "first added order should be second")
-	assert.Equal(t, buyOrders[2].ID, book.BuyOrders[0].ID, "last added order should be first")
+	assert.Equal(t, 4, len(book.BuyOrders), "should be 3 orders")
+	assert.Equal(t, or2.ID, book.BuyOrders[3].ID, "highest price buy should be last")
+	assert.Equal(t, or3.ID, book.BuyOrders[1].ID, "second order incorrect")
+	assert.Equal(t, or4.ID, book.BuyOrders[0].ID, "first order incorrect")
 }
 
 func TestSellSortOrder(t *testing.T) {
 
-	sellOrders := []*Order{
-		&Order{
-			ID:         "1",
-			MarketName: "test-btc",
-			Side:       constants.Sell,
-			Amount:     100,
-			Price:      1000,
-		},
-		&Order{
-			ID:         "2",
-			MarketName: "test-btc",
-			Side:       constants.Sell,
-			Amount:     400,
-			Price:      200,
-		},
-		&Order{
-			ID:         "0",
-			MarketName: "test-btc",
-			Side:       constants.Sell,
-			Amount:     204,
-			Price:      1000,
-		},
+	s1 := &Order{
+		ID:         "1",
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     100,
+		Price:      1000,
 	}
+	s2 := &Order{
+		ID:         "3",
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     400,
+		Price:      200,
+	}
+	s3 := &Order{
+		ID:         "0",
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     204,
+		Price:      1000,
+	}
+	s4 := &Order{
+		ID:         "2",
+		MarketName: "test-btc",
+		Side:       constants.Sell,
+		Amount:     800,
+		Price:      200,
+	}
+
+	sellOrders := []*Order{s1, s2, s3, s4}
 
 	book := NewOrderBook("test-btc")
 	for _, order := range sellOrders {
 		book.Process(order)
 	}
 
-	assert.Equal(t, 3, len(book.SellOrders), "should be 3 orders")
-	assert.Equal(t, sellOrders[1].ID, book.SellOrders[2].ID, "lowest price sell should be last")
-	assert.Equal(t, sellOrders[0].ID, book.SellOrders[1].ID, "first added order should be second")
-	assert.Equal(t, sellOrders[2].ID, book.SellOrders[0].ID, "last added order should be first")
+	assert.Equal(t, 4, len(book.SellOrders), "should be 3 orders")
+	assert.Equal(t, s2.ID, book.SellOrders[3].ID, "lowest price sell should be last")
+	assert.Equal(t, s1.ID, book.SellOrders[1].ID, "second order in array is incorrect")
+	assert.Equal(t, s3.ID, book.SellOrders[0].ID, "first order in array is incorrect")
 }
 
 // Test first in first out buy. Buy orders at the same price should be FIFO

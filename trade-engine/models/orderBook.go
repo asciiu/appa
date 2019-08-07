@@ -39,18 +39,18 @@ func (book *OrderBook) addBuyOrder(order *Order) {
 		return
 	}
 
-	var i int
+	index := 0
 	for i := n - 1; i >= 0; i-- {
 		buyOrder := book.BuyOrders[i]
 		if buyOrder.Price < order.Price {
-			i++
+			index = i + 1
 			break
 		}
 	}
 
 	book.BuyOrders = append(book.BuyOrders, order)
-	copy(book.BuyOrders[i+1:], book.BuyOrders[i:])
-	book.BuyOrders[i] = order
+	copy(book.BuyOrders[index+1:], book.BuyOrders[index:])
+	book.BuyOrders[index] = order
 }
 
 // sell orders will be kept sorted in descending price order
@@ -65,17 +65,18 @@ func (book *OrderBook) addSellOrder(order *Order) {
 		return
 	}
 
-	var i int
+	index := 0
 	for i := n - 1; i >= 0; i-- {
 		sellOrder := book.SellOrders[i]
 		if sellOrder.Price > order.Price {
+			index = i + 1
 			break
 		}
 	}
 
 	book.SellOrders = append(book.SellOrders, order)
-	copy(book.SellOrders[i+1:], book.SellOrders[i:])
-	book.SellOrders[i] = order
+	copy(book.SellOrders[index+1:], book.SellOrders[index:])
+	book.SellOrders[index] = order
 }
 
 // Cancel a buy order.
@@ -154,6 +155,9 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 	orders := make([]*Order, 0, 1)
 
 	numSellOrders := len(book.SellOrders)
+	//for i, o := range book.SellOrders {
+	//	fmt.Printf("%d - %+v\n", i, o)
+	//}
 
 	if numSellOrders > 0 {
 		i1 := 0
@@ -168,6 +172,7 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 		for i := numSellOrders - 1; i >= 0; i-- {
 			sellOrder := book.SellOrders[i]
 
+			//fmt.Printf("sell: %d, buy: %d\n", sellOrder.Price, buyOrder.Price)
 			// a higher asking sell price cannot fill a lower buy price
 			if sellOrder.Price > buyOrder.Price {
 				// the first buy order index should be the next order
@@ -187,8 +192,10 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 		}
 
 		if count > 0 {
+			//fmt.Println(count)
+			//fmt.Printf("i2: %d, i1: %d\n", i2, i1)
 			// fills orders from i2 -> i1.
-			for j := i2; buyOrder.Amount > 0 && j >= i1; j-- {
+			for j := i2; buyOrder.Status != constants.Completed && j >= i1; j-- {
 				sellOrder := book.SellOrders[j]
 
 				trade := NewTrade(
@@ -215,16 +222,16 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 					sellOrder.Amount -= buyOrder.Amount
 					sellOrder.Filled += buyOrder.Amount
 
-					buyOrder.Filled += buyOrder.Amount
-					buyOrder.Amount = 0
-					buyOrder.Status = constants.Completed
-
 					// if the sell order amount == 0 then the sell
 					// order has been filled - remove it
 					if sellOrder.Amount == 0 {
 						sellOrder.Status = constants.Completed
 						book.removeSellOrder(j)
 					}
+					buyOrder.Filled += buyOrder.Amount
+					buyOrder.Amount = 0
+					buyOrder.Status = constants.Completed
+
 					orders = append(orders, sellOrder)
 
 					return orders, trades
@@ -247,7 +254,7 @@ func (book *OrderBook) processLimitBuy(buyOrder *Order) ([]*Order, []*Trade) {
 				sellOrder.Status = constants.Completed
 				orders = append(orders, sellOrder)
 
-				// buy order should be removed
+				// this sell order has completed remove it from the sell orders
 				book.removeSellOrder(j)
 			}
 		}
