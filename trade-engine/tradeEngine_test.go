@@ -124,13 +124,14 @@ func TestProcessTrade(t *testing.T) {
 	assert.Equal(t, buy.Amount, res.Data.Order.Filled, "fill should be entire amount")
 	assert.Equal(t, constants.Completed, res.Data.Order.Status, "status incorrect")
 
-	// assert db data
+	// assert order data for buy order
 	order, err := tradeRepo.FindOrderByID(engine.DB, res.Data.Order.OrderID)
 	assert.Nil(t, err, "error should be nil")
 	assert.Equal(t, uint64(0), order.Amount, "amount should be 0")
 	assert.Equal(t, buy.Amount, order.Filled, "fill incorrect")
 	assert.Equal(t, constants.Completed, order.Status, "status incorrect")
 
+	// assert trade data
 	tp, err := tradeRepo.FindUserTrades(engine.DB, user.ID, 0, 100)
 	assert.Nil(t, err, "error should be nil")
 	assert.Equal(t, uint32(2), tp.Total, "should be 2 trades")
@@ -140,6 +141,21 @@ func TestProcessTrade(t *testing.T) {
 	assert.Equal(t, or3.Price, tp.Trades[0].Price, "price not correct")
 	assert.Equal(t, uint64(1), tp.Trades[1].Amount, "amount not correct")
 	assert.Equal(t, or4.Price, tp.Trades[1].Price, "price not correct")
+
+	// assert order data for sell orders
+	// trade 1 - maker sell order
+	order, err = tradeRepo.FindOrderByID(engine.DB, tp.Trades[0].MakerOrderID)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t, uint64(0), order.Amount, "amount should be 0")
+	assert.Equal(t, uint64(7), order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Completed, order.Status, "status incorrect")
+
+	// trade 2 - maker sell order
+	order, err = tradeRepo.FindOrderByID(engine.DB, tp.Trades[1].MakerOrderID)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t, uint64(1), order.Amount, "amount should be 0")
+	assert.Equal(t, uint64(1), order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Pending, order.Status, "status incorrect")
 
 	repo.DeleteUserHard(engine.DB, user.ID)
 }

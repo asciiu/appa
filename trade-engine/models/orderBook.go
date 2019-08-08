@@ -133,6 +133,7 @@ func (book *OrderBook) removeSellOrder(index int) {
 
 // Process an order and return the trades generated before adding the remaining amount to the market
 // returns the orders that were filled and the trades associated with the orders
+// TODO a user cannot fill their own order.
 func (book *OrderBook) Process(order *Order) ([]*Order, []*Trade) {
 	if order.MarketName != book.MarketName {
 		return []*Order{}, []*Trade{}
