@@ -46,6 +46,7 @@ func NewOrder(userID, marketName, side string, amount, price uint64) *Order {
 }
 
 type Trade struct {
+	ID           string `json:"id"`
 	TakerOrderID string `json:"taker_order_id"`
 	MakerOrderID string `json:"maker_order_id"`
 	Amount       uint64 `json:"amount"`
@@ -55,9 +56,17 @@ type Trade struct {
 	UpdatedOn    string `json:"updatedOn"`
 }
 
+type TradesPage struct {
+	Page     uint32
+	PageSize uint32
+	Total    uint32
+	Trades   []*Trade
+}
+
 func NewTrade(taker, maker, side string, amount, price uint64) *Trade {
 	now := string(pq.FormatTimestamp(time.Now().UTC()))
 	return &Trade{
+		ID:           uuid.New().String(),
 		TakerOrderID: taker,
 		MakerOrderID: maker,
 		Side:         side,
