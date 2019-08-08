@@ -77,35 +77,35 @@ func TestProcessTrade(t *testing.T) {
 		UserID:     user.ID,
 		MarketName: "btc-usd",
 		Side:       constants.Sell,
-		Amount:     12.0,
+		Amount:     12,
 		Price:      10000000,
 	}
 	or2 := &trade.NewOrderRequest{
 		UserID:     user.ID,
 		MarketName: "btc-usd",
 		Side:       constants.Sell,
-		Amount:     20.0,
+		Amount:     20,
 		Price:      1000000,
 	}
 	or3 := &trade.NewOrderRequest{
 		UserID:     user.ID,
 		MarketName: "btc-usd",
 		Side:       constants.Sell,
-		Amount:     7.0,
+		Amount:     7,
 		Price:      100000,
 	}
 	or4 := &trade.NewOrderRequest{
 		UserID:     user.ID,
 		MarketName: "btc-usd",
 		Side:       constants.Sell,
-		Amount:     2.0,
+		Amount:     2,
 		Price:      100000,
 	}
 	buy := &trade.NewOrderRequest{
 		UserID:     user.ID,
 		MarketName: "btc-usd",
 		Side:       constants.Buy,
-		Amount:     8.0,
+		Amount:     8,
 		Price:      100010,
 	}
 
@@ -130,6 +130,16 @@ func TestProcessTrade(t *testing.T) {
 	assert.Equal(t, uint64(0), order.Amount, "amount should be 0")
 	assert.Equal(t, buy.Amount, order.Filled, "fill incorrect")
 	assert.Equal(t, constants.Completed, order.Status, "status incorrect")
+
+	tp, err := tradeRepo.FindUserTrades(engine.DB, user.ID, 0, 100)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t, uint32(2), tp.Total, "should be 2 trades")
+	assert.Equal(t, res.Data.Order.OrderID, tp.Trades[0].TakerOrderID, "maker not correct")
+	assert.Equal(t, res.Data.Order.OrderID, tp.Trades[1].TakerOrderID, "maker not correct")
+	assert.Equal(t, or3.Amount, tp.Trades[0].Amount, "amount not correct")
+	assert.Equal(t, or3.Price, tp.Trades[0].Price, "price not correct")
+	assert.Equal(t, uint64(1), tp.Trades[1].Amount, "amount not correct")
+	assert.Equal(t, or4.Price, tp.Trades[1].Price, "price not correct")
 
 	repo.DeleteUserHard(engine.DB, user.ID)
 }
