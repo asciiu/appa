@@ -39,5 +39,11 @@ func TestInsertTrade(t *testing.T) {
 	err = repoTrade.InsertTrade(db, newTrade)
 	assert.Equal(t, nil, err, "err should be nil")
 
+	pagedTrades, err := repoTrade.FindUserTrades(db, user.ID, 0, 100)
+	assert.Nil(t, err, "find trades should be nil")
+	assert.Equal(t, uint32(1), pagedTrades.Total, "should be a single trade")
+	assert.Equal(t, uint32(0), pagedTrades.Page, "page incorrect")
+	assert.Equal(t, uint32(100), pagedTrades.PageSize, "page size incorrect")
+
 	repoUser.DeleteUserHard(db, user.ID)
 }

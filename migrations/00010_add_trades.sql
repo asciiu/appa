@@ -1,5 +1,6 @@
 -- +goose Up
 CREATE TABLE trades(
+  id UUID PRIMARY KEY, 
   taker_order_id UUID REFERENCES orders (id) ON DELETE CASCADE,
   maker_order_id UUID REFERENCES orders (id) ON DELETE CASCADE,
   amount BIGINT NOT NULL,
