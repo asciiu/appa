@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/asciiu/appa/ether-service/examples"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -45,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("connected!")
 
-	fmt.Println("we have a connection")
-	_ = client
+	examples.Balance(client)
 }
