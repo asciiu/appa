@@ -44,5 +44,6 @@ func main() {
 	//}
 	//fmt.Println("connected!")
 
-	examples.GenerateNewWallet()
+	//examples.GenerateNewWallet()
+	examples.SimulatedClient()
 }
