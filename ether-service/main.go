@@ -1,11 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/asciiu/appa/ether-service/examples"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
@@ -42,11 +38,11 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
-	client, err := ethclient.Dial("https://mainnet.infura.io")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("connected!")
+	//client, err := ethclient.Dial("https://mainnet.infura.io")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println("connected!")
 
-	examples.Balance(client)
+	examples.GenerateNewWallet()
 }
