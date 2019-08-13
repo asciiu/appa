@@ -1,8 +1,8 @@
 # How to generate go source from solidity 
-1. Generate the application binary interface. This is needed in 
+1. Generate the application binary interface and evm bytecode. This is needed in 
 order to interact with the contract.
 ```
-solc --abi Solidity.sol > file.abi
+solc --abi --bin Contract.sol -o build
 ```
 2. Generate EVN bytecode:
 ```
@@ -10,7 +10,7 @@ solc --bin Solidity.sol > file.bin
 ```
 3. Use abigen to to generate the go source.
 ```
-abigen --bin=Store_sol_Store.bin --abi=Store_sol_Store.abi --pkg=store --out=Store.go
+abigen --bin=./build/Contract.bin --abi=./build/Contract.abi --pkg=store --out=Contract.go
 ```
 
 ### Prerequisites
