@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 
+	store "github.com/asciiu/appa/ether-service/contracts/store"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
@@ -146,4 +147,58 @@ func SimulatedClient() {
 	}
 
 	fmt.Printf("status: %v\n", receipt.Status) // status: 1
+}
+
+func DeployContract() {
+	privateKey, err := crypto.GenerateKey()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	auth := bind.NewKeyedTransactor(privateKey)
+	balance := new(big.Int)
+	balance.SetString("10000000000000000000", 10) // 10 eth in wei
+
+	address := auth.From
+	genesisAlloc := map[common.Address]core.GenesisAccount{
+		address: {
+			Balance: balance,
+		},
+	}
+
+	blockGasLimit := uint64(4712388)
+	client := backends.NewSimulatedBackend(genesisAlloc, blockGasLimit)
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Value = big.NewInt(0)     // in wei
+	auth.GasLimit = uint64(300000) // in units
+	auth.GasPrice = gasPrice
+
+	//input := "1.0"
+	address, tx, instance, err := store.DeployStore(auth, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(address.Hex())   // 0x147B8eb97fD247D06C4006D269c90C1908Fb5D54
+	fmt.Println(tx.Hash().Hex()) // 0xdae8ba5444eefdc99f4d45cd0c4f24056cba6a02cefbf78066ef9f4188ff7dc0
+
+	_ = instance
 }
