@@ -191,14 +191,50 @@ func DeployContract() {
 	auth.GasLimit = uint64(300000) // in units
 	auth.GasPrice = gasPrice
 
-	//input := "1.0"
-	address, tx, instance, err := store.DeployStore(auth, client)
+	address, tx, instance, err := store.DeployStore(auth, client, "1.0")
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.Commit()
+
+	fmt.Println("address: ", address.Hex())     // 0x147B8eb97fD247D06C4006D269c90C1908Fb5D54
+	fmt.Println("deploy tx: ", tx.Hash().Hex()) // 0xdae8ba5444eefdc99f4d45cd0c4f24056cba6a02cefbf78066ef9f4188ff7dc0
+
+	// alternative mdethod to create an instance
+	//address = common.HexToAddress(address.Hex())
+	//instance, err = store.NewStore(address, client)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	// reading from the contract
+	version, err := instance.Version(nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(address.Hex())   // 0x147B8eb97fD247D06C4006D269c90C1908Fb5D54
-	fmt.Println(tx.Hash().Hex()) // 0xdae8ba5444eefdc99f4d45cd0c4f24056cba6a02cefbf78066ef9f4188ff7dc0
+	fmt.Println("version read: ", version)
 
-	_ = instance
+	auth.Nonce = big.NewInt(int64(1))
+
+	// write to the contract
+	key := [32]byte{}
+	value := [32]byte{}
+	copy(key[:], []byte("foo"))
+	copy(value[:], []byte("bar"))
+	tx, err = instance.SetItem(auth, key, value)
+	////data, err := instance.Get(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.Commit()
+
+	fmt.Println("transaction sent: ", tx.Hash().Hex()) // 0xdae8ba5444eefdc99f4d45cd0c4f24056cba6a02cefbf78066ef9f4188ff7dc0
+
+	result, err := instance.Items(nil, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(result[:]))
 }

@@ -28,18 +28,18 @@ var (
 )
 
 // StoreABI is the input ABI used to generate the binding from.
-const StoreABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const StoreABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"items\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"key\",\"type\":\"bytes32\"},{\"name\":\"value\",\"type\":\"bytes32\"}],\"name\":\"setItem\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_version\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"key\",\"type\":\"bytes32\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"bytes32\"}],\"name\":\"ItemSet\",\"type\":\"event\"}]"
 
 // StoreBin is the compiled bytecode used for deploying new contracts.
-const StoreBin = `608060405234801561001057600080fd5b5060c68061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806360fe47b11460375780636d4ce63c146062575b600080fd5b606060048036036020811015604b57600080fd5b8101908080359060200190929190505050607e565b005b60686088565b6040518082815260200191505060405180910390f35b8060008190555050565b6000805490509056fea265627a7a723058205136f53af3358b8c0989c6c3005dcaa3a8cef0b6762659b825651c673815452b64736f6c634300050a0032`
+const StoreBin = `608060405234801561001057600080fd5b506040516103e03803806103e08339818101604052602081101561003357600080fd5b81019080805164010000000081111561004b57600080fd5b8281019050602081018481111561006157600080fd5b815185600182028301116401000000008211171561007e57600080fd5b5050929190505050806000908051906020019061009c9291906100a3565b5050610148565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106100e457805160ff1916838001178555610112565b82800160010185558215610112579182015b828111156101115782518255916020019190600101906100f6565b5b50905061011f9190610123565b5090565b61014591905b80821115610141576000816000905550600101610129565b5090565b90565b610289806101576000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806348f343f31461004657806354fd4d5014610088578063f56256c71461010b575b600080fd5b6100726004803603602081101561005c57600080fd5b8101908080359060200190929190505050610143565b6040518082815260200191505060405180910390f35b61009061015b565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100d05780820151818401526020810190506100b5565b50505050905090810190601f1680156100fd5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6101416004803603604081101561012157600080fd5b8101908080359060200190929190803590602001909291905050506101f9565b005b60016020528060005260406000206000915090505481565b60008054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156101f15780601f106101c6576101008083540402835291602001916101f1565b820191906000526020600020905b8154815290600101906020018083116101d457829003601f168201915b505050505081565b8060016000848152602001908152602001600020819055507fe79e73da417710ae99aa2088575580a60415d359acfad9cdd3382d59c80281d48282604051808381526020018281526020019250505060405180910390a1505056fea265627a7a72305820df1f73a054be4db8df0f466020529d75ec84d65dba2665deb45adeed34f11ef964736f6c634300050a0032`
 
 // DeployStore deploys a new Ethereum contract, binding an instance of Store to it.
-func DeployStore(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Store, error) {
+func DeployStore(auth *bind.TransactOpts, backend bind.ContractBackend, _version string) (common.Address, *types.Transaction, *Store, error) {
 	parsed, err := abi.JSON(strings.NewReader(StoreABI))
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(StoreBin), backend)
+	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(StoreBin), backend, _version)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
@@ -188,49 +188,198 @@ func (_Store *StoreTransactorRaw) Transact(opts *bind.TransactOpts, method strin
 	return _Store.Contract.contract.Transact(opts, method, params...)
 }
 
-// Get is a free data retrieval call binding the contract method 0x6d4ce63c.
+// Items is a free data retrieval call binding the contract method 0x48f343f3.
 //
-// Solidity: function get() constant returns(uint256)
-func (_Store *StoreCaller) Get(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function items(bytes32 ) constant returns(bytes32)
+func (_Store *StoreCaller) Items(opts *bind.CallOpts, arg0 [32]byte) ([32]byte, error) {
 	var (
-		ret0 = new(*big.Int)
+		ret0 = new([32]byte)
 	)
 	out := ret0
-	err := _Store.contract.Call(opts, out, "get")
+	err := _Store.contract.Call(opts, out, "items", arg0)
 	return *ret0, err
 }
 
-// Get is a free data retrieval call binding the contract method 0x6d4ce63c.
+// Items is a free data retrieval call binding the contract method 0x48f343f3.
 //
-// Solidity: function get() constant returns(uint256)
-func (_Store *StoreSession) Get() (*big.Int, error) {
-	return _Store.Contract.Get(&_Store.CallOpts)
+// Solidity: function items(bytes32 ) constant returns(bytes32)
+func (_Store *StoreSession) Items(arg0 [32]byte) ([32]byte, error) {
+	return _Store.Contract.Items(&_Store.CallOpts, arg0)
 }
 
-// Get is a free data retrieval call binding the contract method 0x6d4ce63c.
+// Items is a free data retrieval call binding the contract method 0x48f343f3.
 //
-// Solidity: function get() constant returns(uint256)
-func (_Store *StoreCallerSession) Get() (*big.Int, error) {
-	return _Store.Contract.Get(&_Store.CallOpts)
+// Solidity: function items(bytes32 ) constant returns(bytes32)
+func (_Store *StoreCallerSession) Items(arg0 [32]byte) ([32]byte, error) {
+	return _Store.Contract.Items(&_Store.CallOpts, arg0)
 }
 
-// Set is a paid mutator transaction binding the contract method 0x60fe47b1.
+// Version is a free data retrieval call binding the contract method 0x54fd4d50.
 //
-// Solidity: function set(uint256 x) returns()
-func (_Store *StoreTransactor) Set(opts *bind.TransactOpts, x *big.Int) (*types.Transaction, error) {
-	return _Store.contract.Transact(opts, "set", x)
+// Solidity: function version() constant returns(string)
+func (_Store *StoreCaller) Version(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _Store.contract.Call(opts, out, "version")
+	return *ret0, err
 }
 
-// Set is a paid mutator transaction binding the contract method 0x60fe47b1.
+// Version is a free data retrieval call binding the contract method 0x54fd4d50.
 //
-// Solidity: function set(uint256 x) returns()
-func (_Store *StoreSession) Set(x *big.Int) (*types.Transaction, error) {
-	return _Store.Contract.Set(&_Store.TransactOpts, x)
+// Solidity: function version() constant returns(string)
+func (_Store *StoreSession) Version() (string, error) {
+	return _Store.Contract.Version(&_Store.CallOpts)
 }
 
-// Set is a paid mutator transaction binding the contract method 0x60fe47b1.
+// Version is a free data retrieval call binding the contract method 0x54fd4d50.
 //
-// Solidity: function set(uint256 x) returns()
-func (_Store *StoreTransactorSession) Set(x *big.Int) (*types.Transaction, error) {
-	return _Store.Contract.Set(&_Store.TransactOpts, x)
+// Solidity: function version() constant returns(string)
+func (_Store *StoreCallerSession) Version() (string, error) {
+	return _Store.Contract.Version(&_Store.CallOpts)
+}
+
+// SetItem is a paid mutator transaction binding the contract method 0xf56256c7.
+//
+// Solidity: function setItem(bytes32 key, bytes32 value) returns()
+func (_Store *StoreTransactor) SetItem(opts *bind.TransactOpts, key [32]byte, value [32]byte) (*types.Transaction, error) {
+	return _Store.contract.Transact(opts, "setItem", key, value)
+}
+
+// SetItem is a paid mutator transaction binding the contract method 0xf56256c7.
+//
+// Solidity: function setItem(bytes32 key, bytes32 value) returns()
+func (_Store *StoreSession) SetItem(key [32]byte, value [32]byte) (*types.Transaction, error) {
+	return _Store.Contract.SetItem(&_Store.TransactOpts, key, value)
+}
+
+// SetItem is a paid mutator transaction binding the contract method 0xf56256c7.
+//
+// Solidity: function setItem(bytes32 key, bytes32 value) returns()
+func (_Store *StoreTransactorSession) SetItem(key [32]byte, value [32]byte) (*types.Transaction, error) {
+	return _Store.Contract.SetItem(&_Store.TransactOpts, key, value)
+}
+
+// StoreItemSetIterator is returned from FilterItemSet and is used to iterate over the raw logs and unpacked data for ItemSet events raised by the Store contract.
+type StoreItemSetIterator struct {
+	Event *StoreItemSet // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *StoreItemSetIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(StoreItemSet)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(StoreItemSet)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *StoreItemSetIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *StoreItemSetIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// StoreItemSet represents a ItemSet event raised by the Store contract.
+type StoreItemSet struct {
+	Key   [32]byte
+	Value [32]byte
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterItemSet is a free log retrieval operation binding the contract event 0xe79e73da417710ae99aa2088575580a60415d359acfad9cdd3382d59c80281d4.
+//
+// Solidity: event ItemSet(bytes32 key, bytes32 value)
+func (_Store *StoreFilterer) FilterItemSet(opts *bind.FilterOpts) (*StoreItemSetIterator, error) {
+
+	logs, sub, err := _Store.contract.FilterLogs(opts, "ItemSet")
+	if err != nil {
+		return nil, err
+	}
+	return &StoreItemSetIterator{contract: _Store.contract, event: "ItemSet", logs: logs, sub: sub}, nil
+}
+
+// WatchItemSet is a free log subscription operation binding the contract event 0xe79e73da417710ae99aa2088575580a60415d359acfad9cdd3382d59c80281d4.
+//
+// Solidity: event ItemSet(bytes32 key, bytes32 value)
+func (_Store *StoreFilterer) WatchItemSet(opts *bind.WatchOpts, sink chan<- *StoreItemSet) (event.Subscription, error) {
+
+	logs, sub, err := _Store.contract.WatchLogs(opts, "ItemSet")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(StoreItemSet)
+				if err := _Store.contract.UnpackLog(event, "ItemSet", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }
