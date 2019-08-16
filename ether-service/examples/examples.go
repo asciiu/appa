@@ -10,6 +10,7 @@ import (
 
 	store "github.com/asciiu/appa/ether-service/contracts/store"
 	"github.com/asciiu/appa/ether-service/contracts/token"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
@@ -285,4 +286,30 @@ func TokenExample() {
 	value := new(big.Float).Quo(fbal, big.NewFloat(math.Pow10(int(decimals))))
 
 	fmt.Printf("balance: %f\n", value)
+}
+
+func SubscribeExample() {
+	client, err := ethclient.Dial("wss://rinkeby.infura.io/ws")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// using the contract address of our deployed contract
+	contractAddress := common.HexToAddress("0x147B8eb97fD247D06C4006D269c90C1908Fb5D54")
+	query := ethereum.FilterQuery{
+		Addresses: []common.Address{contractAddress},
+	}
+	logs := make(chan types.Log)
+	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case vLog := <-logs:
+			fmt.Println(vLog) // pointer to event log
+		}
+	}
 }

@@ -47,5 +47,6 @@ func main() {
 	//examples.GenerateNewWallet()
 	//examples.SimulatedClient()
 	//examples.DeployContract()
-	examples.TokenExample()
+	//examples.TokenExample()
+	examples.Zerox()
 }
