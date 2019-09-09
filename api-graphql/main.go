@@ -17,7 +17,7 @@ import (
 	"github.com/asciiu/appa/common/db"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	micro "github.com/micro/go-micro"
-	k8s "github.com/micro/kubernetes/go/micro"
+	k8s "github.com/micro/examples/kubernetes/go/micro"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
