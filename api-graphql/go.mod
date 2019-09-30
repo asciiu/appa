@@ -15,8 +15,8 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/micro/examples v0.2.0
 	github.com/micro/go-micro v1.9.1
-	github.com/openzipkin/zipkin-go v0.1.6 // indirect
 	github.com/rs/cors v1.7.0
+	github.com/stretchr/testify v1.3.0
 	github.com/vektah/gqlparser v1.1.2
 	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739
 )
