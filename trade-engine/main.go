@@ -8,7 +8,7 @@ import (
 	"github.com/asciiu/appa/common/db"
 	"github.com/asciiu/appa/trade-engine/proto/trade"
 	micro "github.com/micro/go-micro"
-	k8s "github.com/micro/kubernetes/go/micro"
+	k8s "github.com/micro/examples/kubernetes/go/micro"
 )
 
 func main() {
