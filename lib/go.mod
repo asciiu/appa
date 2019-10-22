@@ -1,4 +1,4 @@
-module github.com/asciiu/appa/common
+module github.com/asciiu/appa/lib
 
 go 1.12
 
