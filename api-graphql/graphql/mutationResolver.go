@@ -11,7 +11,7 @@ import (
 	"github.com/asciiu/appa/api-graphql/auth"
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
-	constRes "github.com/asciiu/appa/common/constants/response"
+	constRes "github.com/asciiu/appa/lib/constants/response"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
