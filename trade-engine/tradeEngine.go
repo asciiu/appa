@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/asciiu/appa/common/constants/response"
+	"github.com/asciiu/appa/lib/constants/response"
 	"github.com/asciiu/appa/trade-engine/constants"
 	repo "github.com/asciiu/appa/trade-engine/db/sql"
 	"github.com/asciiu/appa/trade-engine/models"

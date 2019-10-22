@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	protoAccount "github.com/asciiu/gomo/account-service/proto/account"
-	constRes "github.com/asciiu/gomo/common/constants/response"
+	constRes "github.com/asciiu/gomo/lib/constants/response"
 	protoUser "github.com/asciiu/gomo/user-service/proto/user"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/db"
 	constants "github.com/asciiu/appa/trade-engine/constants"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

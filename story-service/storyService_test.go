@@ -9,7 +9,7 @@ import (
 
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/db"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

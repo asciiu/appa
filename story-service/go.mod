@@ -8,7 +8,7 @@ replace github.com/nats-io/nats.go v1.8.2-0.20190607221125-9f4d16fe7c2d => githu
 
 require (
 	github.com/asciiu/appa/api-graphql v0.0.5
-	github.com/asciiu/appa/common v0.0.1
+	github.com/asciiu/appa/lib v0.0.0-20191022013234-7fdd8e2731b3
 	github.com/golang/protobuf v1.3.2
 	github.com/google/uuid v1.1.1
 	github.com/micro/examples v0.2.0

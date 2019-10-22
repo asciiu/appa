@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/db"
 	"github.com/asciiu/appa/socket/controllers"
 	"github.com/asciiu/appa/socket/middlewares"
 	"github.com/labstack/echo"

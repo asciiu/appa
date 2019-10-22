@@ -39,7 +39,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/gomo/common/db"
+	"github.com/asciiu/gomo/lib/db"
 	_ "github.com/lib/pq"
 )
 

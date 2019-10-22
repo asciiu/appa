@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	protoEvt "github.com/asciiu/gomo/common/proto/events"
+	protoEvt "github.com/asciiu/gomo/lib/proto/events"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )

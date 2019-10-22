@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	constRes "github.com/asciiu/appa/common/constants/response"
+	constRes "github.com/asciiu/appa/lib/constants/response"
 	protoOrder "github.com/asciiu/appa/trade-engine/proto/order"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"

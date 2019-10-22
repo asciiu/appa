@@ -12,7 +12,7 @@ import (
 	"time"
 
 	asql "github.com/asciiu/gomo/api/db/sql"
-	constRes "github.com/asciiu/gomo/common/constants/response"
+	constRes "github.com/asciiu/gomo/lib/constants/response"
 	protoDevice "github.com/asciiu/gomo/device-service/proto/device"
 	repoUser "github.com/asciiu/gomo/user-service/db/sql"
 	protoUser "github.com/asciiu/gomo/user-service/proto/user"

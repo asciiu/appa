@@ -5,7 +5,7 @@ go 1.12
 replace github.com/nats-io/nats.go v1.8.2-0.20190607221125-9f4d16fe7c2d => github.com/nats-io/nats.go v1.8.1
 
 require (
-	github.com/asciiu/appa/common v0.0.1
+	github.com/asciiu/appa/lib v0.0.0-20191022013234-7fdd8e2731b3
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/labstack/echo v3.3.10+incompatible

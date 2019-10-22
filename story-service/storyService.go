@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"time"
 
-	commonResp "github.com/asciiu/appa/common/constants/response"
+	commonResp "github.com/asciiu/appa/lib/constants/response"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	"gopkg.in/libgit2/git2go.v27"
 )

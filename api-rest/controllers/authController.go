@@ -12,7 +12,7 @@ import (
 	"time"
 
 	asql "github.com/asciiu/appa/api/db/sql"
-	constRes "github.com/asciiu/appa/common/constants/response"
+	constRes "github.com/asciiu/appa/lib/constants/response"
 	repoUser "github.com/asciiu/appa/user-service/db/sql"
 	protoUser "github.com/asciiu/appa/user-service/proto/user"
 	micro "github.com/micro/go-micro"

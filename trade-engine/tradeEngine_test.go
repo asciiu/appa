@@ -7,8 +7,8 @@ import (
 
 	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
-	"github.com/asciiu/appa/common/constants/response"
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/constants/response"
+	"github.com/asciiu/appa/lib/db"
 	"github.com/asciiu/appa/trade-engine/constants"
 	tradeRepo "github.com/asciiu/appa/trade-engine/db/sql"
 	"github.com/asciiu/appa/trade-engine/proto/trade"

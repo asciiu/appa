@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/db"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 	micro "github.com/micro/go-micro"
 	//k8s "github.com/micro/kubernetes/go/micro"

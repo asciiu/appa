@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	constRes "github.com/asciiu/appa/common/constants/response"
+	constRes "github.com/asciiu/appa/lib/constants/response"
 	user "github.com/asciiu/appa/user-service/models"
 	protoUser "github.com/asciiu/appa/user-service/proto/user"
 	jwt "github.com/dgrijalva/jwt-go"
