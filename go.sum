@@ -92,6 +92,7 @@ github.com/asciiu/appa/story-service v0.0.4 h1:dNNXvUz+rmRC7Eqm2N1R8EsolZLQac21D
 github.com/asciiu/appa/story-service v0.0.4/go.mod h1:YuyuyhpkO7Ii324WEkdbdCrQhcgAk5vWtamw1vA4ChI=
 github.com/asciiu/appa/trade-engine v0.0.0-20190909013023-5d30006b84b2 h1:OeHt94HxPEwoF4U7pgj37Q3OdY5Xt/itSGLd3eczZsI=
 github.com/asciiu/appa/trade-engine v0.0.0-20190909013023-5d30006b84b2/go.mod h1:4uU1rE9M4igAesyGzrwGG6e8rf8ORK3KPXRd+soG8wc=
+github.com/asciiu/appa/trade-engine v0.0.0-20190930021409-2f4d5e9234da h1:tuhYs5PbrJxC8GeMmTjjnuhCngMJsumqHAnlgd05wsw=
 github.com/asciiu/gomo v0.0.0-20181013035637-b0f2be03163c h1:bHtemDRtHWiNPSwXbRXBLS1m8LHRMqyXJGKjHdCzbB4=
 github.com/asciiu/gomo v0.0.0-20181013035637-b0f2be03163c/go.mod h1:LzSEn3dwyhJZ7HjDjTHQijoS7bfajsS+vlQnfXn30Jc=
 github.com/asim/go-awsxray v0.0.0-20161209120537-0d8a60b6e205/go.mod h1:frVmN4PtXUuL1EbZn0uL4PHSTKNKFnbMpBIhngqMuNQ=

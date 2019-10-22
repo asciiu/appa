@@ -74,7 +74,7 @@ func (controller *SessionController) HandleSession(c echo.Context) error {
 	if r.Status != constRes.Success {
 		response := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {

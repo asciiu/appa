@@ -40,19 +40,6 @@ type JwtClaims struct {
 	jwt.StandardClaims
 }
 
-// swagger:parameters login
-type LoginRequest struct {
-	// Required. Backend code does not check email atm.
-	// in: body
-	Email string `json:"email"`
-	// Required. Backend code does not have any password requirements atm.
-	// in: body
-	Password string `json:"password"`
-	// Optional. Return refresh token in response
-	// in: body
-	Remember bool `json:"remember"`
-}
-
 // swagger:parameters signup
 type SignupRequest struct {
 	// Optional.
@@ -86,14 +73,6 @@ type Device struct {
 type UserData struct {
 	User    *models.UserInfo `json:"user"`
 	Devices []*Device        `json:"devices"`
-}
-
-// A ResponseSuccess will always contain a status of "successful".
-// This response may or may not include data encapsulating the user information.
-// swagger:model responseError
-type ResponseError struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
 }
 
 func NewAuthController(db *sql.DB, service micro.Service) *AuthController {
@@ -196,6 +175,19 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 	}
 }
 
+// swagger:parameters login
+type LoginRequest struct {
+	// Required. Backend code does not check email atm.
+	// in: body
+	Email string `json:"email" validate:"required,email"`
+	// Required. Backend code does not have any password requirements atm.
+	// in: body
+	Password string `json:"password" validate:"required"`
+	// Optional. Return refresh token in response
+	// in: body
+	Remember bool `json:"remember"`
+}
+
 // swagger:route POST /login authentication login
 //
 // user login (open)
@@ -210,15 +202,23 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 //  401: responseError unauthorized user because of incorrect password with "status": "fail"
 //  500: responseError the message will state what the internal server error was with "status": "error"
 func (controller *AuthController) HandleLogin(c echo.Context) error {
-	loginRequest := LoginRequest{}
-
 	defer c.Request().Body.Close()
 
-	err := json.NewDecoder(c.Request().Body).Decode(&loginRequest)
+	loginRequest := new(LoginRequest)
+	err := c.Bind(loginRequest)
 	if err != nil {
 		response := &ResponseError{
-			Status:  constRes.Fail,
-			Message: "malformed json request for 'email' and 'password'",
+			Status:   constRes.Fail,
+			Messages: []string{"malformed json request for 'email' and 'password'"},
+		}
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	if err = c.Validate(loginRequest); err != nil {
+		msgs := strings.Split(err.Error(), "\n")
+		response := &ResponseError{
+			Status:   constRes.Fail,
+			Messages: []string{msgs},
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -228,16 +228,16 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 	switch {
 	case err == sql.ErrNoRows:
 		response := &ResponseError{
-			Status:  constRes.Fail,
-			Message: "password/login incorrect",
+			Status:   constRes.Fail,
+			Messages: []string{"password/login incorrect"},
 		}
 		// no user by this email send unauthorized response
 		return c.JSON(http.StatusUnauthorized, response)
 
 	case err != nil:
 		response := &ResponseError{
-			Status:  constRes.Error,
-			Message: err.Error(),
+			Status:   constRes.Error,
+			Messages: []string{err.Error()},
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 
@@ -247,8 +247,8 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 			accessToken, err := createJwtToken(user.ID, jwtDuration)
 			if err != nil {
 				response := &ResponseError{
-					Status:  constRes.Error,
-					Message: err.Error(),
+					Status:   constRes.Error,
+					Messages: []string{err.Error()},
 				}
 				return c.JSON(http.StatusInternalServerError, response)
 			}
@@ -262,8 +262,8 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 
 				if err3 != nil {
 					response := &ResponseError{
-						Status:  constRes.Error,
-						Message: err.Error(),
+						Status:   constRes.Error,
+						Messages: []string{err.Error()},
 					}
 					return c.JSON(http.StatusInternalServerError, response)
 				}
@@ -284,7 +284,7 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 
 	response := &ResponseError{
 		Status:  constRes.Fail,
-		Message: "password/login incorrect",
+		Messages: []string{"password/login incorrect"},
 	}
 	return c.JSON(http.StatusUnauthorized, response)
 }
@@ -307,7 +307,7 @@ func (controller *AuthController) HandleLogout(c echo.Context) error {
 		if len(sa) != 2 {
 			response := &ResponseError{
 				Status:  constRes.Fail,
-				Message: "refresh token invalid",
+				Messages: []string{"refresh token invalid"},
 			}
 			return c.JSON(http.StatusBadRequest, response)
 		}
@@ -340,7 +340,7 @@ func (controller *AuthController) HandleSignup(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: err.Error(),
+			Messages: []string{err.Error()},
 		}
 
 		return c.JSON(http.StatusBadRequest, response)
@@ -349,7 +349,7 @@ func (controller *AuthController) HandleSignup(c echo.Context) error {
 	if signupRequest.Email == "" || signupRequest.Password == "" {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: "email and password are required",
+			Message: []string{"email and password are required"},
 		}
 
 		return c.JSON(http.StatusBadRequest, response)
@@ -366,7 +366,7 @@ func (controller *AuthController) HandleSignup(c echo.Context) error {
 	if r.Status != constRes.Success {
 		response := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {

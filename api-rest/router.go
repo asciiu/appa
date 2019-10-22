@@ -12,10 +12,19 @@ import (
 	"github.com/labstack/echo"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // clean up stage refresh tokens in DB every 30 minutes
 const cleanUpInterval = 30 * time.Minute
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
 
 // send 200 ok to ping requests
 func health(c echo.Context) error {

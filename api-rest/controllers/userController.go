@@ -71,7 +71,7 @@ func (controller *UserController) HandleChangePassword(c echo.Context) error {
 	if paramID != userID {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: "unauthorized",
+			Messages: []string{"unauthorized"},
 		}
 
 		return c.JSON(http.StatusUnauthorized, response)
@@ -83,7 +83,7 @@ func (controller *UserController) HandleChangePassword(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: err.Error(),
+			Messages: []string{err.Error()},
 		}
 
 		return c.JSON(http.StatusBadRequest, response)
@@ -99,7 +99,7 @@ func (controller *UserController) HandleChangePassword(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Error,
-			Message: "change password service unavailable",
+			Messages: []string{"change password service unavailable"},
 		}
 
 		return c.JSON(http.StatusGone, response)
@@ -108,7 +108,7 @@ func (controller *UserController) HandleChangePassword(c echo.Context) error {
 	if r.Status != constRes.Success {
 		response := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {
@@ -148,7 +148,7 @@ func (controller *UserController) HandleUpdateUser(c echo.Context) error {
 	if paramID != userID {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: "unauthorized",
+			Messages: []string{"unauthorized"},
 		}
 
 		return c.JSON(http.StatusUnauthorized, response)
@@ -160,7 +160,7 @@ func (controller *UserController) HandleUpdateUser(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: err.Error(),
+			Messages: []string{err.Error()},
 		}
 
 		return c.JSON(http.StatusBadRequest, response)
@@ -177,7 +177,7 @@ func (controller *UserController) HandleUpdateUser(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Error,
-			Message: "update service unavailable",
+			Messages: []string{"update service unavailable"},
 		}
 
 		return c.JSON(http.StatusGone, response)

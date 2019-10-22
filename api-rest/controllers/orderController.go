@@ -62,7 +62,7 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 	if err != nil {
 		response := &ResponseError{
 			Status:  constRes.Fail,
-			Message: err.Error(),
+			Messages: []string{err.Error()},
 		}
 
 		return c.JSON(http.StatusBadRequest, response)
@@ -81,7 +81,7 @@ func (controller *OrderController) HandlePostOrder(c echo.Context) error {
 	if r.Status != constRes.Success {
 		res := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {
@@ -148,7 +148,7 @@ func (controller *OrderController) HandleGetOrders(c echo.Context) error {
 	if r.Status != constRes.Success {
 		res := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {
@@ -201,7 +201,7 @@ func (controller *OrderController) HandleGetOrder(c echo.Context) error {
 	if r.Status != constRes.Success {
 		res := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {
@@ -244,7 +244,7 @@ func (controller *OrderController) HandleDeleteOrder(c echo.Context) error {
 	if r.Status != constRes.Success {
 		res := &ResponseError{
 			Status:  r.Status,
-			Message: r.Message,
+			Messages: []string{r.Message},
 		}
 
 		if r.Status == constRes.Fail {

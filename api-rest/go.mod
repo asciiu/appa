@@ -7,6 +7,8 @@ require (
 	github.com/asciiu/appa/common v0.0.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-log/log v0.1.0
+	github.com/go-playground/locales v0.13.0 // indirect
+	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/golang/protobuf v1.2.0
 	github.com/google/uuid v1.0.0
 	github.com/hashicorp/consul v1.3.0
@@ -21,7 +23,8 @@ require (
 	github.com/json-iterator/go v1.1.5
 	github.com/labstack/echo v0.0.0-20181106020225-2e9f4ea4e010
 	github.com/labstack/gommon v0.2.7
-	github.com/lib/pq v1.0.0
+	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/lib/pq v1.2.0
 	github.com/mattn/go-colorable v0.0.9
 	github.com/mattn/go-isatty v0.0.4
 	github.com/micro/cli v0.0.0-20180830071301-8b9d33ec2f19
@@ -48,6 +51,7 @@ require (
 	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16
 	golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc
 	golang.org/x/sys v0.0.0-20181031143558-9b800f95dbbc
-	golang.org/x/text v0.3.0
+	golang.org/x/text v0.3.2
 	google.golang.org/genproto v0.0.0-20181101192439-c830210a61df
+	gopkg.in/go-playground/validator.v9 v9.30.0
 )
