@@ -5,7 +5,7 @@ import (
 
 	"github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
-	"github.com/asciiu/appa/common/db"
+	"github.com/asciiu/appa/lib/db"
 	"github.com/stretchr/testify/assert"
 )
 
