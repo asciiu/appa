@@ -9,6 +9,37 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type RoleType string
+type PermissionType string
+
+const (
+	// role types
+	AdminRole   RoleType = "admin"
+	InvalidRole RoleType = "invalid"
+
+	// permissions
+	UnrestrictedPermission PermissionType = "unrestricted"
+	UnknownPermission      PermissionType = "unknown"
+)
+
+func RoleFromString(role string) RoleType {
+	switch role {
+	case "admin":
+		return AdminRole
+	default:
+		return InvalidRole
+	}
+}
+
+func PermissionFromString(permission string) PermissionType {
+	switch permission {
+	case "unrestricted":
+		return UnrestrictedPermission
+	default:
+		return UnknownPermission
+	}
+}
+
 func NewUser(username, email, password string) *User {
 	// assign new uuid for user
 	newID := uuid.New()
