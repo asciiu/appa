@@ -143,7 +143,7 @@ func (admin *AdminUser) Info() *AdminInfo {
 
 func (admin *AdminUser) HasPermission(permission PermissionType) bool {
 	for _, p := range admin.Permissions {
-		if p == Unrestricted || p == permission {
+		if p == UnrestrictedPermission || p == permission {
 			return true
 		}
 	}
