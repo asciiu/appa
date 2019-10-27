@@ -12,7 +12,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/asciiu/appa/api-graphql/models"
+	models2 "github.com/asciiu/appa/api-graphql/models"
+	models1 "github.com/asciiu/appa/lib/balance/models"
+	"github.com/asciiu/appa/lib/user/models"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -109,12 +111,12 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
-	Balances(ctx context.Context) ([]*models.Balance, error)
+	Balances(ctx context.Context) ([]*models1.Balance, error)
 	Info(ctx context.Context) (*models.User, error)
 	GetUser(ctx context.Context) (*models.User, error)
 	UserSummary(ctx context.Context) (*models.UserSummary, error)
 	FindOrder(ctx context.Context, id string) (*models.Order, error)
-	ListStories(ctx context.Context) ([]*models.Story, error)
+	ListStories(ctx context.Context) ([]*models2.Story, error)
 }
 
 type executableSchema struct {
@@ -701,7 +703,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Balance_id(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_id(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -738,7 +740,7 @@ func (ec *executionContext) _Balance_id(ctx context.Context, field graphql.Colle
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_userID(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_userID(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -775,7 +777,7 @@ func (ec *executionContext) _Balance_userID(ctx context.Context, field graphql.C
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_symbol(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_symbol(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -809,7 +811,7 @@ func (ec *executionContext) _Balance_symbol(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_name(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_name(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -843,7 +845,7 @@ func (ec *executionContext) _Balance_name(ctx context.Context, field graphql.Col
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_amount(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_amount(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -871,13 +873,13 @@ func (ec *executionContext) _Balance_amount(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(models.Int64)
+	res := resTmp.(models1.Int64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOInt642githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐInt64(ctx, field.Selections, res)
+	return ec.marshalOInt642githubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐInt64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_locked(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_locked(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -905,13 +907,13 @@ func (ec *executionContext) _Balance_locked(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(models.Int64)
+	res := resTmp.(models1.Int64)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOInt642githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐInt64(ctx, field.Selections, res)
+	return ec.marshalOInt642githubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐInt64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_precision(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_precision(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -945,7 +947,7 @@ func (ec *executionContext) _Balance_precision(ctx context.Context, field graphq
 	return ec.marshalOFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Balance_address(ctx context.Context, field graphql.CollectedField, obj *models.Balance) (ret graphql.Marshaler) {
+func (ec *executionContext) _Balance_address(ctx context.Context, field graphql.CollectedField, obj *models1.Balance) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1017,7 +1019,7 @@ func (ec *executionContext) _Mutation_signup(ctx context.Context, field graphql.
 	res := resTmp.(*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1257,7 +1259,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_balances(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1288,10 +1290,10 @@ func (ec *executionContext) _Query_balances(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Balance)
+	res := resTmp.([]*models1.Balance)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx, field.Selections, res)
+	return ec.marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_info(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1328,7 +1330,7 @@ func (ec *executionContext) _Query_info(ctx context.Context, field graphql.Colle
 	res := resTmp.(*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1362,7 +1364,7 @@ func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.Co
 	res := resTmp.(*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_userSummary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1396,7 +1398,7 @@ func (ec *executionContext) _Query_userSummary(ctx context.Context, field graphq
 	res := resTmp.(*models.UserSummary)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUserSummary2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUserSummary(ctx, field.Selections, res)
+	return ec.marshalOUserSummary2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUserSummary(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_findOrder(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1437,7 +1439,7 @@ func (ec *executionContext) _Query_findOrder(ctx context.Context, field graphql.
 	res := resTmp.(*models.Order)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOOrder2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐOrder(ctx, field.Selections, res)
+	return ec.marshalOOrder2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_listStories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1471,7 +1473,7 @@ func (ec *executionContext) _Query_listStories(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Story)
+	res := resTmp.([]*models2.Story)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNStory2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx, field.Selections, res)
@@ -1552,7 +1554,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Story_id(ctx context.Context, field graphql.CollectedField, obj *models.Story) (ret graphql.Marshaler) {
+func (ec *executionContext) _Story_id(ctx context.Context, field graphql.CollectedField, obj *models2.Story) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1589,7 +1591,7 @@ func (ec *executionContext) _Story_id(ctx context.Context, field graphql.Collect
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Story_title(ctx context.Context, field graphql.CollectedField, obj *models.Story) (ret graphql.Marshaler) {
+func (ec *executionContext) _Story_title(ctx context.Context, field graphql.CollectedField, obj *models2.Story) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1626,7 +1628,7 @@ func (ec *executionContext) _Story_title(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Story_content(ctx context.Context, field graphql.CollectedField, obj *models.Story) (ret graphql.Marshaler) {
+func (ec *executionContext) _Story_content(ctx context.Context, field graphql.CollectedField, obj *models2.Story) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1944,10 +1946,10 @@ func (ec *executionContext) _UserSummary_balance(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*models.Balance)
+	res := resTmp.(*models1.Balance)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx, field.Selections, res)
+	return ec.marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserSummary_user(ctx context.Context, field graphql.CollectedField, obj *models.UserSummary) (ret graphql.Marshaler) {
@@ -1981,7 +1983,7 @@ func (ec *executionContext) _UserSummary_user(ctx context.Context, field graphql
 	res := resTmp.(*models.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3145,7 +3147,7 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 var balanceImplementors = []string{"Balance"}
 
-func (ec *executionContext) _Balance(ctx context.Context, sel ast.SelectionSet, obj *models.Balance) graphql.Marshaler {
+func (ec *executionContext) _Balance(ctx context.Context, sel ast.SelectionSet, obj *models1.Balance) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, balanceImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3377,7 +3379,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var storyImplementors = []string{"Story"}
 
-func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, obj *models.Story) graphql.Marshaler {
+func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, obj *models2.Story) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, storyImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3784,11 +3786,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNStory2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models2.Story) graphql.Marshaler {
 	return ec._Story(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v []*models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v []*models2.Story) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3825,7 +3827,7 @@ func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋa
 	return ret
 }
 
-func (ec *executionContext) marshalNStory2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models2.Story) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3849,11 +3851,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v []*models.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v []*models.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3877,7 +3879,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3890,7 +3892,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋap
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4126,11 +4128,11 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOBalance2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v models.Balance) graphql.Marshaler {
+func (ec *executionContext) marshalOBalance2githubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v models1.Balance) graphql.Marshaler {
 	return ec._Balance(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v []*models.Balance) graphql.Marshaler {
+func (ec *executionContext) marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v []*models1.Balance) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4157,7 +4159,7 @@ func (ec *executionContext) marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappa�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx, sel, v[i])
+			ret[i] = ec.marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4170,7 +4172,7 @@ func (ec *executionContext) marshalOBalance2ᚕᚖgithubᚗcomᚋasciiuᚋappa�
 	return ret
 }
 
-func (ec *executionContext) marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v *models.Balance) graphql.Marshaler {
+func (ec *executionContext) marshalOBalance2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐBalance(ctx context.Context, sel ast.SelectionSet, v *models1.Balance) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4208,20 +4210,20 @@ func (ec *executionContext) marshalOFloat2float64(ctx context.Context, sel ast.S
 	return graphql.MarshalFloat(v)
 }
 
-func (ec *executionContext) unmarshalOInt642githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐInt64(ctx context.Context, v interface{}) (models.Int64, error) {
-	var res models.Int64
+func (ec *executionContext) unmarshalOInt642githubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐInt64(ctx context.Context, v interface{}) (models1.Int64, error) {
+	var res models1.Int64
 	return res, res.UnmarshalGQL(v)
 }
 
-func (ec *executionContext) marshalOInt642githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐInt64(ctx context.Context, sel ast.SelectionSet, v models.Int64) graphql.Marshaler {
+func (ec *executionContext) marshalOInt642githubᚗcomᚋasciiuᚋappaᚋlibᚋbalanceᚋmodelsᚐInt64(ctx context.Context, sel ast.SelectionSet, v models1.Int64) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalOOrder2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v models.Order) graphql.Marshaler {
+func (ec *executionContext) marshalOOrder2githubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v models.Order) graphql.Marshaler {
 	return ec._Order(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOOrder2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v *models.Order) graphql.Marshaler {
+func (ec *executionContext) marshalOOrder2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐOrder(ctx context.Context, sel ast.SelectionSet, v *models.Order) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4262,22 +4264,22 @@ func (ec *executionContext) marshalOToken2ᚖgithubᚗcomᚋasciiuᚋappaᚋapi�
 	return ec._Token(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOUser2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2githubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOUserSummary2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUserSummary(ctx context.Context, sel ast.SelectionSet, v models.UserSummary) graphql.Marshaler {
+func (ec *executionContext) marshalOUserSummary2githubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUserSummary(ctx context.Context, sel ast.SelectionSet, v models.UserSummary) graphql.Marshaler {
 	return ec._UserSummary(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOUserSummary2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚋmodelsᚐUserSummary(ctx context.Context, sel ast.SelectionSet, v *models.UserSummary) graphql.Marshaler {
+func (ec *executionContext) marshalOUserSummary2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUserSummary(ctx context.Context, sel ast.SelectionSet, v *models.UserSummary) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

@@ -10,8 +10,9 @@ import (
 	"strings"
 	"time"
 
-	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
-	"github.com/asciiu/appa/api-graphql/models"
+	userRepo "github.com/asciiu/appa/lib/user/db/sql"
+	user "github.com/asciiu/appa/lib/user/models"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -30,8 +31,8 @@ type contextKey struct {
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *models.User {
-	raw, _ := ctx.Value(userCtxKey).(*models.User)
+func ForContext(ctx context.Context) *user.User {
+	raw, _ := ctx.Value(userCtxKey).(*user.User)
 	return raw
 }
 
@@ -44,7 +45,7 @@ func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	// Generate encoded token and send it as response.
-	token, err := rawToken.SignedString([]byte(os.Getenv("appa_JWT")))
+	token, err := rawToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		return "", err
 	}
@@ -74,9 +75,9 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 				// if valid token and no error
 				if tok != nil && err == nil {
 					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
-					user, _ := repoUser.FindUserByID(db, userID)
-					if user != nil {
-						ctx = context.WithValue(r.Context(), userCtxKey, user)
+					loginUser, _ := userRepo.FindUserByID(db, userID)
+					if loginUser != nil {
+						ctx = context.WithValue(r.Context(), userCtxKey, loginUser)
 					}
 				}
 
@@ -88,7 +89,7 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 						if len(sa) == 2 {
 							selector := sa[0]
 							authenticator := sa[1]
-							refreshToken, err := repoUser.FindRefreshToken(db, selector)
+							refreshToken, err := tokenRepo.FindRefreshToken(db, selector)
 							if err == nil {
 								if refreshToken.Valid(authenticator) {
 									accessToken, err := CreateJwtToken(refreshToken.UserID, JwtDuration)
@@ -98,13 +99,13 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 
 										w.Header().Set("set-authorization", accessToken)
 										w.Header().Set("set-refresh", selectAuth)
-										if _, err := repoUser.UpdateRefreshToken(db, refreshToken); err != nil {
+										if _, err := tokenRepo.UpdateRefreshToken(db, refreshToken); err != nil {
 											log.Println(err)
 										}
 									}
 								}
 								if refreshToken.ExpiresOn.Before(time.Now()) {
-									repoUser.DeleteRefreshToken(db, refreshToken)
+									tokenRepo.DeleteRefreshToken(db, refreshToken)
 								}
 							}
 						}

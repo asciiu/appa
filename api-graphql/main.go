@@ -12,7 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/api-graphql/auth"
-	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/lib/db"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
@@ -33,7 +33,7 @@ const cleanUpInterval = 30 * time.Minute
 func cleanDatabase(db *sql.DB) {
 	for {
 		time.Sleep(cleanUpInterval)
-		error := repoUser.DeleteStaleTokens(db, time.Now())
+		error := tokenRepo.DeleteStaleTokens(db, time.Now())
 		if error != nil {
 			log.Fatal(error)
 		}
@@ -58,7 +58,7 @@ func main() {
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8080", "http://localhost:4000", "http://localhost:3000"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
 		ExposedHeaders:   []string{"set-authorization", "set-refresh"},

@@ -6,58 +6,60 @@ import (
 	"log"
 
 	"github.com/asciiu/appa/api-graphql/auth"
-	repo "github.com/asciiu/appa/api-graphql/db/sql"
+	user "github.com/asciiu/appa/lib/user/models"
+	balance "github.com/asciiu/appa/lib/balance/models"
+	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
 )
 
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Balances(ctx context.Context) ([]*models.Balance, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
-		return []*models.Balance{}, fmt.Errorf("unauthorized")
+func (r *queryResolver) Balances(ctx context.Context) ([]*balance.Balance, error) {
+	loginUser := auth.ForContext(ctx)
+	if loginUser == nil {
+		return []*balance.Balance{}, fmt.Errorf("unauthorized")
 	}
 
-	balances, err := repo.FindUserBalances(r.DB, user.ID)
+	balances, err := balanceRepo.FindUserBalances(r.DB, loginUser.ID)
 	return balances, err
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
-	if user := auth.ForContext(ctx); user == nil {
-		return []*models.User{}, fmt.Errorf("unauthorized")
+func (r *queryResolver) Users(ctx context.Context) ([]*user.User, error) {
+	if loginUser := auth.ForContext(ctx); loginUser == nil {
+		return []*user.User{}, fmt.Errorf("unauthorized")
 	}
 
-	return []*models.User{}, nil
+	return []*user.User{}, nil
 }
 
-func (r *queryResolver) Info(ctx context.Context) (*models.User, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
-		return &models.User{}, fmt.Errorf("unauthorized")
+func (r *queryResolver) Info(ctx context.Context) (*user.User, error) {
+	loginUser := auth.ForContext(ctx)
+	if loginUser == nil {
+		return &user.User{}, fmt.Errorf("unauthorized")
 	}
 
-	return user, nil
+	return loginUser, nil
 }
 
-func (r *queryResolver) GetUser(ctx context.Context) (*models.User, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
+func (r *queryResolver) GetUser(ctx context.Context) (*user.User, error) {
+	loginUser := auth.ForContext(ctx)
+	if loginUser == nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	return user, nil
+	return loginUser, nil
 }
 
-func (r *queryResolver) UserSummary(ctx context.Context) (*models.UserSummary, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
+func (r *queryResolver) UserSummary(ctx context.Context) (*user.UserSummary, error) {
+	loginUser := auth.ForContext(ctx)
+	if loginUser == nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
-	summary := models.UserSummary{
-		User: user,
+	summary := user.UserSummary{
+		User: loginUser,
 	}
 
-	balances, err := repo.FindUserBalances(r.DB, user.ID)
+	balances, err := balanceRepo.FindUserBalances(r.DB, loginUser.ID)
 	if err != nil {
 		log.Println("encountered error when pulling balances: ", err)
 	}
@@ -74,13 +76,13 @@ func (r *queryResolver) UserSummary(ctx context.Context) (*models.UserSummary, e
 	return &summary, nil
 }
 
-func (r *queryResolver) FindOrder(ctx context.Context, id string) (*models.Order, error) {
-	user := auth.ForContext(ctx)
-	if user == nil {
+func (r *queryResolver) FindOrder(ctx context.Context, id string) (*user.Order, error) {
+	loginUser := auth.ForContext(ctx)
+	if loginUser == nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	return &models.Order{ID: id, Txt: "yeah!"}, nil
+	return &user.Order{ID: id, Txt: "yeah!"}, nil
 }
 
 func (r *queryResolver) ListStories(ctx context.Context) ([]*models.Story, error) {

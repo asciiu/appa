@@ -15,14 +15,14 @@ resolver:
 
 models:
   Int64:
-    model: github.com/asciiu/appa/api-graphql/models.Int64
+    model: github.com/asciiu/appa/lib/balance/models.Int64
   Balance:
-    model: github.com/asciiu/appa/api-graphql/models.Balance
+    model: github.com/asciiu/appa/lib/balance/models.Balance
   Order:
-    model: github.com/asciiu/appa/api-graphql/models.Order
+    model: github.com/asciiu/appa/lib/user/models.Order
   User:
-    model: github.com/asciiu/appa/api-graphql/models.User
+    model: github.com/asciiu/appa/lib/user/models.User
   UserSummary:
-    model: github.com/asciiu/appa/api-graphql/models.UserSummary
+    model: github.com/asciiu/appa/lib/user/models.UserSummary
   Story:
     model: github.com/asciiu/appa/api-graphql/models.Story

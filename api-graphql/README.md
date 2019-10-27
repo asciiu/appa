@@ -5,8 +5,13 @@ gqlgen
 https://github.com/99designs/gqlgen
 https://gqlgen.com/
 
-Regenerate the support files from graphql dir.
+### Generate the graphql related support files under graphql/
+
+1. Update the model defs in gqlgen.yml
+
+2. Regenerate the support files from graphql dir.
 ```
+$ cd graphql
 $ go run github.com/99designs/gqlgen -v
 ```
 
