@@ -2,10 +2,11 @@ package models
 
 import (
 	"log"
+	"time"
 
+	balance "github.com/asciiu/appa/lib/balance/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	balance "github.com/asciiu/appa/lib/balance/models"
 )
 
 func NewUser(username, email, password string) *User {
@@ -52,7 +53,7 @@ type User struct {
 }
 
 type UserSummary struct {
-	User    *User    `json:"user"`
+	User    *User            `json:"user"`
 	Balance *balance.Balance `json:"balance"`
 }
 
@@ -62,3 +63,58 @@ type UserSummary struct {
 //		Balance:
 //	}
 //}
+
+type UserInfo struct {
+	UserID        string `json:"userID"`
+	Username      string `json:"username"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"emailVerified"`
+}
+
+func (user *User) Info() *UserInfo {
+	return &UserInfo{
+		UserID:        user.ID,
+		Username:      user.Username,
+		Email:         user.Email,
+		EmailVerified: user.EmailVerified,
+	}
+}
+
+type AdminUser struct {
+	ID           uint
+	First        string
+	Last         string
+	Email        string
+	PasswordHash string
+	Role         RoleType
+	Permissions  []PermissionType
+	InsertedAt   time.Time
+	UpdatedAt    time.Time
+}
+
+type AdminInfo struct {
+	UserID      uint             `json:"userID"`
+	First       string           `json:"first"`
+	Last        string           `json:"last"`
+	Email       string           `json:"email"`
+	Permissions []PermissionType `json:"permissions"`
+}
+
+func (admin *AdminUser) Info() *AdminInfo {
+	return &AdminInfo{
+		UserID:      admin.ID,
+		First:       admin.First,
+		Last:        admin.Last,
+		Email:       admin.Email,
+		Permissions: admin.Permissions,
+	}
+}
+
+func (admin *AdminUser) HasPermission(permission PermissionType) bool {
+	for _, p := range admin.Permissions {
+		if p == Unrestricted || p == permission {
+			return true
+		}
+	}
+	return false
+}
