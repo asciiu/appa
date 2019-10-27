@@ -4,18 +4,22 @@ build:
 push:
 	docker push dockerowy/appa-apiql:dev 
 
-start:
-	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
-	kubectl create -f ./deployments/deployment.yml
-	kubectl create -f ./deployments/service.yml
+start-minikube:
+	kubectl create -f ./deployments/minikube/config-map.yaml
+	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yaml
+	kubectl create -f ./deployments/deployment.yaml
+	kubectl create -f ./deployments/service.yaml
 
-stop:
-	kubectl delete -f ./deployments/deployment.yml
-	kubectl delete -f ./deployments/service.yml
+stop-minikube:
+	kubectl delete -f ./deployments/deployment.yaml
+	kubectl delete -f ./deployments/service.yaml
+	kubectl delete -f ./deployments/minikube/config-map.yaml
 
-restart: 
-	kubectl delete -f ./deployments/deployment.yml
-	kubectl delete -f ./deployments/service.yml
-	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
-	kubectl create -f ./deployments/deployment.yml
-	kubectl create -f ./deployments/service.yml
+restart-minikube: 
+	kubectl delete -f ./deployments/minikube/config-map.yaml
+	kubectl delete -f ./deployments/deployment.yaml
+	kubectl delete -f ./deployments/service.yaml
+	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yaml
+	kubectl create -f ./deployments/minikube/config-map.yaml
+	kubectl create -f ./deployments/deployment.yaml
+	kubectl create -f ./deployments/service.yaml

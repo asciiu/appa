@@ -79,6 +79,8 @@ github.com/asciiu/appa/api v0.0.0-20190909013023-5d30006b84b2 h1:eIXrPqZoEJreQEw
 github.com/asciiu/appa/api v0.0.0-20190909013023-5d30006b84b2/go.mod h1:ro4ACYcLBam3Aw35aEle+1ghL9SKZuzLm14X3b1DkVU=
 github.com/asciiu/appa/api-graphql v0.0.5 h1:8UxEF/mO0JTawxyIEI3gVp+cx/xedRJvW81vN0HJmO0=
 github.com/asciiu/appa/api-graphql v0.0.5/go.mod h1:aCiHbr55llpzygH11zN1kKib2LPcUhCZt14qgWBluvk=
+github.com/asciiu/appa/api-template v0.0.0-20191027050345-413eb587f769 h1:XmmkN8P4hSz7UhRfbvF7eHZMCJIfS3g+kG3QC7XMTFQ=
+github.com/asciiu/appa/api-template v0.0.0-20191027050345-413eb587f769/go.mod h1:EFLEdPXp9XaBMOZgvEswpuTR0Ev5K1WjNTn63H9+qyw=
 github.com/asciiu/appa/common v0.0.1 h1:ed0ojOG9bEEI8/EhT+HL06qO/V6bd8vhmncICCvm0Tg=
 github.com/asciiu/appa/common v0.0.1/go.mod h1:jlPRbBBSObiKOiziif7MRJBMjaHbfcISDPdbU9pViRw=
 github.com/asciiu/appa/ether-service v0.0.0-20190811020423-e7812ede9d2c h1:i+yI9x2p4hNdTGZjOzPmDGyKkccslTVziW1P0nZE//A=
@@ -91,6 +93,8 @@ github.com/asciiu/appa/lib v0.0.0-20191022014125-8e5a67ecc920/go.mod h1:wM79Vomz
 github.com/asciiu/appa/lib v0.0.0-20191027031802-429cf9c916f9 h1:iBMuQIfgYwcHlfnGbptqpAmdrrHwpxKbbGye3l6TLKM=
 github.com/asciiu/appa/lib v0.0.0-20191027041627-a4073fba8618 h1:/dn3CzlPNOqfCkNsbm8x3fKXyZ1Qw5ad3J000/gbca4=
 github.com/asciiu/appa/lib v0.0.0-20191027041627-a4073fba8618/go.mod h1:mqwzHO30IWpseYAVBXAuAmEbnSegt4sfPpHz5+g13q8=
+github.com/asciiu/appa/lib v0.0.0-20191027043908-ecf3d391bf57 h1:oGufd7BwKz05STVKUXijgQFKGggK3tyvMNEOciIs1ic=
+github.com/asciiu/appa/lib v0.0.0-20191027043908-ecf3d391bf57/go.mod h1:mqwzHO30IWpseYAVBXAuAmEbnSegt4sfPpHz5+g13q8=
 github.com/asciiu/appa/socket v0.0.0-20190909013023-5d30006b84b2 h1:dY21KxSnjvfuGttMYlQ5/XRtfG96U26KpxW2Kh541+Q=
 github.com/asciiu/appa/socket v0.0.0-20190909013023-5d30006b84b2/go.mod h1:Lovrh4fYCZJFF0AlH96dO6TILVdX5/z87AoCZeWLIdY=
 github.com/asciiu/appa/story-service v0.0.4 h1:dNNXvUz+rmRC7Eqm2N1R8EsolZLQac21DEb9JZLiuLg=
@@ -911,6 +915,7 @@ golang.org/x/sys v0.0.0-20190812073006-9eafafc0a87e/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190922100055-0a153f010e69/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191008105621-543471e840be/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191010194322-b09406accb47 h1:/XfQ9z7ib8eEJX2hdgFTZJ/ntt0swNk5oYBziWeTCvY=
 golang.org/x/sys v0.0.0-20191010194322-b09406accb47/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
