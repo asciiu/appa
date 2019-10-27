@@ -1,0 +1,22 @@
+FROM golang:1.12 AS builder
+ARG SSH_PRIVATE_KEY
+
+WORKDIR /
+
+RUN mkdir -p ~/.ssh && umask 0077 && echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa \
+	&& git config --global url."git@github.com:".insteadOf https://github.com/ \
+	&& ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+COPY . . 
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o api 
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+COPY --from=builder /api .
+
+EXPOSE 9000
+
+CMD ["/api"]

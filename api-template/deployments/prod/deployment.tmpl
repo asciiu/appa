@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: api-template
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-template 
+  template:
+    metadata:
+      labels:
+        app: api-template 
+    spec:
+        containers:
+        - name: api-template 
+          image: dockerowy/appa-api-template:dev 
+          imagePullPolicy: Always 
+          command: [
+            "./api",
+            "true",
+            "--selector=static"
+          ]
+          envFrom:
+          - configMapRef:
+              name: template-config
+          env:
+          - name: UPDATED_AT
+            value: "{{ UPDATED_AT }}"
+          ports:
+          - containerPort:  443 
+            name: https-port
+          - containerPort:  80 
+            name: http-port
+          volumeMounts:
+          - mountPath: /mnt/appa
+            name: api-data
+        volumes:
+        - name: api-data
+          persistentVolumeClaim:
+            claimName: template-vol 
