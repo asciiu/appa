@@ -1,3 +1,6 @@
 github.com/asciiu/appa v0.0.0-20191022012617-6cbecd8442f4 h1:nawogYt7WVDTkPLZioct6exfZZFQrgmWhAkP4Ja6wh0=
+github.com/asciiu/appa v0.0.0-20191022014125-8e5a67ecc920 h1:Y0pNY5BhPSfZmChVOFMjqxd85ZwOsyqCPwr5JWXIJD8=
+github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
+github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/lib/pq v1.2.0 h1:LXpIM/LZ5xGFhOpXAQUIMM1HdyqzVYM13zNdjCEEcA0=
 github.com/lib/pq v1.2.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
