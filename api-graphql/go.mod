@@ -8,7 +8,7 @@ replace github.com/nats-io/nats.go v1.8.2-0.20190607221125-9f4d16fe7c2d => githu
 
 require (
 	github.com/99designs/gqlgen v0.9.3
-	github.com/asciiu/appa/lib v0.0.0-20191027050345-413eb587f769
+	github.com/asciiu/appa/lib v0.0.0-20191027174331-aa43b0414339
 	github.com/asciiu/appa/story-service v0.0.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.2+incompatible

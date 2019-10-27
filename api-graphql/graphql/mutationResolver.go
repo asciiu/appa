@@ -9,14 +9,14 @@ import (
 	"time"
 
 	"github.com/asciiu/appa/api-graphql/auth"
-	token "github.com/asciiu/appa/lib/refreshToken/models"
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
-	userRepo "github.com/asciiu/appa/lib/user/db/sql"
-	user "github.com/asciiu/appa/lib/user/models"
+	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
 	constRes "github.com/asciiu/appa/lib/constants/response"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	token "github.com/asciiu/appa/lib/refreshToken/models"
+	userRepo "github.com/asciiu/appa/lib/user/db/sql"
+	user "github.com/asciiu/appa/lib/user/models"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
-	repo "github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/vektah/gqlparser/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -86,8 +86,8 @@ func (r *mutationResolver) CreateStory(ctx context.Context, title, jsonData stri
 	req := protoStory.InitStoryRequest{
 		StoryID:   story.ID,
 		UserID:    loginUser.ID,
-		Username:  user.Username,
-		UserEmail: user.Email,
+		Username:  loginUser.Username,
+		UserEmail: loginUser.Email,
 		Title:     title,
 		JsonData:  jsonData,
 	}
@@ -121,7 +121,7 @@ func (r *mutationResolver) UpdateStory(ctx context.Context, storyID, title, json
 
 	story := models.Story{
 		ID:       storyID,
-		AuthorID: user.ID,
+		AuthorID: loginUser.ID,
 		Title:    title,
 		Content:  jsonData,
 		Status:   status,
