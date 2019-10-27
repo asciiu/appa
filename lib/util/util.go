@@ -1,6 +1,7 @@
 package util
 
 import (
+	"log"
 	"math"
 	"strings"
 	"unicode"
@@ -37,4 +38,12 @@ func Rot32768(input string) string {
 	}
 
 	return strings.Join(result, "")
+}
+
+// panic on error
+func CheckErr(err error) {
+	if err != nil {
+		log.Println(err)
+		panic(err)
+	}
 }
