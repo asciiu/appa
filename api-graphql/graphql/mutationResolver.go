@@ -79,6 +79,10 @@ func (r *mutationResolver) CreateStory(ctx context.Context, title, jsonData stri
 		return "", fmt.Errorf("unauthorized")
 	}
 
+	if r.StoryClient == nil {
+		return "", fmt.Errorf("story service client was not intantiated")
+	}
+
 	story := models.NewStory(loginUser.ID, title, jsonData)
 	if err := repo.InsertStory(r.DB, story); err != nil {
 		return "", err
