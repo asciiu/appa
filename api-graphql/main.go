@@ -14,7 +14,10 @@ import (
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/lib/db"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	"github.com/micro/go-micro"
+
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
+
 	k8s "github.com/micro/examples/kubernetes/go/micro"
 	micro "github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
@@ -41,8 +44,6 @@ func cleanDatabase(db *sql.DB) {
 }
 
 func main() {
-	router := chi.NewRouter()
-
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
 
@@ -57,12 +58,14 @@ func main() {
 		DB:          database,
 		StoryClient: protoStory.NewStoryService("stories", service.Client()),
 	}
+
+	router := chi.NewRouter()
 	router.Use(auth.Secure(database))
 
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
 		ExposedHeaders:   []string{"set-authorization", "set-refresh"},
@@ -80,11 +83,11 @@ func main() {
 
 	go cleanDatabase(database)
 
-	go func() {
-		if err := service.Run(); err != nil {
-			log.Error(fmt.Sprintf("nope! %s", err))
-		}
-	}()
+	//go func() {
+	//	if err := service.Run(); err != nil {
+	//		log.Error(fmt.Sprintf("nope! %s", err))
+	//	}
+	//}()
 
 	log.Info(fmt.Sprintf("connect to http://localhost:%s/ for GraphQL playground", defaultPort))
 	log.Fatal(http.ListenAndServe(":"+defaultPort, router))

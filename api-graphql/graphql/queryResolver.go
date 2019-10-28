@@ -55,13 +55,13 @@ func (r *queryResolver) UserSummary(ctx context.Context) (*user.UserSummary, err
 	if loginUser == nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
-	log.Info(loginUser)
+
+	log.Info("UserSummary", loginUser)
 
 	balances, err := balanceRepo.FindUserBalances(r.DB, loginUser.ID)
 	if err != nil {
 		log.Error("encountered error when pulling balances: ", err)
 	}
-	log.Info(balances)
 
 	for _, balance := range balances {
 		if balance.Symbol == "BTC" {

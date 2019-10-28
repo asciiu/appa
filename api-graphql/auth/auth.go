@@ -69,7 +69,7 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 					}
 
 					// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-					return []byte(os.Getenv("appa_JWT")), nil
+					return []byte(os.Getenv("JWT_SECRET")), nil
 				})
 
 				// if valid token and no error
