@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -12,12 +11,13 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/api-graphql/auth"
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/lib/db"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
-	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/examples/kubernetes/go/micro"
+	micro "github.com/micro/go-micro"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -35,7 +35,7 @@ func cleanDatabase(db *sql.DB) {
 		time.Sleep(cleanUpInterval)
 		error := tokenRepo.DeleteStaleTokens(db, time.Now())
 		if error != nil {
-			log.Fatal(error)
+			log.Error(error)
 		}
 	}
 }
@@ -45,6 +45,10 @@ func main() {
 
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
+
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 
 	service := k8s.NewService(micro.Name("graphql"))
 	service.Init()
@@ -62,7 +66,7 @@ func main() {
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
 		ExposedHeaders:   []string{"set-authorization", "set-refresh"},
-		Debug:            true,
+		Debug:            false,
 	}).Handler)
 
 	router.Handle("/", handler.Playground("gql", "/graphql"))
@@ -78,10 +82,10 @@ func main() {
 
 	go func() {
 		if err := service.Run(); err != nil {
-			log.Println("nope! ", err)
+			log.Error(fmt.Sprintf("nope! %s", err))
 		}
 	}()
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", defaultPort)
+	log.Info(fmt.Sprintf("connect to http://localhost:%s/ for GraphQL playground", defaultPort))
 	log.Fatal(http.ListenAndServe(":"+defaultPort, router))
 }

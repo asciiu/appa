@@ -3,13 +3,13 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/asciiu/appa/api-graphql/auth"
-	user "github.com/asciiu/appa/lib/user/models"
-	balance "github.com/asciiu/appa/lib/balance/models"
-	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
+	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
+	balance "github.com/asciiu/appa/lib/balance/models"
+	user "github.com/asciiu/appa/lib/user/models"
+	log "github.com/sirupsen/logrus"
 )
 
 type queryResolver struct{ *Resolver }
@@ -55,25 +55,27 @@ func (r *queryResolver) UserSummary(ctx context.Context) (*user.UserSummary, err
 	if loginUser == nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
-	summary := user.UserSummary{
-		User: loginUser,
-	}
+	log.Info(loginUser)
 
 	balances, err := balanceRepo.FindUserBalances(r.DB, loginUser.ID)
 	if err != nil {
-		log.Println("encountered error when pulling balances: ", err)
+		log.Error("encountered error when pulling balances: ", err)
 	}
+	log.Info(balances)
 
 	for _, balance := range balances {
 		if balance.Symbol == "BTC" {
-			summary.Balance = balance
+			return &user.UserSummary{
+				User:    loginUser,
+				Balance: balance,
+			}, nil
 		}
 	}
 
 	// TODO when adding more currencies you'll need to determine
 	// total balance in BTC
 
-	return &summary, nil
+	return nil, nil
 }
 
 func (r *queryResolver) FindOrder(ctx context.Context, id string) (*user.Order, error) {

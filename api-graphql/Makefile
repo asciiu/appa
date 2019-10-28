@@ -23,3 +23,9 @@ restart-minikube:
 	kubectl create -f ./deployments/minikube/config-map.yaml
 	kubectl create -f ./deployments/deployment.yaml
 	kubectl create -f ./deployments/service.yaml
+
+update-minikube:
+	kubectl delete -f ./deployments/minikube/config-map.yaml
+	kubectl delete -f ./deployments/deployment.yaml
+	kubectl create -f ./deployments/minikube/config-map.yaml
+	kubectl create -f ./deployments/deployment.yaml

@@ -2,10 +2,9 @@ package graphql
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
-	"log"
-	"strings"
 	"time"
 
 	"github.com/asciiu/appa/api-graphql/auth"
@@ -17,7 +16,7 @@ import (
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
-	"github.com/vektah/gqlparser/gqlerror"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -32,15 +31,17 @@ func (r *mutationResolver) Signup(ctx context.Context, email, username, password
 }
 
 func (r *mutationResolver) Login(ctx context.Context, email, password string, remember bool) (*Token, error) {
+	log.Info(fmt.Sprintf("login: %s", email))
+
 	loginUser, err := userRepo.FindUserByEmail(r.DB, email)
 	switch {
-	case err != nil && strings.Contains(err.Error(), "no rows"):
-		return nil, gqlerror.Errorf("incorrect password/email")
+	case err == sql.ErrNoRows:
+		return nil, fmt.Errorf("incorrect password/email")
 	case err != nil:
 		return nil, err
 	case !loginUser.EmailVerified:
 		// only verified accounts should be able to login
-		return nil, gqlerror.Errorf("email account not verified")
+		return nil, fmt.Errorf("email account not verified")
 	default:
 		if bcrypt.CompareHashAndPassword([]byte(loginUser.PasswordHash), []byte(password)) == nil {
 			jwt, err := auth.CreateJwtToken(loginUser.ID, auth.JwtDuration)
@@ -56,7 +57,7 @@ func (r *mutationResolver) Login(ctx context.Context, email, password string, re
 
 				// this needs to be checked
 				if _, err := tokenRepo.InsertRefreshToken(r.DB, refreshToken); err != nil {
-					log.Println("failed to insert refresh token: ", err)
+					log.Error(fmt.Sprintf("failed to insert refresh token: %s", err.Error()))
 				}
 
 				return &Token{

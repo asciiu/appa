@@ -4,16 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	jwt "github.com/dgrijalva/jwt-go"
+	log "github.com/sirupsen/logrus"
 )
 
 // refresh window
@@ -75,9 +75,12 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 				// if valid token and no error
 				if tok != nil && err == nil {
 					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
-					loginUser, _ := userRepo.FindUserByID(db, userID)
+					loginUser, err := userRepo.FindUserByID(db, userID)
 					if loginUser != nil {
 						ctx = context.WithValue(r.Context(), userCtxKey, loginUser)
+					}
+					if err != nil {
+						log.Error(err.Error())
 					}
 				}
 

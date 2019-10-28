@@ -104,6 +104,7 @@ github.com/asciiu/appa/trade-engine v0.0.0-20190909013023-5d30006b84b2 h1:OeHt94
 github.com/asciiu/appa/trade-engine v0.0.0-20190909013023-5d30006b84b2/go.mod h1:4uU1rE9M4igAesyGzrwGG6e8rf8ORK3KPXRd+soG8wc=
 github.com/asciiu/appa/trade-engine v0.0.0-20190930021409-2f4d5e9234da h1:tuhYs5PbrJxC8GeMmTjjnuhCngMJsumqHAnlgd05wsw=
 github.com/asciiu/appa/trade-engine v0.0.0-20191022014125-8e5a67ecc920 h1:9NIh0IAIQfmEVo0lupIZIHEJdKBDnFnvNq6qx6LTF3Y=
+github.com/asciiu/appa/trade-engine v0.0.0-20191027181428-47f30e1cbe87 h1:KJI95DK4HAg2pKk8Hzf+mjd4R+hqjHjtRrCFDhQIeK0=
 github.com/asciiu/gomo v0.0.0-20181013035637-b0f2be03163c h1:bHtemDRtHWiNPSwXbRXBLS1m8LHRMqyXJGKjHdCzbB4=
 github.com/asciiu/gomo v0.0.0-20181013035637-b0f2be03163c/go.mod h1:LzSEn3dwyhJZ7HjDjTHQijoS7bfajsS+vlQnfXn30Jc=
 github.com/asciiu/gomo v0.0.0-20181102182515-5eda7b36f686 h1:lgf9Tw79m+dgfTbfGaeegkRmf92AT5QRcbq7CnTFKsA=
@@ -703,6 +704,7 @@ github.com/shurcooL/webdavfs v0.0.0-20181215192745-5988b2d638f6/go.mod h1:hKmq5k
 github.com/sirupsen/logrus v1.0.5/go.mod h1:pMByvHTf9Beacp5x1UXfOR9xyW/9antXMhjMPG0dEzc=
 github.com/sirupsen/logrus v1.1.1/go.mod h1:zrgwTnHtNr00buQ1vSptGe8m1f/BbgsPukg8qsT7A+A=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
+github.com/sirupsen/logrus v1.3.0 h1:hI/7Q+DtNZ2kINb6qt/lS+IyXnHQe9e90POfeewL/ME=
 github.com/sirupsen/logrus v1.3.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.1/go.mod h1:ni0Sbl8bgC9z8RoU9G6nDWqqs/fq4eDPysMBDgk/93Q=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
