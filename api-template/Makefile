@@ -1,5 +1,5 @@
 build:
-	docker build --no-cache -t dockerowy/appa-api-template:dev --build-arg SSH_PRIVATE_KEY .
+	docker build --no-cache -t dockerowy/appa-api-template:dev --build-arg SSH_PRIVATE_KEY -f ../api-template/Dockerfile .. 
 
 push:
 	docker push dockerowy/appa-api-template:dev 

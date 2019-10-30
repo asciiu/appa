@@ -4,8 +4,10 @@ go 1.13.3
 
 replace github.com/hashicorp/consul => github.com/hashicorp/consul v1.6.0
 
+replace github.com/asciiu/appa/lib => ../lib
+
 require (
-	github.com/asciiu/appa/lib v0.0.0-20191027043908-ecf3d391bf57
+	github.com/asciiu/appa/lib v0.0.0-00010101000000-000000000000
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
