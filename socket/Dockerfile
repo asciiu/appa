@@ -1,5 +1,5 @@
 # First stage: build the executable.
-FROM golang:1.12-alpine AS builder
+FROM golang:1.13.3-alpine AS builder
 
 WORKDIR /
 

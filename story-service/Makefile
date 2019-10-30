@@ -7,16 +7,16 @@ prodo:
 push:
 	docker push dockerowy/appa-story-service:dev 
 
-start:
+start-minikube:
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml
 	kubectl create -f ./deployments/deployment.yml
 	kubectl create -f ./deployments/service.yml
 
-stop:
+stop-minikube:
 	kubectl delete -f ./deployments/deployment.yml
 	kubectl delete -f ./deployments/service.yml
 
-restart: 
+restart-minikube: 
 	kubectl delete -f ./deployments/deployment.yml
 	kubectl delete -f ./deployments/service.yml
 	sed "s/{{ UPDATED_AT }}/$(shell date)/g" ./deployments/deployment.tmpl > ./deployments/deployment.yml

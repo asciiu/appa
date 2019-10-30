@@ -1,6 +1,6 @@
 module github.com/asciiu/appa/socket
 
-go 1.12
+go 1.13.3
 
 replace github.com/nats-io/nats.go v1.8.2-0.20190607221125-9f4d16fe7c2d => github.com/nats-io/nats.go v1.8.1
 

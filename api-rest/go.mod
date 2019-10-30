@@ -1,6 +1,6 @@
 module github.com/asciiu/appa/api
 
-go 1.12
+go 1.13.3
 
 require (
 	github.com/armon/go-metrics v0.0.0-20160717043458-3df31a1ada83

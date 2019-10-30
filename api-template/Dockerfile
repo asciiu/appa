@@ -1,4 +1,4 @@
-FROM golang:1.12 AS builder
+FROM golang:1.13.3 AS builder
 ARG SSH_PRIVATE_KEY
 
 WORKDIR /

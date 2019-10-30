@@ -14,8 +14,6 @@ import (
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/lib/db"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
-	"github.com/micro/go-micro"
-
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 
 	k8s "github.com/micro/examples/kubernetes/go/micro"

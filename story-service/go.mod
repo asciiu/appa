@@ -1,6 +1,6 @@
 module github.com/asciiu/appa/story-service
 
-go 1.12
+go 1.13.3
 
 replace github.com/hashicorp/consul => github.com/hashicorp/consul v1.6.0
 
