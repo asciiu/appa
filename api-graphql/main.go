@@ -13,6 +13,7 @@ import (
 	"github.com/asciiu/appa/api-graphql/auth"
 	gql "github.com/asciiu/appa/api-graphql/graphql"
 	"github.com/asciiu/appa/lib/db"
+	util "github.com/asciiu/appa/lib/util"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	protoStory "github.com/asciiu/appa/story-service/proto/story"
 
@@ -42,6 +43,8 @@ func cleanDatabase(db *sql.DB) {
 }
 
 func main() {
+	util.HelloThere("satori!")
+
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	database, _ := db.NewDB(dbURL)
 

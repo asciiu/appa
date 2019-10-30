@@ -1,5 +1,5 @@
 build:
-	docker build  -t dockerowy/appa-apiql:dev .
+	docker build  -t dockerowy/appa-apiql:dev -f ../api-graphql/Dockerfile .. 
 
 push:
 	docker push dockerowy/appa-apiql:dev 

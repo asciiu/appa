@@ -4,15 +4,16 @@ WORKDIR /
 
 RUN apk add --no-cache git
 
-COPY . . 
+COPY api-graphql/ api-graphql 
+COPY lib/ lib 
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o app 
+RUN cd api-graphql && CGO_ENABLED=0 GOOS=linux go build -o app 
 
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-COPY --from=builder /app /api
+COPY --from=builder /api-graphql/app /api
 
 EXPOSE 8080
 

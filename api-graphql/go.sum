@@ -76,8 +76,6 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/asciiu/appa/api-graphql v0.0.5/go.mod h1:aCiHbr55llpzygH11zN1kKib2LPcUhCZt14qgWBluvk=
 github.com/asciiu/appa/common v0.0.1 h1:ed0ojOG9bEEI8/EhT+HL06qO/V6bd8vhmncICCvm0Tg=
 github.com/asciiu/appa/common v0.0.1/go.mod h1:jlPRbBBSObiKOiziif7MRJBMjaHbfcISDPdbU9pViRw=
-github.com/asciiu/appa/lib v0.0.0-20191027174331-aa43b0414339 h1:W7qLbq73VirKi091RdxTbHw3D0+QaugKHHM7XGlkHuI=
-github.com/asciiu/appa/lib v0.0.0-20191027174331-aa43b0414339/go.mod h1:mqwzHO30IWpseYAVBXAuAmEbnSegt4sfPpHz5+g13q8=
 github.com/asciiu/appa/story-service v0.0.5 h1:sV0ho9Ja/drn9kEwUVXAXgvmm5GC5G55bE5DUeTZx4g=
 github.com/asciiu/appa/story-service v0.0.5/go.mod h1:W3BsB5HYit15rWS/x+YxDjDsnzIbi8vA3h9KNOHnWZ0=
 github.com/asim/go-awsxray v0.0.0-20161209120537-0d8a60b6e205/go.mod h1:frVmN4PtXUuL1EbZn0uL4PHSTKNKFnbMpBIhngqMuNQ=

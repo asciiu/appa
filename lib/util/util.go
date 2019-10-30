@@ -47,3 +47,7 @@ func CheckErr(err error) {
 		panic(err)
 	}
 }
+
+func HelloThere(name string) {
+	log.Println("Hello", name)
+}
