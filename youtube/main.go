@@ -24,7 +24,9 @@ func main() {
 	if err := youtube.DecodeURL(arg); err != nil {
 		fmt.Println("err:", err)
 	}
-	if err := youtube.StartDownload(filepath.Join(currentDir, "dl.mp4")); err != nil {
+	fileName := fmt.Sprintf("%s.mp4", youtube.VideoID)
+
+	if err := youtube.StartDownload(filepath.Join(currentDir, fileName)); err != nil {
 		fmt.Println("err:", err)
 	}
 }
