@@ -2,9 +2,9 @@
 
 ### Getting started
 1. Copy the api and name it appropriate. Use the api-name convention to keep this repo organized.
-2. Update the imports in router.go - e.g. "github.com/appa/plasma/[api-template]/controllers". The api-template import needs to be udpated to reflect your new api-name.
-3. Update the docker image tag names in the Makefile for build and push. Tag the docker image according to the naming convention above - e.g. us.gcr.io/fluidtruck/plasma-api-name:dev. You must follow the us.gcr/io/fluidtruck convention as that is the gcloud docker registry for fluid's clusters.
-4. Update the deployment.tmpl, deployment.yml, and service.yml files under deployments/prod and deployments/stage. Follow the same convention you used for the api-name. You will also have to update the docker image name in these files. e.g. us.gcr.io/fluidtruck/plasma-api-name:dev. This ensures that the approprite image is used during deployment.
+2. Update the imports in router.go - e.g. "github.com/asciiu/appa/[api-template]/controllers". The api-template import needs to be udpated to reflect your new api-name.
+3. Update the docker image tag names in the Makefile for build and push. Tag the docker image according to the naming convention above - e.g. us.gcr.io/asciiu/appa/api-name:dev. You must follow the us.gcr/asciiu/appa convention as that is the gcloud docker registry for appa's clusters.
+4. Update the deployment.tmpl, deployment.yml, and service.yml files under deployments/prod and deployments/stage. Follow the same convention you used for the api-name. You will also have to update the docker image name in these files. e.g. us.gcr.io/asciiu/appa/api-name:dev. This ensures that the approprite image is used during deployment.
 5. Update your local config-maps using api-name as well:
 ```
 metadata:
