@@ -283,7 +283,7 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 	}
 
 	response := &ResponseError{
-		Status:  constRes.Fail,
+		Status:   constRes.Fail,
 		Messages: []string{"password/login incorrect"},
 	}
 	return c.JSON(http.StatusUnauthorized, response)
@@ -306,7 +306,7 @@ func (controller *AuthController) HandleLogout(c echo.Context) error {
 
 		if len(sa) != 2 {
 			response := &ResponseError{
-				Status:  constRes.Fail,
+				Status:   constRes.Fail,
 				Messages: []string{"refresh token invalid"},
 			}
 			return c.JSON(http.StatusBadRequest, response)
@@ -339,7 +339,7 @@ func (controller *AuthController) HandleSignup(c echo.Context) error {
 	err := json.NewDecoder(c.Request().Body).Decode(&signupRequest)
 	if err != nil {
 		response := &ResponseError{
-			Status:  constRes.Fail,
+			Status:   constRes.Fail,
 			Messages: []string{err.Error()},
 		}
 
@@ -365,7 +365,7 @@ func (controller *AuthController) HandleSignup(c echo.Context) error {
 	r, _ := controller.UserClient.CreateUser(context.Background(), &createRequest)
 	if r.Status != constRes.Success {
 		response := &ResponseError{
-			Status:  r.Status,
+			Status:   r.Status,
 			Messages: []string{r.Message},
 		}
 

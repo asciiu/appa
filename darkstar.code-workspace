@@ -1,0 +1,44 @@
+{
+	"folders": [
+		{
+			"path": "api-graphql"
+		},
+		{
+			"path": "api-rest"
+		},
+		{
+			"path": "api-template"
+		},
+		{
+			"path": "configs"
+		},
+		{
+			"path": "docs"
+		},
+		{
+			"path": "ether-service"
+		},
+		{
+			"path": "gotube"
+		},
+		{
+			"path": "lib"
+		},
+		{
+			"path": "migrations"
+		},
+		{
+			"path": "socket"
+		},
+		{
+			"path": "story-service"
+		},
+		{
+			"path": "tensor"
+		},
+		{
+			"path": "trade-engine"
+		},
+	],
+	"settings": {}
+}
