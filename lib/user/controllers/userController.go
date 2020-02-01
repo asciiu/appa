@@ -18,9 +18,9 @@ func NewUserController(db *sql.DB) *UserController {
 }
 
 type CreateUserRequest struct {
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username" validate:"required"` 
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 func (controller *UserController) CreateUser(req *CreateUserRequest) (*models.User, error) {
@@ -61,4 +61,13 @@ func (controller *UserController) GetUser(userID string) (*models.User, error) {
 
 func (controller *UserController) UserEmailVerified(userID string) error {
 	return queries.UpdateEmailVerified(controller.DB, userID, true)
+}
+
+type UpdateUserRequest struct {
+	UserID string
+	Username string
+}
+
+func (controller *UserController) UpdateUser(req *DeleteUserRequest) error {
+	return queries.UpdateUsername(controller.DB, req.UserID, req.Username)
 }

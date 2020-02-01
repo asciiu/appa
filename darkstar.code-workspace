@@ -38,9 +38,6 @@
 		},
 		{
 			"path": "trade-engine"
-		},
-		{
-			"path":"order-service"
 		}
 	],
 	"settings": {}

@@ -1,9 +1,7 @@
-package controllers
+package handlers
 
 import (
-	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,16 +9,14 @@ import (
 	"strings"
 	"time"
 
-	asql "github.com/asciiu/appa/api/db/sql"
 	constRes "github.com/asciiu/appa/lib/constants/response"
-	repoUser "github.com/asciiu/appa/user-service/db/sql"
-	protoUser "github.com/asciiu/appa/user-service/proto/user"
-	micro "github.com/micro/go-micro"
+	tokenQueries "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	userQueries "github.com/asciiu/appa/lib/user/db/sql"
 
-	apiModels "github.com/asciiu/appa/api/models"
-	models "github.com/asciiu/appa/user-service/models"
+	tokenModels "github.com/asciiu/appa/lib/refreshToken/models"
+	userModels "github.com/asciiu/appa/lib/user/models"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -30,14 +26,31 @@ const refreshDuration = 360 * time.Hour
 //const jwtDuration = 20 * time.Minute
 const jwtDuration = 12 * time.Hour
 
-type AuthController struct {
-	DB         *sql.DB
-	UserClient protoUser.UserService
+type AuthHandler struct {
+	DB *sql.DB
+}
+
+func NewAuthHandler(db *sql.DB) *AuthHandler {
+	handler := AuthHandler{DB: db}
+	return &handler
 }
 
 type JwtClaims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+// swagger:parameters login
+type LoginRequest struct {
+	// Required. Backend code does not check email atm.
+	// in: body
+	Email string `json:"email" validate:"required,email"`
+	// Required. Backend code does not have any password requirements atm.
+	// in: body
+	Password string `json:"password" validate:"required"`
+	// Optional. Return refresh token in response
+	// in: body
+	Remember bool `json:"remember"`
 }
 
 // swagger:parameters signup
@@ -63,25 +76,9 @@ type ResponseSuccess struct {
 	Data   *UserData `json:"data"`
 }
 
-type Device struct {
-	DeviceID         string `json:"deviceID"`
-	DeviceType       string `json:"deviceType"`
-	ExternalDeviceID string `json:"externalDeviceID"`
-	DeviceToken      string `json:"deviceToken"`
-}
-
 type UserData struct {
-	User    *models.UserInfo `json:"user"`
-	Devices []*Device        `json:"devices"`
-}
-
-func NewAuthController(db *sql.DB, service micro.Service) *AuthController {
-	controller := AuthController{
-		DB:         db,
-		UserClient: protoUser.NewUserService("users", service.Client()),
-	}
-
-	return &controller
+	User  *userModels.UserInfo `json:"user"`
+	Token string               `json:"token"`
 }
 
 func createJwtToken(userID string, duration time.Duration) (string, error) {
@@ -93,7 +90,7 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	// Generate encoded token and send it as response.
-	token, err := rawToken.SignedString([]byte(os.Getenv("appa_JWT")))
+	token, err := rawToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		return "", err
 	}
@@ -102,7 +99,7 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 }
 
 // Renews the refresh token and the access token in the reponse headers.
-func renewTokens(c echo.Context, refreshToken *apiModels.RefreshToken) {
+func renewTokens(c echo.Context, refreshToken *tokenModels.RefreshToken) {
 	// renew access
 	accessToken, err := createJwtToken(refreshToken.UserID, jwtDuration)
 	if err != nil {
@@ -118,7 +115,7 @@ func renewTokens(c echo.Context, refreshToken *apiModels.RefreshToken) {
 }
 
 // A custom middleware function to check the refresh token on each request.
-func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.HandlerFunc {
+func (controller *AuthHandler) RefreshAccess(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		auth := c.Request().Header.Get("Authorization")
 		if auth == "" {
@@ -134,7 +131,7 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 			}
 
 			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			return []byte(os.Getenv("appa_JWT")), nil
+			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 
 		if err != nil && c.Request().Method != http.MethodOptions {
@@ -150,7 +147,7 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 				selector := sa[0]
 				authenticator := sa[1]
 
-				refreshToken, err := asql.FindRefreshToken(controller.DB, selector)
+				refreshToken, err := tokenQueries.FindRefreshToken(controller.DB, selector)
 				if err != nil {
 					return next(c)
 				}
@@ -158,7 +155,7 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 				if refreshToken.Valid(authenticator) {
 					// renew access
 					renewTokens(c, refreshToken)
-					_, err3 := asql.UpdateRefreshToken(controller.DB, refreshToken)
+					_, err3 := tokenQueries.UpdateRefreshToken(controller.DB, refreshToken)
 
 					if err3 != nil {
 						log.Fatal(err3)
@@ -166,26 +163,13 @@ func (controller *AuthController) RefreshAccess(next echo.HandlerFunc) echo.Hand
 				}
 
 				if refreshToken.ExpiresOn.Before(time.Now()) {
-					asql.DeleteRefreshToken(controller.DB, refreshToken)
+					tokenQueries.DeleteRefreshToken(controller.DB, refreshToken)
 				}
 			}
 		}
 
 		return next(c)
 	}
-}
-
-// swagger:parameters login
-type LoginRequest struct {
-	// Required. Backend code does not check email atm.
-	// in: body
-	Email string `json:"email" validate:"required,email"`
-	// Required. Backend code does not have any password requirements atm.
-	// in: body
-	Password string `json:"password" validate:"required"`
-	// Optional. Return refresh token in response
-	// in: body
-	Remember bool `json:"remember"`
 }
 
 // swagger:route POST /login authentication login
@@ -201,7 +185,7 @@ type LoginRequest struct {
 //  400: responseError email and password are not found in request with "status": "fail"
 //  401: responseError unauthorized user because of incorrect password with "status": "fail"
 //  500: responseError the message will state what the internal server error was with "status": "error"
-func (controller *AuthController) HandleLogin(c echo.Context) error {
+func (controller *AuthHandler) HandleLogin(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	loginRequest := new(LoginRequest)
@@ -213,18 +197,17 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
-
 	if err = c.Validate(loginRequest); err != nil {
 		msgs := strings.Split(err.Error(), "\n")
 		response := &ResponseError{
 			Status:   constRes.Fail,
-			Messages: []string{msgs},
+			Messages: msgs,
 		}
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	// lookup user by email
-	user, err := repoUser.FindUser(controller.DB, loginRequest.Email)
+	loginUser, err := userQueries.FindUserByEmail(controller.DB, loginRequest.Email)
 	switch {
 	case err == sql.ErrNoRows:
 		response := &ResponseError{
@@ -242,9 +225,9 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 
 	default:
-		if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginRequest.Password)) == nil {
+		if bcrypt.CompareHashAndPassword([]byte(loginUser.PasswordHash), []byte(loginRequest.Password)) == nil {
 
-			accessToken, err := createJwtToken(user.ID, jwtDuration)
+			accessToken, err := createJwtToken(loginUser.ID, jwtDuration)
 			if err != nil {
 				response := &ResponseError{
 					Status:   constRes.Error,
@@ -255,10 +238,10 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 
 			// issue a refresh token if remember is true
 			if loginRequest.Remember {
-				refreshToken := apiModels.NewRefreshToken(user.ID)
+				refreshToken := tokenModels.NewRefreshToken(loginUser.ID)
 				renewTokens(c, refreshToken)
 
-				_, err3 := asql.InsertRefreshToken(controller.DB, refreshToken)
+				_, err3 := tokenQueries.InsertRefreshToken(controller.DB, refreshToken)
 
 				if err3 != nil {
 					response := &ResponseError{
@@ -274,7 +257,8 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 			response := &ResponseSuccess{
 				Status: constRes.Success,
 				Data: &UserData{
-					User: user.Info(),
+					User:  loginUser.Info(),
+					Token: accessToken,
 				},
 			}
 
@@ -299,7 +283,7 @@ func (controller *AuthController) HandleLogin(c echo.Context) error {
 //	Responses:
 //	  200: responseSuccess data will be null with status "success"
 //	  400: responseError you either sent in no refresh token or the refresh token in the header is not valid with status: "fail"
-func (controller *AuthController) HandleLogout(c echo.Context) error {
+func (controller *AuthHandler) HandleLogout(c echo.Context) error {
 	selectAuth := c.Request().Header.Get("Refresh")
 	if selectAuth != "" {
 		sa := strings.Split(selectAuth, ":")
@@ -312,7 +296,7 @@ func (controller *AuthController) HandleLogout(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, response)
 		}
 
-		asql.DeleteRefreshTokenBySelector(controller.DB, sa[0])
+		tokenQueries.DeleteRefreshTokenBySelector(controller.DB, sa[0])
 	}
 
 	response := &ResponseSuccess{
@@ -321,73 +305,17 @@ func (controller *AuthController) HandleLogout(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-// swagger:route POST /signup authentication signup
-//
-// user registration (open)
-//
-// Registers a new user. Expects email to be unique. Duplicate email will result
-// in a bad request.
-//
-// responses:
-//  200: responseSuccess "data" will be non null with "status": "success"
-//  400: responseError message should relay information with regard to bad request with "status": "fail"
-//  410: responseError the user-service is not reachable. The user-service is a microservice that runs independantly from the api. When we take it offline you will receive this error.
-//  500: responseError the message will state what the internal server error was with "status": "error"
-func (controller *AuthController) HandleSignup(c echo.Context) error {
-	signupRequest := SignupRequest{}
-
-	err := json.NewDecoder(c.Request().Body).Decode(&signupRequest)
-	if err != nil {
-		response := &ResponseError{
-			Status:   constRes.Fail,
-			Messages: []string{err.Error()},
+// This function serves as middleware to populate the context with the logged in user.
+func (handler *AuthHandler) PopulateContext(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user").(*jwt.Token)
+		claims := token.Claims.(jwt.MapClaims)
+		userID := claims["jti"].(string)
+		// lookup user by email
+		user, err := userQueries.FindUserByID(handler.DB, userID)
+		if err != nil {
+			return next(&UserContext{c, nil})
 		}
-
-		return c.JSON(http.StatusBadRequest, response)
+		return next(&UserContext{c, user})
 	}
-
-	if signupRequest.Email == "" || signupRequest.Password == "" {
-		response := &ResponseError{
-			Status:  constRes.Fail,
-			Message: []string{"email and password are required"},
-		}
-
-		return c.JSON(http.StatusBadRequest, response)
-	}
-
-	createRequest := protoUser.CreateUserRequest{
-		First:    signupRequest.First,
-		Last:     signupRequest.Last,
-		Email:    signupRequest.Email,
-		Password: signupRequest.Password,
-	}
-
-	r, _ := controller.UserClient.CreateUser(context.Background(), &createRequest)
-	if r.Status != constRes.Success {
-		response := &ResponseError{
-			Status:   r.Status,
-			Messages: []string{r.Message},
-		}
-
-		if r.Status == constRes.Fail {
-			return c.JSON(http.StatusBadRequest, response)
-		}
-		if r.Status == constRes.Error {
-			return c.JSON(http.StatusInternalServerError, response)
-		}
-	}
-
-	response := &ResponseSuccess{
-		Status: constRes.Success,
-		Data: &UserData{
-			User: &models.UserInfo{
-				UserID: r.Data.User.UserID,
-				First:  r.Data.User.First,
-				Last:   r.Data.User.Last,
-				Email:  r.Data.User.Email,
-			},
-		},
-	}
-
-	return c.JSON(http.StatusOK, response)
 }

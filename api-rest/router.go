@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asciiu/appa/api/controllers"
-	repoToken "github.com/asciiu/appa/api/db/sql"
+	repoQueries "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	"github.com/asciiu/appa/api/handlers"
 	"github.com/asciiu/appa/api/middlewares"
 	"github.com/labstack/echo"
-	micro "github.com/micro/go-micro"
+	micro "github.com/micro/go-micro/v2"
 	k8s "github.com/micro/kubernetes/go/micro"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -35,7 +35,7 @@ func health(c echo.Context) error {
 func cleanDatabase(db *sql.DB) {
 	for {
 		time.Sleep(cleanUpInterval)
-		error := repoToken.DeleteStaleTokens(db, time.Now())
+		error := repoQueries.DeleteStaleTokens(db, time.Now())
 		if error != nil {
 			log.Fatal(error)
 		}
@@ -56,11 +56,10 @@ func NewRouter(db *sql.DB) *echo.Echo {
 
 	service.Init()
 
-	// controllers
-	authController := controllers.NewAuthController(db, service)
-	orderController := controllers.NewOrderController(db, service)
-	sessionController := controllers.NewSessionController(db, service)
-	userController := controllers.NewUserController(db, service)
+	// handlers
+	authHandler := handlers.NewAuthController(db)
+	sessionHandler := handlers.NewSessionController(db)
+	userHandler := handlers.NewUserController(db)
 
 	// required for health checks
 	e.GET("/index.html", health)
@@ -70,27 +69,22 @@ func NewRouter(db *sql.DB) *echo.Echo {
 	openApi := e.Group("/api")
 
 	// open endpoints here
-	openApi.POST("/login", authController.HandleLogin)
-	openApi.POST("/signup", authController.HandleSignup)
+	openApi.POST("/login", authHandler.HandleLogin)
+	openApi.POST("/signup", userHandler.HandleSignup)
 
 	protectedApi := e.Group("/api")
 	// set the auth middlewares
-	protectedApi.Use(authController.RefreshAccess)
+	protectedApi.Use(authHandler.RefreshAccess)
+	protectedApi.Use(authHandler.PopulateContext)
 	middlewares.SetApiMiddlewares(protectedApi)
 
 	// ###########################  protected endpoints here
-	protectedApi.GET("/session", sessionController.HandleSession)
-	protectedApi.GET("/logout", authController.HandleLogout)
-
-	// order management
-	protectedApi.GET("/orders", orderController.HandleGetOrders)
-	protectedApi.POST("/orders", orderController.HandlePostOrder)
-	protectedApi.DELETE("/orders/:orderID", orderController.HandleDeleteOrder)
-	protectedApi.GET("/orders/:orderID", orderController.HandleGetOrder)
+	protectedApi.GET("/session", sessionHandler.HandleSession)
+	protectedApi.GET("/logout", authHandler.HandleLogout)
 
 	// user manangement endpoints
-	protectedApi.PUT("/users/:userID/changepassword", userController.HandleChangePassword)
-	protectedApi.PUT("/users/:userID", userController.HandleUpdateUser)
+	protectedApi.PUT("/users/:userID/changepassword", userHandler.HandleChangePassword)
+	protectedApi.PUT("/users/:userID", userHandler.HandleUpdateUser)
 
 	go func() {
 		if err := service.Run(); err != nil {

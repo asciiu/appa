@@ -81,6 +81,13 @@ func UpdatePassword(db *sql.DB, userID, hash string) error {
 	return err
 }
 
+func UpdateUsername(db *sql.DB, userID, username string) error {
+	_, err := db.Exec("UPDATE users SET username = $1 WHERE id = $2",
+		username, userID)
+
+	return err
+}
+
 func UpdateEmailVerified(db *sql.DB, userID string, emailVerified bool) error {
 	_, err := db.Exec("UPDATE users SET email_verified = $1 WHERE id = $2",
 		emailVerified, userID)
