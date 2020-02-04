@@ -1,6 +1,18 @@
 {
 	"folders": [
 		{
+			"path": "configs"
+		},
+		{
+			"path": "docs"
+		},
+		{
+			"path": "lib"
+		},
+		{
+			"path": "migrations"
+		},
+		{
 			"path": "api-graphql"
 		},
 		{
@@ -10,35 +22,23 @@
 			"path": "api-template"
 		},
 		{
-			"path": "configs"
+			"path": "micro-socket"
 		},
 		{
-			"path": "docs"
+			"path": "micro-story"
 		},
 		{
-			"path": "ether-service"
+			"path": "micro-trade"
 		},
 		{
-			"path": "gotube"
+			"path": "util-ethereum"
 		},
 		{
-			"path": "lib"
+			"path": "util-gotube"
 		},
 		{
-			"path": "migrations"
+			"path": "util-tensor"
 		},
-		{
-			"path": "socket"
-		},
-		{
-			"path": "story-service"
-		},
-		{
-			"path": "tensor"
-		},
-		{
-			"path": "trade-engine"
-		}
 	],
 	"settings": {}
 }

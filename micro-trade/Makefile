@@ -2,7 +2,8 @@ build:
 	docker build -t dockerowy/appa-trade-engine:dev .
 
 prodo: 
-	protoc --proto_path=./ --micro_out=. --go_out=. proto/trade/trade.proto 
+	#protoc --proto_path=./ --micro_out=. --go_out=. proto/trade/trade.proto 
+	protoc --micro_out=. --go_out=. proto/trade/trade.proto 
 
 push:
 	docker push dockerowy/appa-trade-engine:dev 
