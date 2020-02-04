@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/asciiu/appa/lib/db"
-	proto "github.com/asciiu/appa/trade-engine/proto/trade"
-	micro "github.com/micro/go-micro/v2"
+	proto "github.com/asciiu/appa/micro-trade/proto/trade"
+	micro "github.com/micro/go-micro"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	// Register our service with the gRPC server, this will tie our
 	// implementation into the auto-generated interface code for our
 	// protobuf definition.
-	proto.RegisterTradeEngineHandler(service.Server(), new(engine))
+	proto.RegisterTradeEngineHandler(service.Server(), engine)
 
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

@@ -7,10 +7,10 @@ import (
 	"log"
 
 	"github.com/asciiu/appa/lib/constants/response"
-	"github.com/asciiu/appa/trade-engine/constants"
-	repo "github.com/asciiu/appa/trade-engine/db/sql"
-	"github.com/asciiu/appa/trade-engine/models"
-	"github.com/asciiu/appa/trade-engine/proto/trade"
+	"github.com/asciiu/appa/micro-trade/constants"
+	repo "github.com/asciiu/appa/micro-trade/db/sql"
+	"github.com/asciiu/appa/micro-trade/models"
+	"github.com/asciiu/appa/micro-trade/proto/trade"
 )
 
 type TradeEngine struct {

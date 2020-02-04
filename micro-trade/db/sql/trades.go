@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/asciiu/appa/trade-engine/models"
+	"github.com/asciiu/appa/micro-trade/models"
 )
 
 func InsertTrade(db *sql.DB, trade *models.Trade) error {

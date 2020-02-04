@@ -7,9 +7,9 @@ import (
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/lib/db"
-	"github.com/asciiu/appa/trade-engine/constants"
-	repoTrade "github.com/asciiu/appa/trade-engine/db/sql"
-	"github.com/asciiu/appa/trade-engine/models"
+	"github.com/asciiu/appa/micro-trade/constants"
+	repoTrade "github.com/asciiu/appa/micro-trade/db/sql"
+	"github.com/asciiu/appa/micro-trade/models"
 
 	"github.com/stretchr/testify/assert"
 )

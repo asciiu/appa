@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/asciiu/appa/lib/db"
-	constants "github.com/asciiu/appa/trade-engine/constants"
+	constants "github.com/asciiu/appa/micro-trade/constants"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )

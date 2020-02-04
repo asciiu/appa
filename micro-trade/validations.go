@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/asciiu/appa/trade-engine/constants"
+	"github.com/asciiu/appa/micro-trade/constants"
 )
 
 func ValidateSide(side string) bool {

@@ -9,9 +9,9 @@ import (
 	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/lib/constants/response"
 	"github.com/asciiu/appa/lib/db"
-	"github.com/asciiu/appa/trade-engine/constants"
-	tradeRepo "github.com/asciiu/appa/trade-engine/db/sql"
-	"github.com/asciiu/appa/trade-engine/proto/trade"
+	"github.com/asciiu/appa/micro-trade/constants"
+	tradeRepo "github.com/asciiu/appa/micro-trade/db/sql"
+	"github.com/asciiu/appa/micro-trade/proto/trade"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -139,7 +139,7 @@ func TestProcessTrade(t *testing.T) {
 	assert.Equal(t, res.Data.Order.OrderID, tp.Trades[1].TakerOrderID, "maker not correct")
 	assert.Equal(t, or3.Amount, tp.Trades[0].Amount, "amount not correct")
 	assert.Equal(t, or3.Price, tp.Trades[0].Price, "price not correct")
-	assert.Equal(t, uint64(1), tp.Trades[1].Amount, "amount not correct")
+	assert.Equal(t, uint64(7), tp.Trades[1].Amount, "amount not correct")
 	assert.Equal(t, or4.Price, tp.Trades[1].Price, "price not correct")
 
 	// assert order data for sell orders
@@ -153,9 +153,9 @@ func TestProcessTrade(t *testing.T) {
 	// trade 2 - maker sell order
 	order, err = tradeRepo.FindOrderByID(engine.DB, tp.Trades[1].MakerOrderID)
 	assert.Nil(t, err, "error should be nil")
-	assert.Equal(t, uint64(1), order.Amount, "amount should be 0")
-	assert.Equal(t, uint64(1), order.Filled, "fill incorrect")
-	assert.Equal(t, constants.Pending, order.Status, "status incorrect")
+	assert.Equal(t, uint64(0), order.Amount, "amount should be 0")
+	assert.Equal(t, uint64(7), order.Filled, "fill incorrect")
+	assert.Equal(t, constants.Completed, order.Status, "status incorrect")
 
 	repo.DeleteUserHard(engine.DB, user.ID)
 }
