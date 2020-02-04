@@ -7,16 +7,19 @@ import (
 	"github.com/asciiu/appa/api-graphql/db/sql"
 	"github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/lib/db"
+	userQueries "github.com/asciiu/appa/lib/user/db/sql"
+	userModels "github.com/asciiu/appa/lib/user/models"
+	util "github.com/asciiu/appa/lib/util"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInsertStory(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
+	util.CheckErr(err)
 	defer db.Close()
 
-	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
-	err = sql.InsertUser(db, user)
+	user := userModels.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = userQueries.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
 	story := models.NewStory(user.ID, "test", "{\"some\":\"json\"}")
@@ -24,16 +27,16 @@ func TestInsertStory(t *testing.T) {
 
 	assert.Nil(t, err, "insert story failed")
 
-	sql.DeleteUserHard(db, user.ID)
+	userQueries.DeleteUserHard(db, user.ID)
 }
 
 func TestListStories(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
+	util.CheckErr(err)
 	defer db.Close()
 
-	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
-	err = sql.InsertUser(db, user)
+	user := userModels.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = userQueries.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
 	story1 := models.NewStory(user.ID, "one", "{\"some\":\"json\"}")
@@ -62,16 +65,16 @@ func TestListStories(t *testing.T) {
 	assert.Equal(t, pageSize, pagedStories.PageSize, "page size should be 10")
 	assert.Equal(t, 4, len(pagedStories.Stories), "should be 4 stories")
 
-	sql.DeleteUserHard(db, user.ID)
+	userQueries.DeleteUserHard(db, user.ID)
 }
 
 func TestFindStoryByID(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
+	util.CheckErr(err)
 	defer db.Close()
 
-	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
-	err = sql.InsertUser(db, user)
+	user := userModels.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = userQueries.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
 	story1 := models.NewStory(user.ID, "one", "{\"some\":\"json\"}")
@@ -90,16 +93,16 @@ func TestFindStoryByID(t *testing.T) {
 	assert.Equal(t, story2.Title, foundStory.Title, "titles do not match")
 	assert.Equal(t, story2.Content, foundStory.Content, "content do not match")
 
-	sql.DeleteUserHard(db, user.ID)
+	userQueries.DeleteUserHard(db, user.ID)
 }
 
 func TestUpdateStory(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
+	util.CheckErr(err)
 	defer db.Close()
 
-	user := models.NewUser("flowtester", "test@email", "Yo yo yo!!")
-	err = sql.InsertUser(db, user)
+	user := userModels.NewUser("flowtester", "test@email", "Yo yo yo!!")
+	err = userQueries.InsertUser(db, user)
 	assert.Nil(t, err, "insert new user failed")
 
 	story := models.NewStory(user.ID, "one", "{\"some\":\"json\"}")
@@ -121,5 +124,5 @@ func TestUpdateStory(t *testing.T) {
 	assert.Equal(t, story.Content, foundStory.Content, "content do not match")
 	assert.Equal(t, story.Status, "published", "titles do not match")
 
-	sql.DeleteUserHard(db, user.ID)
+	userQueries.DeleteUserHard(db, user.ID)
 }

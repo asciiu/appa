@@ -15,8 +15,6 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/google/uuid v1.1.1
-	github.com/labstack/echo v3.3.10+incompatible // indirect
-	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/micro/examples v0.2.0
 	github.com/micro/go-micro v1.9.1
 	github.com/rs/cors v1.7.0
@@ -24,4 +22,5 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/vektah/gqlparser v1.1.2
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
 )
