@@ -3,24 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os/exec"
 	"testing"
 
-	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
-	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/lib/db"
-	protoStory "github.com/asciiu/appa/story-service/proto/story"
+	repoUser "github.com/asciiu/appa/lib/user/db/sql"
+	user "github.com/asciiu/appa/lib/user/models"
+	util "github.com/asciiu/appa/lib/util"
+	protoStory "github.com/asciiu/appa/micro-story/proto/story"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
-
-func checkErr(err error) {
-	if err != nil {
-		log.Println(err)
-		panic(err)
-	}
-}
 
 var TEST_DIR = "trash"
 
@@ -36,7 +29,7 @@ func setupService() (*StoryService, *user.User) {
 
 	user := user.NewUser("chester", "test@email", "hash")
 	err := repoUser.InsertUser(db, user)
-	checkErr(err)
+	util.CheckErr(err)
 
 	return &storyService, user
 }

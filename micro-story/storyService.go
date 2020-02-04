@@ -9,8 +9,8 @@ import (
 	"time"
 
 	commonResp "github.com/asciiu/appa/lib/constants/response"
-	protoStory "github.com/asciiu/appa/story-service/proto/story"
-	"gopkg.in/libgit2/git2go.v27"
+	protoStory "github.com/asciiu/appa/micro-story/proto/story"
+	git "gopkg.in/libgit2/git2go.v27"
 )
 
 // StoryService - manages story repos

@@ -2,26 +2,19 @@ package sql_test
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	repoUser "github.com/asciiu/appa/api-graphql/db/sql"
 	user "github.com/asciiu/appa/api-graphql/models"
 	"github.com/asciiu/appa/lib/db"
-	repoWriter "github.com/asciiu/appa/story-service/db/sql"
+	util "github.com/asciiu/appa/lib/util"
+	repoWriter "github.com/asciiu/appa/micro-story/db/sql"
 	"github.com/stretchr/testify/assert"
 )
 
-func checkErr(err error) {
-	if err != nil {
-		log.Println(err)
-		panic(err)
-	}
-}
-
 func TestInsertWriter(t *testing.T) {
 	db, err := db.NewDB("postgres://postgres@localhost/appa_test?&sslmode=disable")
-	checkErr(err)
+	util.CheckErr(err)
 	defer db.Close()
 
 	user := user.NewUser("tastytest", "test@email", "password")
