@@ -22,6 +22,9 @@
 			"path": "api-template"
 		},
 		{
+			"path": "gokit-server"
+		},
+		{
 			"path": "micro-socket"
 		},
 		{
