@@ -14,7 +14,9 @@ import (
 func main() {
 	logger := log.NewLogfmtLogger(os.Stderr)
 
-	svc := service.GoKitService{}
+	var svc service.StringService
+	svc = service.GoKitService{}
+	svc = service.LogMiddleware{logger, svc}
 
 	var uppercase endpoint.Endpoint
 	uppercase = makeUppercaseEndpoint(svc)
