@@ -61,8 +61,11 @@ func main() {
 		service.EncodeResponse,
 	)
 
+	// curl -XPOST -d'{"string":"hello, world"}' localhost:8080/uppercase
 	http.Handle("/uppercase", uppercaseHandler)
+	// curl -XPOST -d'{"string":"hello, world"}' localhost:8080/count
 	http.Handle("/count", countHandler)
+
 	http.Handle("/metrics", promhttp.Handler())
 	logger.Log("gokit-server", "HTTP", "address", "localhost:8080")
 	logger.Log("err", http.ListenAndServe(":8080", nil))
