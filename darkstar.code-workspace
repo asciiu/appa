@@ -16,6 +16,9 @@
 			"path": "api-graphql"
 		},
 		{
+			"path": "api-graphql-chat"
+		},
+		{
 			"path": "api-rest"
 		},
 		{
