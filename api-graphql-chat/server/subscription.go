@@ -8,6 +8,20 @@ import (
 	graph "github.com/asciiu/appa/api-graphql-chat/graph/model"
 )
 
+func (s *graphQLServer) createUser(user string) error {
+	// Upsert user
+	if err := s.redisClient.SAdd("users", user).Err(); err != nil {
+		return err
+	}
+	// Notify new user joined
+	s.mutex.Lock()
+	for _, ch := range s.userChannels {
+		ch <- user
+	}
+	s.mutex.Unlock()
+	return nil
+}
+
 func (s *graphQLServer) MessagePosted(ctx context.Context, user string) (<-chan *graph.Message, error) {
 	err := s.createUser(user)
 	if err != nil {
@@ -52,20 +66,6 @@ func (s *graphQLServer) UserJoined(ctx context.Context, user string) (<-chan str
 	}()
 
 	return users, nil
-}
-
-func (s *graphQLServer) createUser(user string) error {
-	// Upsert user
-	if err := s.redisClient.SAdd("users", user).Err(); err != nil {
-		return err
-	}
-	// Notify new user joined
-	s.mutex.Lock()
-	for _, ch := range s.userChannels {
-		ch <- user
-	}
-	s.mutex.Unlock()
-	return nil
 }
 
 func (s *graphQLServer) Subscription() generated.SubscriptionResolver {
