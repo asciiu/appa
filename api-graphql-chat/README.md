@@ -21,6 +21,8 @@ This created the following package layout:
 └── server.go                - The entry point to your app. Customize it however you see fit
 
 
+Note: server.go was renamed to main.go to follow convention. 
+
 ## To regen the files from an updated schema.graphqls
 At the top of our resolver.go, between package and import, add the following line:
 
