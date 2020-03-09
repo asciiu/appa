@@ -12,7 +12,7 @@ require (
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/segmentio/ksuid v1.0.2
-	github.com/tinrab/graphql-realtime-chat v0.0.0-20200118172425-a1148c2ab79d
+	github.com/tinrab/graphql-realtime-chat v0.0.0-20200118172425-a1148c2ab79d // indirect
 	github.com/tinrab/retry v1.0.0
 	github.com/vektah/gqlparser/v2 v2.0.1
 )
