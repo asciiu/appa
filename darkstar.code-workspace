@@ -19,6 +19,9 @@
 			"path": "api-graphql-chat"
 		},
 		{
+			"path": "api-graphql-rocket"
+		},
+		{
 			"path": "api-rest"
 		},
 		{

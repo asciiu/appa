@@ -9,7 +9,8 @@ replace github.com/nats-io/nats.go v1.8.2-0.20190607221125-9f4d16fe7c2d => githu
 replace github.com/asciiu/appa/lib => ../lib
 
 require (
-	github.com/99designs/gqlgen v0.9.3
+	github.com/99designs/gqlgen v0.11.2
+	github.com/asciiu/appa/api-graphql-chat v0.0.0-20200309030253-e7d07fc5fae3 // indirect
 	github.com/asciiu/appa/lib v0.0.0-00010101000000-000000000000
 	github.com/asciiu/appa/story-service v0.0.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -20,7 +21,6 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
-	github.com/vektah/gqlparser v1.1.2
+	github.com/vektah/gqlparser v1.2.0
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
-	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
 )
