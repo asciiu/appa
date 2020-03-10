@@ -7,18 +7,14 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-type config struct {
-	RedisURL string `envconfig:"REDIS_URL"`
-}
-
 func main() {
-	var cfg config
+	var cfg server.Config
 	err := envconfig.Process("", &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s, err := server.NewGraphQLServer(cfg.RedisURL)
+	s, err := server.NewGraphQLServer(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

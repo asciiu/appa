@@ -54,3 +54,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Int64:
+    model: github.com/asciiu/appa/lib/balance/models.Int64
+  User:
+    model: github.com/asciiu/appa/lib/user/models.User
