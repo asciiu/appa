@@ -66,3 +66,30 @@ func TestLogin(t *testing.T) {
 
 	userQuery.DeleteUserHard(s.DB, user.ID)
 }
+
+func TestLoginIncorrectPassword(t *testing.T) {
+	cfg := server.Config{
+		RedisURL: "localhost:6379",
+		DBURL:    "postgres://postgres@localhost:5432/appa_test?sslmode=disable",
+	}
+
+	s, err := server.NewGraphQLServer(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email := "test.email"
+	username := "jerry"
+
+	user, err := s.Signup(context.Background(), email, username, "password")
+	if err != nil {
+		log.Fatal(err)
+	}
+	userQuery.UpdateEmailVerified(s.DB, user.ID, true)
+
+	token, err := s.Login(context.Background(), email, "passwo", true)
+	assert.Equal(t, "incorrect password/email", err.Error())
+	assert.Nil(t, token, "token should be nil")
+
+	userQuery.DeleteUserHard(s.DB, user.ID)
+}
