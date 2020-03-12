@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/asciiu/appa/api-graphql-rocket/auth"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
-	"github.com/asciiu/appa/api-graphql/auth"
 	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
 	balance "github.com/asciiu/appa/lib/balance/models"
 	user "github.com/asciiu/appa/lib/user/models"

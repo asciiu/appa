@@ -115,7 +115,6 @@ func Secure(db *sql.DB) func(http.Handler) http.Handler {
 					}
 				}
 			}
-
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})

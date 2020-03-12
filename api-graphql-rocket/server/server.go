@@ -43,7 +43,6 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		Addr: config.RedisURL,
 	})
 
-	fmt.Println(config.DBURL)
 	database, _ := db.NewDB(config.DBURL)
 
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
@@ -81,5 +80,7 @@ func (s *graphQLServer) Serve(route string, port int) error {
 		),
 	)
 	router.Handle("/playground", handler.Playground("GraphQL", route))
+	fmt.Println(fmt.Sprintf("connect to http://localhost:%d/playground for GraphQL playground", port))
+
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 }

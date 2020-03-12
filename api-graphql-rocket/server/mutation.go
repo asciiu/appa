@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asciiu/appa/api-graphql-rocket/auth"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
-	"github.com/asciiu/appa/api-graphql/auth"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
