@@ -8,6 +8,8 @@ require (
 	github.com/asciiu/appa/api-graphql-chat v0.0.0-20200309030253-e7d07fc5fae3 // indirect
 	github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3
 	github.com/asciiu/appa/story-service v0.0.5 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/gorilla/websocket v1.4.1
 	github.com/kelseyhightower/envconfig v1.4.0

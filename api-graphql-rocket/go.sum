@@ -76,6 +76,7 @@ github.com/armon/go-radix v1.0.0/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgI
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkYZB8zMSxRWpUBQtwG5a7fFgvEO+odwuTv2gs=
 github.com/asciiu/appa v0.0.0-20200305041152-3a8e2fe60f8a h1:Ym7TpX3eGIkIUwYyflJ1sa4GFz4e8zcfLOzt0xenSFs=
 github.com/asciiu/appa v0.0.0-20200309030253-e7d07fc5fae3 h1:Ji5vvkPu+l2YOoqtdix9Ma6HcZBG44cHEL45ThrVWJY=
+github.com/asciiu/appa v0.0.0-20200311025607-409459594f2c h1:dODQT8M1cidXEGmjlTZPSy4HJBQT/YOx1LWORPzZBBY=
 github.com/asciiu/appa/api-graphql v0.0.5 h1:8UxEF/mO0JTawxyIEI3gVp+cx/xedRJvW81vN0HJmO0=
 github.com/asciiu/appa/api-graphql v0.0.5/go.mod h1:aCiHbr55llpzygH11zN1kKib2LPcUhCZt14qgWBluvk=
 github.com/asciiu/appa/api-graphql-chat v0.0.0-20200309030253-e7d07fc5fae3 h1:uyjseGfvMqVCYohCbeBbJVpOxCBBqQbeVCQMhhcJHIk=
@@ -166,6 +167,7 @@ github.com/glycerine/go-unsnap-stream v0.0.0-20180323001048-9f0cb55181dd/go.mod 
 github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2/go.mod h1:/20jfyN9Y5QPEAprSgKAUr+glWDY39ZiUEAYOEv5dsE=
 github.com/glycerine/goconvey v0.0.0-20180728074245-46e3a41ad493/go.mod h1:Ogl1Tioa0aV7gstGFO7KhffUsb9M4ydbEbbxpcEDc24=
 github.com/go-chi/chi v3.3.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
+github.com/go-chi/chi v4.0.1+incompatible h1:RSRC5qmFPtO90t7pTL0DBMNpZFsb/sHF3RXVlDgFisA=
 github.com/go-chi/chi v4.0.1+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
 github.com/go-ini/ini v1.25.4/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=

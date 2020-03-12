@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/handler"
+	"github.com/asciiu/appa/api-graphql-rocket/auth"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	"github.com/asciiu/appa/lib/db"
+	"github.com/go-chi/chi"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
 	"github.com/rs/cors"
@@ -33,7 +35,7 @@ type graphQLServer struct {
 
 type Config struct {
 	RedisURL string `envconfig:"REDIS_URL"`
-	DBURL    string `envconfig:"DB_URL"`
+	DBURL    string `envconfig:"APPA_API_GRAPHQL_DB_URL"`
 }
 
 func NewGraphQLServer(config Config) (*graphQLServer, error) {
@@ -41,6 +43,7 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		Addr: config.RedisURL,
 	})
 
+	fmt.Println(config.DBURL)
 	database, _ := db.NewDB(config.DBURL)
 
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
@@ -57,8 +60,17 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 }
 
 func (s *graphQLServer) Serve(route string, port int) error {
-	mux := http.NewServeMux()
-	mux.Handle(
+	router := chi.NewRouter()
+	router.Use(auth.Secure(s.DB))
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
+		ExposedHeaders:   []string{"set-authorization", "set-refresh"},
+		Debug:            false,
+	}).Handler)
+
+	router.Handle(
 		route,
 		handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: s}),
 			handler.WebsocketUpgrader(websocket.Upgrader{
@@ -68,8 +80,6 @@ func (s *graphQLServer) Serve(route string, port int) error {
 			}),
 		),
 	)
-	mux.Handle("/playground", handler.Playground("GraphQL", route))
-
-	handler := cors.AllowAll().Handler(mux)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
+	router.Handle("/playground", handler.Playground("GraphQL", route))
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 }

@@ -10,8 +10,8 @@ replace github.com/asciiu/appa/lib => ../lib
 
 require (
 	github.com/99designs/gqlgen v0.11.2
-	github.com/asciiu/appa/api-graphql-chat v0.0.0-20200309030253-e7d07fc5fae3 // indirect
-	github.com/asciiu/appa/lib v0.0.0-00010101000000-000000000000
+	github.com/asciiu/appa/api-graphql-rocket v0.0.0-20200311025607-409459594f2c // indirect
+	github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3
 	github.com/asciiu/appa/story-service v0.0.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.2+incompatible
