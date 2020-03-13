@@ -30,6 +30,9 @@
 		{
 			"path": "gokit-server"
 		},
+                {
+			"path": "micro-image-recognizer"
+                },
 		{
 			"path": "micro-socket"
 		},

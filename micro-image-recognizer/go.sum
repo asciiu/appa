@@ -1,0 +1,7 @@
+github.com/golang/protobuf v1.3.5 h1:F768QJ1E9tib+q5Sc8MkdJi1RxLTbRcTf8LJV56aRls=
+github.com/golang/protobuf v1.3.5/go.mod h1:6O5/vntMXwX2lRkT1hjjk0nAC1IDOTvTlVgjlRvqsdk=
+github.com/tensorflow/tensorflow v1.15.2 h1:7/f/A664Tml/nRJg04+p3StcrsT53mkcvmxYHXI21Qo=
+github.com/tensorflow/tensorflow v2.1.0+incompatible h1:piL4AzfPuv67+gbsKo2IhIecCe4ILpN0294O8ZrxneI=
+github.com/tensorflow/tensorflow v2.1.0+incompatible/go.mod h1:itOSERT4trABok4UOoG+X4BoKds9F3rIsySdn+Lvu90=
+github.com/tensorflow/tensorflow v2.2.0-rc0+incompatible h1:61/+RqbE5APDHHqxuhpIHbjf6hZQrWg1Mdqw1h0jpds=
+github.com/tensorflow/tensorflow v2.2.0-rc0+incompatible/go.mod h1:itOSERT4trABok4UOoG+X4BoKds9F3rIsySdn+Lvu90=
