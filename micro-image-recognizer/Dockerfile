@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow
 
 #Begin: install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git
+RUN apt-get update && apt-get install -y --no-install-recommends git wget unzip
 #End: install dependencies
 
 #Begin: install golang
@@ -29,3 +29,10 @@ RUN  curl -fsSL "https://storage.googleapis.com/tensorflow/libtensorflow/$TENSOR
 COPY . /micro-image-recognizer
 RUN cd micro-image-recognizer && CGO_ENABLED=1 GOOS=linux go build -o app
 CMD ["./micro-image-recognizer/app"]
+
+# test inception model data
+RUN mkdir -p /model && \
+  wget "https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip" -O /model/inception.zip && \
+  unzip /model/inception.zip -d /model && \
+  chmod -R 777 /model
+
