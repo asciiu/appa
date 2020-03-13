@@ -24,7 +24,6 @@ RUN  curl -fsSL "https://storage.googleapis.com/tensorflow/libtensorflow/$TENSOR
      tar -C $TARGET_DIRECTORY -xzf $TENSORFLOW_LIB_GZIP && \
      rm -Rf $TENSORFLOW_LIB_GZIP && \
      ldconfig 
-#RUN go get github.com/tensorflow/tensorflow/tensorflow/go
 #End: install tensorflow
 
 COPY . /micro-image-recognizer
