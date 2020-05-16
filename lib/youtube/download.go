@@ -8,6 +8,11 @@ import (
 	. "github.com/kkdai/youtube"
 )
 
+//### Dependencies
+// go - v1.14
+// brew install ffmpeg (OSX)
+// apt install ffmpeg (Linux)
+
 func Download(url, downloadDir string) (string, error) {
 	log.Println("downloading fiel...", url)
 
