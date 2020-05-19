@@ -7,20 +7,20 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+func check(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	var cfg server.Config
 	err := envconfig.Process("", &cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 
-	s, err := server.NewGraphQLServer(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	srv, err := server.NewGraphQLServer(cfg)
+	check(err)
 
-	err = s.Serve("/graphql", 8080)
-	if err != nil {
-		log.Fatal(err)
-	}
+	err = srv.Serve("/graphql", 8080)
+	check(err)
 }
