@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/asciiu/appa/api-graphql-rocket/auth"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
@@ -38,7 +37,7 @@ func (srv *graphQLServer) Login(ctx context.Context, email, password string, rem
 		return nil, fmt.Errorf("email account not verified")
 	default:
 		if bcrypt.CompareHashAndPassword([]byte(loginUser.PasswordHash), []byte(password)) == nil {
-			jwt, err := auth.CreateJwtToken(loginUser.ID, auth.JwtDuration)
+			jwt, err := createJwtToken(loginUser.ID, jwtDuration)
 			if err != nil {
 				return nil, err
 			}
@@ -46,7 +45,7 @@ func (srv *graphQLServer) Login(ctx context.Context, email, password string, rem
 			// issue a refresh token if remember is true
 			if remember {
 				refreshToken := token.NewRefreshToken(loginUser.ID)
-				expiresOn := time.Now().Add(auth.RefreshDuration)
+				expiresOn := time.Now().Add(refreshDuration)
 				selectAuth := refreshToken.Renew(expiresOn)
 
 				// this needs to be checked

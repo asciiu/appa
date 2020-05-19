@@ -2,6 +2,7 @@
 package server
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -9,9 +10,9 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/handler"
-	"github.com/asciiu/appa/api-graphql-rocket/auth"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	"github.com/asciiu/appa/lib/db"
+	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/go-chi/chi"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
@@ -22,8 +23,16 @@ import (
 type contextKey string
 
 const (
+	// A private key for context that only this package can access. This is important
+	// to prevent collisions between different context uses
 	userContextKey = contextKey("user")
 )
+
+// ForContext finds the user from the context. REQUIRES Middleware to have run.
+func ForContext(ctx context.Context) *user.User {
+	raw, _ := ctx.Value(userContextKey).(*user.User)
+	return raw
+}
 
 type graphQLServer struct {
 	DB          *sql.DB
@@ -68,7 +77,7 @@ func (srv *graphQLServer) Query() generated.QueryResolver {
 
 func (srv *graphQLServer) Serve(route string, port int) error {
 	router := chi.NewRouter()
-	router.Use(auth.Secure(srv.DB))
+	router.Use(secure(srv.DB))
 	router.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
