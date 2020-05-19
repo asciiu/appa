@@ -19,5 +19,9 @@ $ go run github.com/99designs/gqlgen -v
 This api is meant to be run within a kube cluster. Locally you can run it within minikube.
 
 ```
-make start
+$ minikube start -p appa
+$ minikube ip -p appa
+$ make start-minikube 
 ```
+
+Access playground via: [minikube-ip]:30000 from any web browser.

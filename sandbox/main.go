@@ -5,20 +5,19 @@ import (
 	"fmt"
 	"log"
 	"os/user"
-
-	gotube "github.com/asciiu/appa/lib/youtube"
+	"path/filepath"
 )
 
 func main() {
 	flag.Parse()
 	log.Println(flag.Args())
-	usr, _ := user.Current()
 
+	usr, _ := user.Current()
 	downloadDir := fmt.Sprintf("%v/Movies/youtubedr", usr.HomeDir)
 	log.Println("download to dir=", downloadDir)
 
-	arg := flag.Arg(0)
-	if err := gotube.Download(arg, downloadDir); err != nil {
-		fmt.Println("err:", err)
-	}
+	// convert mp4
+	path := filepath.Join(downloadDir, "LWE79K2Ii-s.mp4")
+
+	fmt.Println(path)
 }

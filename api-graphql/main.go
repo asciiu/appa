@@ -1,29 +1,26 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/99designs/gqlgen/handler"
-	"github.com/asciiu/appa/api-graphql/auth"
-	gql "github.com/asciiu/appa/api-graphql/graphql"
-	"github.com/asciiu/appa/lib/db"
-	util "github.com/asciiu/appa/lib/util"
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
-	protoStory "github.com/asciiu/appa/story-service/proto/story"
+	"github.com/99designs/gqlgen/graphql/handler"
 
-	k8s "github.com/micro/examples/kubernetes/go/micro"
-	micro "github.com/micro/go-micro"
+	"github.com/asciiu/appa/api-graphql/auth"
+	"github.com/asciiu/appa/api-graphql/graph"
+	"github.com/asciiu/appa/lib/db"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	util "github.com/asciiu/appa/lib/util"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi"
+	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/cors"
-	"github.com/vektah/gqlparser/gqlerror"
 )
 
 const defaultPort = "8080"
@@ -45,19 +42,23 @@ func cleanDatabase(db *sql.DB) {
 func main() {
 	util.HelloThere("satori!")
 
+	_ = godotenv.Load("env/local.env")
+
 	dbURL := fmt.Sprintf("%s", os.Getenv("DB_URL"))
+	fmt.Println(dbURL)
+
 	database, _ := db.NewDB(dbURL)
 
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
 
-	service := k8s.NewService(micro.Name("graphql"))
-	service.Init()
+	//service := k8s.NewService(micro.Name("graphql"))
+	//service.Init()
 
-	resolver := gql.Resolver{
-		DB:          database,
-		StoryClient: protoStory.NewStoryService("stories", service.Client()),
+	resolver := &graph.Resolver{
+		DB: database,
+		//StoryClient: protoStory.NewStoryService("stories", service.Client()),
 	}
 
 	router := chi.NewRouter()
@@ -66,21 +67,17 @@ func main() {
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "Refresh"},
 		ExposedHeaders:   []string{"set-authorization", "set-refresh"},
 		Debug:            false,
 	}).Handler)
 
-	router.Handle("/", handler.Playground("gql", "/graphql"))
-	router.Handle("/graphql", handler.GraphQL(gql.NewExecutableSchema(gql.Config{Resolvers: &resolver}),
-		handler.ErrorPresenter(
-			func(ctx context.Context, e error) *gqlerror.Error {
-				return graphql.DefaultErrorPresenter(ctx, e)
-			},
-		),
-	))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
+
+	router.Handle("/", handler.Playground("GraphQL playground", "/graphql"))
+	router.Handle("/graphql", srv)
 
 	go cleanDatabase(database)
 

@@ -13,7 +13,7 @@ import (
 func TestDownload(t *testing.T) {
 	usr, _ := user.Current()
 	downloadDir := fmt.Sprintf("%v/Movies/youtubedr", usr.HomeDir)
-	url := "https://www.youtube.com/watch?v=LWE79K2Ii-s"
+	url := "https://www.youtube.com/watch?v=OUcNMDa8T8E"
 
 	filename, err := gotube.Download(url, downloadDir)
 	assert.Nil(t, err, fmt.Sprintf("download failed with"))

@@ -22,7 +22,7 @@ spec:
               name: api-graphql-config 
           env:
           - name: UPDATED_AT
-            value: "Sun Oct 27 17:43:28 MDT 2019"
+            value: "Mon May 18 20:46:05 MDT 2020"
           ports:
           - containerPort: 8080 
             name: http-port
