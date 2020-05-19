@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/asciiu/appa/api-graphql-rocket/auth"
-	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
@@ -17,18 +16,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (r *graphQLServer) Signup(ctx context.Context, email, username, password string) (*user.User, error) {
+func (srv *graphQLServer) Signup(ctx context.Context, email, username, password string) (*user.User, error) {
 	newUser := user.NewUser(username, email, password)
-	if err := userRepo.InsertUser(r.DB, newUser); err != nil {
+	if err := userRepo.InsertUser(srv.DB, newUser); err != nil {
 		return nil, err
 	}
 	return newUser, nil
 }
 
-func (r *graphQLServer) Login(ctx context.Context, email, password string, remember bool) (*roken.Token, error) {
+func (srv *graphQLServer) Login(ctx context.Context, email, password string, remember bool) (*roken.Token, error) {
 	log.Info(fmt.Sprintf("login: %s", email))
 
-	loginUser, err := userRepo.FindUserByEmail(r.DB, email)
+	loginUser, err := userRepo.FindUserByEmail(srv.DB, email)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, fmt.Errorf("incorrect password/email")
@@ -51,7 +50,7 @@ func (r *graphQLServer) Login(ctx context.Context, email, password string, remem
 				selectAuth := refreshToken.Renew(expiresOn)
 
 				// this needs to be checked
-				if _, err := tokenRepo.InsertRefreshToken(r.DB, refreshToken); err != nil {
+				if _, err := tokenRepo.InsertRefreshToken(srv.DB, refreshToken); err != nil {
 					log.Error(fmt.Sprintf("failed to insert refresh token: %s", err.Error()))
 				}
 
@@ -66,8 +65,4 @@ func (r *graphQLServer) Login(ctx context.Context, email, password string, remem
 
 		return nil, fmt.Errorf("incorrect password/email")
 	}
-}
-
-func (s *graphQLServer) Mutation() generated.MutationResolver {
-	return s
 }

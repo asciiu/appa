@@ -58,9 +58,17 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 	}, nil
 }
 
-func (s *graphQLServer) Serve(route string, port int) error {
+func (srv *graphQLServer) Mutation() generated.MutationResolver {
+	return srv
+}
+
+func (srv *graphQLServer) Query() generated.QueryResolver {
+	return srv
+}
+
+func (srv *graphQLServer) Serve(route string, port int) error {
 	router := chi.NewRouter()
-	router.Use(auth.Secure(s.DB))
+	router.Use(auth.Secure(srv.DB))
 	router.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
@@ -71,7 +79,7 @@ func (s *graphQLServer) Serve(route string, port int) error {
 
 	router.Handle(
 		route,
-		handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: s}),
+		handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: srv}),
 			handler.WebsocketUpgrader(websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool {
 					return true
