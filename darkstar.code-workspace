@@ -46,10 +46,10 @@
 			"path": "util-ethereum"
 		},
 		{
-			"path": "util-gotube"
+			"path": "util-tensor"
 		},
 		{
-			"path": "util-tensor"
+			"path": "sandbox"
 		},
 	],
 	"settings": {}
