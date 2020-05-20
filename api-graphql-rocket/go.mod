@@ -11,6 +11,7 @@ require (
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
