@@ -24,7 +24,7 @@ func (srv *graphQLServer) Signup(ctx context.Context, email, username, password 
 	return newUser, nil
 }
 
-func (srv *graphQLServer) Signin(ctx context.Context, email, password string, remember bool) (*roken.Token, error) {
+func (srv *graphQLServer) Signin(ctx context.Context, email, password string, remember bool) (*roken.TokenUser, error) {
 	log.Info(fmt.Sprintf("Signin: %s", email))
 
 	loginUser, err := userRepo.FindUserByEmail(srv.DB, email)
@@ -43,6 +43,8 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 				return nil, err
 			}
 
+			tok := roken.Token{Jwt: &jwt}
+
 			// issue a refresh token if remember is true
 			if remember {
 				refreshToken := token.NewRefreshToken(loginUser.ID)
@@ -53,14 +55,10 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 				if _, err := tokenRepo.InsertRefreshToken(srv.DB, refreshToken); err != nil {
 					log.Error(fmt.Sprintf("failed to insert refresh token: %s", err.Error()))
 				}
-
-				return &roken.Token{
-					Jwt:     &jwt,
-					Refresh: &selectAuth,
-				}, nil
+				tok.Refresh = &selectAuth
 			}
 
-			return &roken.Token{Jwt: &jwt}, nil
+			return &roken.TokenUser{Token: &tok, User: loginUser}, nil
 		}
 
 		return nil, fmt.Errorf("incorrect password/email")

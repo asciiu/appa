@@ -2,7 +2,16 @@
 
 package model
 
+import (
+	"github.com/asciiu/appa/lib/user/models"
+)
+
 type Token struct {
 	Jwt     *string `json:"jwt"`
 	Refresh *string `json:"refresh"`
+}
+
+type TokenUser struct {
+	User  *models.User `json:"user"`
+	Token *Token       `json:"token"`
 }

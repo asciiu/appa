@@ -58,6 +58,11 @@ type ComplexityRoot struct {
 		Refresh func(childComplexity int) int
 	}
 
+	TokenUser struct {
+		Token func(childComplexity int) int
+		User  func(childComplexity int) int
+	}
+
 	User struct {
 		Email         func(childComplexity int) int
 		EmailVerified func(childComplexity int) int
@@ -69,7 +74,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
-	Signin(ctx context.Context, email string, password string, remember bool) (*model.Token, error)
+	Signin(ctx context.Context, email string, password string, remember bool) (*model.TokenUser, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
@@ -134,6 +139,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Token.Refresh(childComplexity), true
+
+	case "TokenUser.token":
+		if e.complexity.TokenUser.Token == nil {
+			break
+		}
+
+		return e.complexity.TokenUser.Token(childComplexity), true
+
+	case "TokenUser.user":
+		if e.complexity.TokenUser.User == nil {
+			break
+		}
+
+		return e.complexity.TokenUser.User(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -249,6 +268,11 @@ type Token {
   refresh: String
 }
 
+type TokenUser {
+  user: User
+  token: Token
+}
+
 # Queries
 type Query {
   users: [User!]!
@@ -257,7 +281,7 @@ type Query {
 # Mutations
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
-  signin(email: String!, password: String!, remember: Boolean!): Token 
+  signin(email: String!, password: String!, remember: Boolean!): TokenUser
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -447,9 +471,9 @@ func (ec *executionContext) _Mutation_signin(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Token)
+	res := resTmp.(*model.TokenUser)
 	fc.Result = res
-	return ec.marshalOToken2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐToken(ctx, field.Selections, res)
+	return ec.marshalOTokenUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐTokenUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -615,6 +639,68 @@ func (ec *executionContext) _Token_refresh(ctx context.Context, field graphql.Co
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TokenUser_user(ctx context.Context, field graphql.CollectedField, obj *model.TokenUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TokenUser",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TokenUser_token(ctx context.Context, field graphql.CollectedField, obj *model.TokenUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TokenUser",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Token)
+	fc.Result = res
+	return ec.marshalOToken2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
@@ -1950,6 +2036,32 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var tokenUserImplementors = []string{"TokenUser"}
+
+func (ec *executionContext) _TokenUser(ctx context.Context, sel ast.SelectionSet, obj *model.TokenUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tokenUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TokenUser")
+		case "user":
+			out.Values[i] = ec._TokenUser_user(ctx, field, obj)
+		case "token":
+			out.Values[i] = ec._TokenUser_token(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *models.User) graphql.Marshaler {
@@ -2616,6 +2728,17 @@ func (ec *executionContext) marshalOToken2ᚖgithubᚗcomᚋasciiuᚋappaᚋapi�
 		return graphql.Null
 	}
 	return ec._Token(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTokenUser2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐTokenUser(ctx context.Context, sel ast.SelectionSet, v model.TokenUser) graphql.Marshaler {
+	return ec._TokenUser(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOTokenUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐTokenUser(ctx context.Context, sel ast.SelectionSet, v *model.TokenUser) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TokenUser(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUser2githubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {

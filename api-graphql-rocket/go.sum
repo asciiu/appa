@@ -8,6 +8,7 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNg
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
+github.com/asciiu/appa v0.0.0-20200523041502-292056e15978 h1:A6CvXWunTjvbZs4y9ZQSQfGzLhDZTFL8hTTakMudPl0=
 github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3 h1:ZaSVE1M91Y6dkF9uk7gJlfVkKqiJtuZ19eW/InNAKbI=
 github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3/go.mod h1:GFK4LWLsUisBAUm6pyGt+T5cCCUb1Lpw6+F/z7CNAeQ=
 github.com/coreos/etcd v3.3.18+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=

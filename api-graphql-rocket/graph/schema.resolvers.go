@@ -16,7 +16,7 @@ func (r *mutationResolver) Signup(ctx context.Context, email string, username st
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) Signin(ctx context.Context, email string, password string, remember bool) (*model.Token, error) {
+func (r *mutationResolver) Signin(ctx context.Context, email string, password string, remember bool) (*model.TokenUser, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
