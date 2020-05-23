@@ -16,6 +16,7 @@ import (
 )
 
 func (srv *graphQLServer) Signup(ctx context.Context, email, username, password string) (*user.User, error) {
+	log.Info(fmt.Sprintf("Signup: %s", email))
 	newUser := user.NewUser(username, email, password)
 	if err := userRepo.InsertUser(srv.DB, newUser); err != nil {
 		return nil, err
@@ -23,8 +24,8 @@ func (srv *graphQLServer) Signup(ctx context.Context, email, username, password 
 	return newUser, nil
 }
 
-func (srv *graphQLServer) Login(ctx context.Context, email, password string, remember bool) (*roken.Token, error) {
-	log.Info(fmt.Sprintf("login: %s", email))
+func (srv *graphQLServer) Signin(ctx context.Context, email, password string, remember bool) (*roken.Token, error) {
+	log.Info(fmt.Sprintf("Signin: %s", email))
 
 	loginUser, err := userRepo.FindUserByEmail(srv.DB, email)
 	switch {

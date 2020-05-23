@@ -45,7 +45,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		Login  func(childComplexity int, email string, password string, remember bool) int
+		Signin func(childComplexity int, email string, password string, remember bool) int
 		Signup func(childComplexity int, email string, username string, password string) int
 	}
 
@@ -69,7 +69,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
-	Login(ctx context.Context, email string, password string, remember bool) (*model.Token, error)
+	Signin(ctx context.Context, email string, password string, remember bool) (*model.Token, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
@@ -90,17 +90,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.login":
-		if e.complexity.Mutation.Login == nil {
+	case "Mutation.signin":
+		if e.complexity.Mutation.Signin == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_signin_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string), args["remember"].(bool)), true
+		return e.complexity.Mutation.Signin(childComplexity, args["email"].(string), args["password"].(string), args["remember"].(bool)), true
 
 	case "Mutation.signup":
 		if e.complexity.Mutation.Signup == nil {
@@ -257,7 +257,7 @@ type Query {
 # Mutations
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
-  login(email: String!, password: String!, remember: Boolean!): Token 
+  signin(email: String!, password: String!, remember: Boolean!): Token 
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -266,7 +266,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_signin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -414,7 +414,7 @@ func (ec *executionContext) _Mutation_signup(ctx context.Context, field graphql.
 	return ec.marshalOUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋlibᚋuserᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_signin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -430,7 +430,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_login_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_signin_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -438,7 +438,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["email"].(string), args["password"].(string), args["remember"].(bool))
+		return ec.resolvers.Mutation().Signin(rctx, args["email"].(string), args["password"].(string), args["remember"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1867,8 +1867,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "signup":
 			out.Values[i] = ec._Mutation_signup(ctx, field)
-		case "login":
-			out.Values[i] = ec._Mutation_login(ctx, field)
+		case "signin":
+			out.Values[i] = ec._Mutation_signin(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

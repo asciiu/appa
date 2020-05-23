@@ -8,7 +8,6 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNg
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
-github.com/asciiu/appa v0.0.0-20200312033120-35aef6647ef4 h1:0jNXTR3vVlQa313ImQD/gE8AxMtjqetsFPShXrBW3GM=
 github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3 h1:ZaSVE1M91Y6dkF9uk7gJlfVkKqiJtuZ19eW/InNAKbI=
 github.com/asciiu/appa/lib v0.0.0-20200309030253-e7d07fc5fae3/go.mod h1:GFK4LWLsUisBAUm6pyGt+T5cCCUb1Lpw6+F/z7CNAeQ=
 github.com/coreos/etcd v3.3.18+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
@@ -102,9 +101,6 @@ github.com/stretchr/testify v1.2.1/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXf
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
-github.com/tensorflow/tensorflow v1.15.2 h1:7/f/A664Tml/nRJg04+p3StcrsT53mkcvmxYHXI21Qo=
-github.com/tensorflow/tensorflow v2.1.0+incompatible h1:piL4AzfPuv67+gbsKo2IhIecCe4ILpN0294O8ZrxneI=
-github.com/tensorflow/tensorflow v2.1.0+incompatible/go.mod h1:itOSERT4trABok4UOoG+X4BoKds9F3rIsySdn+Lvu90=
 github.com/tinrab/retry v1.0.0 h1:u1x0cMZszwG44AaEeH8xx3Z1guNt8syzULeOsDhzg9s=
 github.com/tinrab/retry v1.0.0/go.mod h1:PWRlqYOz5dCyuZbxKhtQ60GN6OwSLwMxnjMqof4LIso=
 github.com/urfave/cli/v2 v2.1.1 h1:Qt8FeAtxE/vfdrLmR3rxR6JRE0RoVmbXu8+6kZtYU4k=

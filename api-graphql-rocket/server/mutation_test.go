@@ -56,7 +56,7 @@ func TestLogin(t *testing.T) {
 	}
 	userQuery.UpdateEmailVerified(s.DB, user.ID, true)
 
-	token, err := s.Login(context.Background(), email, "password", true)
+	token, err := s.Signin(context.Background(), email, "password", true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	}
 	userQuery.UpdateEmailVerified(s.DB, user.ID, true)
 
-	token, err := s.Login(context.Background(), email, "passwo", true)
+	token, err := s.Signin(context.Background(), email, "passwo", true)
 	assert.Equal(t, "incorrect password/email", err.Error())
 	assert.Nil(t, token, "token should be nil")
 

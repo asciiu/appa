@@ -16,7 +16,7 @@ func (r *mutationResolver) Signup(ctx context.Context, email string, username st
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) Login(ctx context.Context, email string, password string, remember bool) (*model.Token, error) {
+func (r *mutationResolver) Signin(ctx context.Context, email string, password string, remember bool) (*model.Token, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -32,3 +32,13 @@ func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string, remember bool) (*model.Token, error) {
+	panic(fmt.Errorf("not implemented"))
+}
