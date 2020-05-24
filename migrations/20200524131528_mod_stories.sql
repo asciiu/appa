@@ -13,6 +13,7 @@ CREATE TABLE stories(
 
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
+DROP TABLE stories;
 CREATE TABLE stories(
   id UUID PRIMARY KEY, 
   author_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,

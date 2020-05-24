@@ -6,6 +6,7 @@ CREATE TABLE users(
     email VARCHAR UNIQUE NOT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT false,
     username VARCHAR UNIQUE NOT NULL, 
+    avatar_url VARCHAR,
     password_hash VARCHAR NOT NULL,
     created_on TIMESTAMP DEFAULT now(),
     updated_on TIMESTAMP DEFAULT current_timestamp,
