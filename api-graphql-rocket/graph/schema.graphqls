@@ -3,6 +3,7 @@ scalar Int64
 type User {
   id: ID!
   username: String!
+  avatarURL: String!
   email: String!
   emailVerified: Boolean!
   passwordHash: String!

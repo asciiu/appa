@@ -95,6 +95,7 @@ type Order struct {
 type User struct {
 	ID            string
 	Username      string
+	AvatarURL     string
 	Email         string
 	EmailVerified bool
 	PasswordHash  string

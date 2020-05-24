@@ -18,14 +18,17 @@ func DeleteUserSoft(db *sql.DB, userID string) error {
 
 func FindUserByEmail(db *sql.DB, email string) (*models.User, error) {
 	var u models.User
+	var avatarURL sql.NullString
 	err := db.QueryRow(`SELECT 
 	id, 
 	username, 
+	avatar_url,
 	email, 
 	email_verified, 
 	password_hash FROM users WHERE email = $1`, email).
 		Scan(&u.ID,
 			&u.Username,
+			&avatarURL,
 			&u.Email,
 			&u.EmailVerified,
 			&u.PasswordHash)
@@ -33,25 +36,34 @@ func FindUserByEmail(db *sql.DB, email string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	if avatarURL.Valid {
+		u.AvatarURL = avatarURL.String
+	}
 	return &u, nil
 }
 
 func FindUserByID(db *sql.DB, userID string) (*models.User, error) {
 	var u models.User
+	var avatarURL sql.NullString
 	err := db.QueryRow(`SELECT 
 	id, 
 	username, 
+	avatar_url,
 	email, 
 	email_verified, 
 	password_hash FROM users WHERE id = $1`, userID).
 		Scan(&u.ID,
 			&u.Username,
+			&avatarURL,
 			&u.Email,
 			&u.EmailVerified,
 			&u.PasswordHash)
 
 	if err != nil {
 		return nil, err
+	}
+	if avatarURL.Valid {
+		u.AvatarURL = avatarURL.String
 	}
 	return &u, nil
 }
