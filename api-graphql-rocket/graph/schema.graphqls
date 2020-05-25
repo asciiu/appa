@@ -2,10 +2,13 @@ scalar Int64
 scalar Time
 
 type Message {
-  id: String!
-  user: String!
-  createdAt: Time!
+  id: String !
+  userID: String!
+  username: String!
   text: String!
+  type: String!
+  avatarURL: String!
+  createdAt: Time !
 }
 
 type User {
@@ -35,10 +38,18 @@ type Query {
 }
 
 # Mutations
+type NewMessage {
+  userID: String!
+  username: String!
+  text: String!
+  type: String!
+  avatarURL: String!
+}
+
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
-  postMessage(user: String!, text: String!): Message
+  postMessage(userID: String! username: String! text: String! avatarURL: String!): Message
 }
 
 type Subscription {

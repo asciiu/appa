@@ -10,9 +10,20 @@ import (
 
 type Message struct {
 	ID        string    `json:"id"`
-	User      string    `json:"user"`
-	CreatedAt time.Time `json:"createdAt"`
+	UserID    string    `json:"userID"`
+	Username  string    `json:"username"`
 	Text      string    `json:"text"`
+	Type      string    `json:"type"`
+	AvatarURL string    `json:"avatarURL"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type NewMessage struct {
+	UserID    string `json:"userID"`
+	Username  string `json:"username"`
+	Text      string `json:"text"`
+	Type      string `json:"type"`
+	AvatarURL string `json:"avatarURL"`
 }
 
 type Token struct {

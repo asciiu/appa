@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
@@ -68,10 +69,11 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 	}
 }
 
-func (s *graphQLServer) PostMessage(ctx context.Context, user string, text string) (*graph.Message, error) {
-	log.Info(fmt.Sprintf("PostMessage: %s: %s", user, text))
+func (s *graphQLServer) PostMessage(ctx context.Context, userID string, username string, text string, avatarURL string) (*model.Message, error) {
+	//func (s *graphQLServer) PostMessage(ctx context.Context, user string, text string) (*graph.Message, error) {
+	log.Info(fmt.Sprintf("PostMessage: %s: %s", username, text))
 
-	err := s.createUser(user)
+	err := s.createUser(username)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -80,9 +82,12 @@ func (s *graphQLServer) PostMessage(ctx context.Context, user string, text strin
 	// Create message
 	m := &graph.Message{
 		ID:        ksuid.New().String(),
-		CreatedAt: time.Now().UTC(),
+		UserID:    userID,
+		Username:  username,
 		Text:      text,
-		User:      user,
+		Type:      "comment",
+		AvatarURL: avatarURL,
+		CreatedAt: time.Now().UTC(),
 	}
 	mj, _ := json.Marshal(m)
 	if err := s.redisClient.LPush("messages", mj).Err(); err != nil {
