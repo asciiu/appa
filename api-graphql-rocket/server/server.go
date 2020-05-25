@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	handler2 "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
@@ -107,19 +106,25 @@ func (srv *graphQLServer) Serve(route string, port int) error {
 	})
 
 	cfg := generated.Config{Resolvers: srv}
-	gqlsrv := handler2.New(generated.NewExecutableSchema(cfg))
-	gqlsrv.AddTransport(transport.Options{})
-	gqlsrv.AddTransport(transport.GET{})
-	gqlsrv.AddTransport(transport.POST{})
-	gqlsrv.AddTransport(transport.Websocket{
-		KeepAlivePingInterval: 10 * time.Second,
-		Upgrader: websocket.Upgrader{
+	gqlsrv := handler.GraphQL(generated.NewExecutableSchema(cfg),
+		handler.WebsocketUpgrader(websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
-		},
-		InitFunc: transport.WebsocketInitFunc(makeWebsocketInitFunc(srv.DB)),
-	})
+		}),
+	)
+	//gqlsrv.AddTransport(transport.Options{})
+	//gqlsrv.AddTransport(transport.GET{})
+	//gqlsrv.AddTransport(transport.POST{})
+	//gqlsrv.AddTransport(transport.Websocket{
+	//	KeepAlivePingInterval: 10 * time.Second,
+	//	Upgrader: websocket.Upgrader{
+	//		CheckOrigin: func(r *http.Request) bool {
+	//			return true
+	//		},
+	//	},
+	//	InitFunc: transport.WebsocketInitFunc(makeWebsocketInitFunc(srv.DB)),
+	//})
 
 	router := chi.NewRouter()
 	router.Use(authenticated(srv.DB))
