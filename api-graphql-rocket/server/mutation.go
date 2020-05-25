@@ -69,8 +69,11 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 }
 
 func (s *graphQLServer) PostMessage(ctx context.Context, user string, text string) (*graph.Message, error) {
+	log.Info(fmt.Sprintf("PostMessage: %s: %s", user, text))
+
 	err := s.createUser(user)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 

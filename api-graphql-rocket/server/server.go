@@ -4,14 +4,17 @@ package server
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
+	//handler2 "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+
+	//"github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	"github.com/asciiu/appa/lib/db"
@@ -78,21 +81,25 @@ func (srv *graphQLServer) Query() generated.QueryResolver {
 	return srv
 }
 
-func makeWebsocketInitFunc(db *sql.DB) transport.WebsocketInitFunc {
-	return func(ctx context.Context, initPayload handler.InitPayload) (context.Context, error) {
-		tokenPayload := initPayload["token"]
-		if tokenPayload == nil {
-			return ctx, errors.New("Token Payload is nil")
-		}
-		token := tokenPayload.(string)
-		fmt.Println(token)
-		//user, err := auth.ParseTokenIntoUser(db, token)
-		//if err != nil {
-		//	return ctx, err
-		//}
-		return ctx, nil
-	}
+func (srv *graphQLServer) Subscription() generated.SubscriptionResolver {
+	return srv
 }
+
+// func makeWebsocketInitFunc(db *sql.DB) transport.WebsocketInitFunc {
+// 	return func(ctx context.Context, initPayload handler.InitPayload) (context.Context, error) {
+// 		tokenPayload := initPayload["token"]
+// 		if tokenPayload == nil {
+// 			return ctx, errors.New("Token Payload is nil")
+// 		}
+// 		token := tokenPayload.(string)
+// 		fmt.Println(token)
+// 		//user, err := auth.ParseTokenIntoUser(db, token)
+// 		//if err != nil {
+// 		//	return ctx, err
+// 		//}
+// 		return ctx, nil
+// 	}
+// }
 
 func (srv *graphQLServer) Serve(route string, port int) error {
 	corsConfig := cors.New(cors.Options{
@@ -106,31 +113,25 @@ func (srv *graphQLServer) Serve(route string, port int) error {
 	})
 
 	cfg := generated.Config{Resolvers: srv}
-	gqlsrv := handler.GraphQL(generated.NewExecutableSchema(cfg),
-		handler.WebsocketUpgrader(websocket.Upgrader{
+	gqlsrv := handler.New(generated.NewExecutableSchema(cfg))
+	gqlsrv.AddTransport(transport.Options{})
+	gqlsrv.AddTransport(transport.GET{})
+	gqlsrv.AddTransport(transport.POST{})
+	gqlsrv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
-		}),
-	)
-	//gqlsrv.AddTransport(transport.Options{})
-	//gqlsrv.AddTransport(transport.GET{})
-	//gqlsrv.AddTransport(transport.POST{})
-	//gqlsrv.AddTransport(transport.Websocket{
-	//	KeepAlivePingInterval: 10 * time.Second,
-	//	Upgrader: websocket.Upgrader{
-	//		CheckOrigin: func(r *http.Request) bool {
-	//			return true
-	//		},
-	//	},
-	//	InitFunc: transport.WebsocketInitFunc(makeWebsocketInitFunc(srv.DB)),
-	//})
+		},
+		//	InitFunc: transport.WebsocketInitFunc(makeWebsocketInitFunc(srv.DB)),
+	})
 
 	router := chi.NewRouter()
 	router.Use(authenticated(srv.DB))
 	router.Use(corsConfig.Handler)
 	router.Handle(route, gqlsrv)
-	router.Handle("/playground", handler.Playground("GraphQL", route))
+	router.Handle("/playground", playground.Handler("GraphQL", route))
 	fmt.Println(fmt.Sprintf("connect to http://localhost:%d/playground for GraphQL playground", port))
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), router)

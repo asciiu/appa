@@ -3,9 +3,10 @@ package server
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
+	log "github.com/sirupsen/logrus"
 )
 
 func (s *graphQLServer) createUser(user string) error {
@@ -23,6 +24,8 @@ func (s *graphQLServer) createUser(user string) error {
 }
 
 func (s *graphQLServer) MessagePosted(ctx context.Context, user string) (<-chan *graph.Message, error) {
+	log.Info(fmt.Sprintf("MessagePosted: %s\n", user))
+
 	err := s.createUser(user)
 	if err != nil {
 		return nil, err
@@ -46,6 +49,8 @@ func (s *graphQLServer) MessagePosted(ctx context.Context, user string) (<-chan 
 }
 
 func (s *graphQLServer) UserJoined(ctx context.Context, user string) (<-chan string, error) {
+	log.Info(fmt.Sprintf("UserJoined: %s\n", user))
+
 	err := s.createUser(user)
 	if err != nil {
 		return nil, err
@@ -66,8 +71,4 @@ func (s *graphQLServer) UserJoined(ctx context.Context, user string) (<-chan str
 	}()
 
 	return users, nil
-}
-
-func (s *graphQLServer) Subscription() generated.SubscriptionResolver {
-	return s
 }
