@@ -1,4 +1,4 @@
-package server
+package auth
 
 import (
 	"context"
@@ -11,17 +11,32 @@ import (
 
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
+	user "github.com/asciiu/appa/lib/user/models"
 	jwt "github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 )
 
 // refresh window
-const refreshDuration = 9 * time.Hour
+const RefreshDuration = 9 * time.Hour
 
 // token valid window
-const jwtDuration = 2 * time.Hour
+const JwtDuration = 2 * time.Hour
 
-func createJwtToken(userID string, duration time.Duration) (string, error) {
+// A private key for context that only this package can access. This is important
+// to prevent collisions between different context uses
+var userCtxKey = &contextKey{"user"}
+
+type contextKey struct {
+	name string
+}
+
+// ForContext finds the user from the context. REQUIRES Middleware to have run.
+func ForContext(ctx context.Context) *user.User {
+	raw, _ := ctx.Value(userCtxKey).(*user.User)
+	return raw
+}
+
+func CreateJwtToken(userID string, duration time.Duration) (string, error) {
 	claims := jwt.StandardClaims{
 		Id:        userID,
 		ExpiresAt: time.Now().Add(duration).Unix(),
@@ -39,10 +54,10 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 }
 
 // Middleware decodes the share session cookie and packs the session into context
-func authenticated(db *sql.DB) func(http.Handler) http.Handler {
+func Secure(db *sql.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := context.WithValue(r.Context(), userContextKey, nil)
+			ctx := context.WithValue(r.Context(), userCtxKey, nil)
 			auth := r.Header.Get("Authorization")
 			str := strings.Replace(auth, "Bearer ", "", 1)
 
@@ -62,7 +77,7 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
 					loginUser, err := userRepo.FindUserByID(db, userID)
 					if loginUser != nil {
-						ctx = context.WithValue(r.Context(), userContextKey, loginUser)
+						ctx = context.WithValue(r.Context(), userCtxKey, loginUser)
 					}
 					if err != nil {
 						log.Error(err.Error())
@@ -80,9 +95,9 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 							refreshToken, err := tokenRepo.FindRefreshToken(db, selector)
 							if err == nil {
 								if refreshToken.Valid(authenticator) {
-									accessToken, err := createJwtToken(refreshToken.UserID, jwtDuration)
+									accessToken, err := CreateJwtToken(refreshToken.UserID, JwtDuration)
 									if err == nil {
-										expiresOn := time.Now().Add(refreshDuration)
+										expiresOn := time.Now().Add(RefreshDuration)
 										selectAuth := refreshToken.Renew(expiresOn)
 
 										w.Header().Set("set-authorization", accessToken)
@@ -100,6 +115,7 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 					}
 				}
 			}
+
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})

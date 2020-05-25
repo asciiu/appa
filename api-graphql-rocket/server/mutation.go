@@ -3,14 +3,17 @@ package server
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
+	"github.com/segmentio/ksuid"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -63,4 +66,31 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 
 		return nil, fmt.Errorf("incorrect password/email")
 	}
+}
+
+func (s *graphQLServer) PostMessage(ctx context.Context, user string, text string) (*graph.Message, error) {
+	err := s.createUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create message
+	m := &graph.Message{
+		ID:        ksuid.New().String(),
+		CreatedAt: time.Now().UTC(),
+		Text:      text,
+		User:      user,
+	}
+	mj, _ := json.Marshal(m)
+	if err := s.redisClient.LPush("messages", mj).Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	// Notify new message
+	s.mutex.Lock()
+	for _, ch := range s.messageChannels {
+		ch <- m
+	}
+	s.mutex.Unlock()
+	return m, nil
 }

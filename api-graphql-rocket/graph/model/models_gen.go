@@ -3,8 +3,17 @@
 package model
 
 import (
+	"time"
+
 	"github.com/asciiu/appa/lib/user/models"
 )
+
+type Message struct {
+	ID        string    `json:"id"`
+	User      string    `json:"user"`
+	CreatedAt time.Time `json:"createdAt"`
+	Text      string    `json:"text"`
+}
 
 type Token struct {
 	Jwt     *string `json:"jwt"`
