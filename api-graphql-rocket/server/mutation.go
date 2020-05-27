@@ -14,7 +14,7 @@ import (
 	token "github.com/asciiu/appa/lib/refreshToken/models"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
-	"github.com/segmentio/ksuid"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -69,11 +69,10 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 	}
 }
 
-func (s *graphQLServer) PostMessage(ctx context.Context, userID string, username string, text string, avatarURL string) (*model.Message, error) {
-	//func (s *graphQLServer) PostMessage(ctx context.Context, user string, text string) (*graph.Message, error) {
-	log.Info(fmt.Sprintf("PostMessage: %s: %s", username, text))
+func (s *graphQLServer) PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error) {
+	log.Info(fmt.Sprintf("PostMessage: %s: %s", input.Username, input.Text))
 
-	err := s.createUser(username)
+	err := s.createUser(input.Username)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -81,12 +80,12 @@ func (s *graphQLServer) PostMessage(ctx context.Context, userID string, username
 
 	// Create message
 	m := &graph.Message{
-		ID:        ksuid.New().String(),
-		UserID:    userID,
-		Username:  username,
-		Text:      text,
+		ID:        uuid.New().String(),
+		UserID:    input.UserID,
+		Username:  input.Username,
+		Text:      input.Text,
 		Type:      "comment",
-		AvatarURL: avatarURL,
+		AvatarURL: input.AvatarURL,
 		CreatedAt: time.Now().UTC(),
 	}
 	mj, _ := json.Marshal(m)

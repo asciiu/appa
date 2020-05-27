@@ -58,17 +58,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		PostMessage func(childComplexity int, userID string, username string, text string, avatarURL string) int
+		PostMessage func(childComplexity int, input *model.MessageInput) int
 		Signin      func(childComplexity int, email string, password string, remember bool) int
 		Signup      func(childComplexity int, email string, username string, password string) int
-	}
-
-	NewMessage struct {
-		AvatarURL func(childComplexity int) int
-		Text      func(childComplexity int) int
-		Type      func(childComplexity int) int
-		UserID    func(childComplexity int) int
-		Username  func(childComplexity int) int
 	}
 
 	Query struct {
@@ -104,7 +96,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
 	Signin(ctx context.Context, email string, password string, remember bool) (*model.TokenUser, error)
-	PostMessage(ctx context.Context, userID string, username string, text string, avatarURL string) (*model.Message, error)
+	PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error)
 }
 type QueryResolver interface {
 	Messages(ctx context.Context) ([]*model.Message, error)
@@ -189,7 +181,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostMessage(childComplexity, args["userID"].(string), args["username"].(string), args["text"].(string), args["avatarURL"].(string)), true
+		return e.complexity.Mutation.PostMessage(childComplexity, args["input"].(*model.MessageInput)), true
 
 	case "Mutation.signin":
 		if e.complexity.Mutation.Signin == nil {
@@ -214,41 +206,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Signup(childComplexity, args["email"].(string), args["username"].(string), args["password"].(string)), true
-
-	case "NewMessage.avatarURL":
-		if e.complexity.NewMessage.AvatarURL == nil {
-			break
-		}
-
-		return e.complexity.NewMessage.AvatarURL(childComplexity), true
-
-	case "NewMessage.text":
-		if e.complexity.NewMessage.Text == nil {
-			break
-		}
-
-		return e.complexity.NewMessage.Text(childComplexity), true
-
-	case "NewMessage.type":
-		if e.complexity.NewMessage.Type == nil {
-			break
-		}
-
-		return e.complexity.NewMessage.Type(childComplexity), true
-
-	case "NewMessage.userID":
-		if e.complexity.NewMessage.UserID == nil {
-			break
-		}
-
-		return e.complexity.NewMessage.UserID(childComplexity), true
-
-	case "NewMessage.username":
-		if e.complexity.NewMessage.Username == nil {
-			break
-		}
-
-		return e.complexity.NewMessage.Username(childComplexity), true
 
 	case "Query.messages":
 		if e.complexity.Query.Messages == nil {
@@ -442,16 +399,6 @@ var sources = []*ast.Source{
 	&ast.Source{Name: "graph/schema.graphqls", Input: `scalar Int64 
 scalar Time
 
-type Message {
-  id: String !
-  userID: String!
-  username: String!
-  text: String!
-  type: String!
-  avatarURL: String!
-  createdAt: Time !
-}
-
 type User {
   id: ID!
   username: String!
@@ -471,26 +418,33 @@ type TokenUser {
   token: Token
 }
 
-# Queries
+input MessageInput {
+  userID: String!
+  username: String!
+  text: String!
+  avatarURL: String!
+}
+
+type Message {
+  id: String !
+  userID: String!
+  username: String!
+  text: String!
+  type: String!
+  avatarURL: String!
+  createdAt: Time !
+}
+
 type Query {
   #users: [User!]!
   messages: [Message!]!
   users: [String!]!
 }
 
-# Mutations
-type NewMessage {
-  userID: String!
-  username: String!
-  text: String!
-  type: String!
-  avatarURL: String!
-}
-
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
-  postMessage(userID: String! username: String! text: String! avatarURL: String!): Message
+  postMessage(input: MessageInput): Message
 }
 
 type Subscription {
@@ -507,38 +461,14 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_postMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["userID"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 *model.MessageInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalOMessageInput2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["userID"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["username"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["username"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["text"]; ok {
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["text"] = arg2
-	var arg3 string
-	if tmp, ok := rawArgs["avatarURL"]; ok {
-		arg3, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["avatarURL"] = arg3
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1018,7 +948,7 @@ func (ec *executionContext) _Mutation_postMessage(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostMessage(rctx, args["userID"].(string), args["username"].(string), args["text"].(string), args["avatarURL"].(string))
+		return ec.resolvers.Mutation().PostMessage(rctx, args["input"].(*model.MessageInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1030,176 +960,6 @@ func (ec *executionContext) _Mutation_postMessage(ctx context.Context, field gra
 	res := resTmp.(*model.Message)
 	fc.Result = res
 	return ec.marshalOMessage2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewMessage_userID(ctx context.Context, field graphql.CollectedField, obj *model.NewMessage) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NewMessage",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewMessage_username(ctx context.Context, field graphql.CollectedField, obj *model.NewMessage) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NewMessage",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Username, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewMessage_text(ctx context.Context, field graphql.CollectedField, obj *model.NewMessage) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NewMessage",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewMessage_type(ctx context.Context, field graphql.CollectedField, obj *model.NewMessage) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NewMessage",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _NewMessage_avatarURL(ctx context.Context, field graphql.CollectedField, obj *model.NewMessage) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "NewMessage",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AvatarURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2824,6 +2584,42 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputMessageInput(ctx context.Context, obj interface{}) (model.MessageInput, error) {
+	var it model.MessageInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "userID":
+			var err error
+			it.UserID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "text":
+			var err error
+			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "avatarURL":
+			var err error
+			it.AvatarURL, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2910,53 +2706,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_signin(ctx, field)
 		case "postMessage":
 			out.Values[i] = ec._Mutation_postMessage(ctx, field)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var newMessageImplementors = []string{"NewMessage"}
-
-func (ec *executionContext) _NewMessage(ctx context.Context, sel ast.SelectionSet, obj *model.NewMessage) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, newMessageImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("NewMessage")
-		case "userID":
-			out.Values[i] = ec._NewMessage_userID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "username":
-			out.Values[i] = ec._NewMessage_username(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "text":
-			out.Values[i] = ec._NewMessage_text(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "type":
-			out.Values[i] = ec._NewMessage_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "avatarURL":
-			out.Values[i] = ec._NewMessage_avatarURL(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3791,6 +3540,18 @@ func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋasciiuᚋappaᚋap
 		return graphql.Null
 	}
 	return ec._Message(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMessageInput2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessageInput(ctx context.Context, v interface{}) (model.MessageInput, error) {
+	return ec.unmarshalInputMessageInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOMessageInput2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessageInput(ctx context.Context, v interface{}) (*model.MessageInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOMessageInput2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessageInput(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

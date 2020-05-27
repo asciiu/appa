@@ -8,9 +8,11 @@ require (
 	github.com/99designs/gqlgen v0.11.2
 	github.com/asciiu/appa/lib v0.0.0-00010101000000-000000000000
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c
 	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/joho/godotenv v1.3.0

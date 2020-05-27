@@ -20,7 +20,7 @@ func (r *mutationResolver) Signin(ctx context.Context, email string, password st
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) PostMessage(ctx context.Context, userID string, username string, text string, avatarURL string) (*model.Message, error) {
+func (r *mutationResolver) PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

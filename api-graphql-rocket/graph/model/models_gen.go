@@ -18,11 +18,10 @@ type Message struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-type NewMessage struct {
+type MessageInput struct {
 	UserID    string `json:"userID"`
 	Username  string `json:"username"`
 	Text      string `json:"text"`
-	Type      string `json:"type"`
 	AvatarURL string `json:"avatarURL"`
 }
 
