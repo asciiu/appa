@@ -1,0 +1,8 @@
+# users.yaml
+- id: 977b127e-060b-4f2d-84d5-b2902716a586 
+  username: tester 
+  email: test@email
+  email_verified: false
+  password_hash: test 
+  created_on: RAW=NOW()
+  updated_on: RAW=NOW()
