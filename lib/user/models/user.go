@@ -99,6 +99,9 @@ type User struct {
 	Email         string
 	EmailVerified bool
 	PasswordHash  string
+	CreatedOn     time.Time
+	UpdatedOn     time.Time
+	DeletedOn     time.Time
 }
 
 type UserSummary struct {
