@@ -13,4 +13,5 @@ id_rsa
 trash
 build/
 config-map.yaml
+data/
 
