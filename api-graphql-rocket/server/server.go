@@ -6,12 +6,14 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
 	//handler2 "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	log "github.com/sirupsen/logrus"
 
 	//"github.com/99designs/gqlgen/handler"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -101,6 +103,46 @@ func (srv *graphQLServer) Subscription() generated.SubscriptionResolver {
 // 	}
 // }
 
+func getMediaBase(mId int) string {
+	mediaRoot := "assets/media"
+	return fmt.Sprintf("%s", mediaRoot)
+}
+
+func serveHlsM3u8(w http.ResponseWriter, r *http.Request, mediaBase, m3u8Name string) {
+	mediaFile := fmt.Sprintf("%s/%s", mediaBase, m3u8Name)
+	log.Println(mediaFile)
+	http.ServeFile(w, r, mediaFile)
+	w.Header().Set("Content-Type", "application/x-mpegURL")
+}
+
+func serveHlsTs(w http.ResponseWriter, r *http.Request, mediaBase, segName string) {
+	mediaFile := fmt.Sprintf("%s/%s", mediaBase, segName)
+	http.ServeFile(w, r, mediaFile)
+	w.Header().Set("Content-Type", "video/MP2T")
+}
+
+func streamHandler(response http.ResponseWriter, request *http.Request) {
+	mid := chi.URLParam(request, "mId")
+
+	mID, err := strconv.Atoi(mid)
+	if err != nil {
+		log.Println(err)
+		response.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	segName := chi.URLParam(request, "segName")
+	//segName, ok := vars["segName"]
+	if segName == "" {
+		mediaBase := getMediaBase(mID)
+		m3u8Name := "index.m3u8"
+		serveHlsM3u8(response, request, mediaBase, m3u8Name)
+	} else {
+		mediaBase := getMediaBase(mID)
+		serveHlsTs(response, request, mediaBase, segName)
+	}
+}
+
 func (srv *graphQLServer) Serve(route string, port int) error {
 	corsConfig := cors.New(cors.Options{
 		AllowedOrigins:     []string{"*"},
@@ -128,8 +170,12 @@ func (srv *graphQLServer) Serve(route string, port int) error {
 	})
 
 	router := chi.NewRouter()
-	router.Use(authenticated(srv.DB))
+	//router.Use(authenticated(srv.DB))
 	router.Use(corsConfig.Handler)
+
+	router.Get("/media/{mId:[0-9]+}/stream/", streamHandler)
+	router.Get("/media/{mId:[0-9]+}/stream/{segName:index[0-9]+.ts}", streamHandler)
+
 	router.Handle(route, gqlsrv)
 	router.Handle("/playground", playground.Handler("GraphQL", route))
 	fmt.Println(fmt.Sprintf("connect to http://localhost:%d/playground for GraphQL playground", port))

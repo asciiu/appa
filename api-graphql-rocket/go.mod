@@ -11,8 +11,8 @@ require (
 	github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c
 	github.com/go-chi/chi v4.0.1+incompatible
 	github.com/go-redis/redis v6.15.7+incompatible
-	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/uuid v1.1.1
+	github.com/gorilla/mux v1.6.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/joho/godotenv v1.3.0
@@ -24,9 +24,9 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	github.com/tinrab/retry v1.0.0
 	github.com/vektah/gqlparser/v2 v2.0.1
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/text v0.3.2 // indirect
 )
