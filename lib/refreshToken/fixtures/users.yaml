@@ -1,0 +1,9 @@
+# users.yaml
+- id: 5d0b8d76-116f-49a7-9aae-4625d507fc4c 
+  email: test@test 
+  email_verified: true
+  username: tester
+  avatar_url: test.png
+  password_hash: $2a$04$jf1LhHrPIoSnAbOw38G3FeYQlMJ81KZMAbAg/RInzyXNA9j6Iy2Ra
+  created_on: RAW=NOW()
+  updated_on: RAW=NOW()

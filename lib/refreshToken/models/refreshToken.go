@@ -14,7 +14,7 @@ type RefreshToken struct {
 	ID            string
 	UserID        string
 	Selector      string
-	Authenticator string
+	Authenticator string `pg:"-"`
 	TokenHash     string
 	ExpiresOn     time.Time
 }
