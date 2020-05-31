@@ -19,8 +19,8 @@ import (
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	"github.com/asciiu/appa/lib/db/gopg"
-	tokenpg "github.com/asciiu/appa/lib/refreshToken/db/gopg"
-	token "github.com/asciiu/appa/lib/refreshToken/models"
+	refreshctrl "github.com/asciiu/appa/lib/refreshToken/controllers"
+	refreshpg "github.com/asciiu/appa/lib/refreshToken/db/gopg"
 	userctrl "github.com/asciiu/appa/lib/user/controllers"
 	userpg "github.com/asciiu/appa/lib/user/db/gopg"
 	user "github.com/asciiu/appa/lib/user/models"
@@ -45,17 +45,13 @@ func ForContext(ctx context.Context) *user.User {
 	return raw
 }
 
-type datastore struct {
-	tokenRepo token.TokenRepo
-}
-
 type graphQLServer struct {
-	userController  *userctrl.UserController
-	datastore       *datastore
-	redisClient     *redis.Client
-	messageChannels map[string]chan *graph.Message
-	userChannels    map[string]chan string
-	mutex           sync.Mutex
+	userController    *userctrl.UserController
+	refreshController *refreshctrl.RefreshController
+	redisClient       *redis.Client
+	messageChannels   map[string]chan *graph.Message
+	userChannels      map[string]chan string
+	mutex             sync.Mutex
 }
 
 type Config struct {
@@ -73,9 +69,8 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		log.Fatal(err)
 	}
 
-	datastore := &datastore{
-		tokenRepo: tokenpg.NewTokenRepo(database),
-	}
+	refreshRepo := refreshpg.NewTokenRepo(database)
+	refreshController := refreshctrl.NewRefreshController(refreshRepo)
 
 	userRepo := userpg.NewUserRepo(database)
 	userController := userctrl.NewUserController(userRepo)
@@ -85,12 +80,12 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		return err
 	})
 	return &graphQLServer{
-		userController:  userController,
-		redisClient:     client,
-		datastore:       datastore,
-		messageChannels: map[string]chan *graph.Message{},
-		userChannels:    map[string]chan string{},
-		mutex:           sync.Mutex{},
+		userController:    userController,
+		refreshController: refreshController,
+		redisClient:       client,
+		messageChannels:   map[string]chan *graph.Message{},
+		userChannels:      map[string]chan string{},
+		mutex:             sync.Mutex{},
 	}, nil
 }
 

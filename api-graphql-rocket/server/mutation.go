@@ -10,7 +10,6 @@ import (
 	"github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
-	token "github.com/asciiu/appa/lib/refreshToken/models"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
@@ -50,15 +49,11 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 
 			// issue a refresh token if remember is true
 			if remember {
-				refreshToken := token.NewRefreshToken(loginUser.ID)
-				expiresOn := time.Now().Add(refreshDuration)
-				selectAuth := refreshToken.Renew(expiresOn)
-
-				// this needs to be checked
-				if _, err := srv.datastore.tokenRepo.InsertRefreshToken(refreshToken); err != nil {
+				if _, selectAuth, err := srv.refreshController.CreateRefreshToken(loginUser.ID, time.Now().Add(refreshDuration)); err != nil {
 					log.Error(fmt.Sprintf("failed to insert refresh token: %s", err.Error()))
+				} else {
+					tok.Refresh = &selectAuth
 				}
-				tok.Refresh = &selectAuth
 			}
 
 			return &roken.TokenUser{Token: &tok, User: loginUser}, nil
