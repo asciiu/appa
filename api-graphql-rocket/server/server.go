@@ -9,13 +9,9 @@ import (
 	"sync"
 	"time"
 
-	//handler2 "github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	log "github.com/sirupsen/logrus"
-
-	//"github.com/99designs/gqlgen/handler"
-	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	"github.com/asciiu/appa/lib/db/gopg"
@@ -28,6 +24,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
 	"github.com/rs/cors"
+	log "github.com/sirupsen/logrus"
 	"github.com/tinrab/retry"
 )
 

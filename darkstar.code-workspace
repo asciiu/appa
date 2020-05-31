@@ -16,9 +16,6 @@
 			"path": "api-graphql"
 		},
 		{
-			"path": "api-graphql-chat"
-		},
-		{
 			"path": "api-graphql-rocket"
 		},
 		{
@@ -30,9 +27,9 @@
 		{
 			"path": "gokit-server"
 		},
-                {
+		{
 			"path": "micro-image-recognizer"
-                },
+		},
 		{
 			"path": "micro-socket"
 		},
@@ -50,7 +47,7 @@
 		},
 		{
 			"path": "sandbox"
-		},
+		}
 	],
 	"settings": {}
 }
