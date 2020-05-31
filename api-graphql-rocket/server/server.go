@@ -181,7 +181,7 @@ func (srv *graphQLServer) Serve(route string, port int) error {
 	})
 
 	router := chi.NewRouter()
-	//router.Use(authenticated(srv.DB))
+	router.Use(authorize(srv))
 	router.Use(corsConfig.Handler)
 
 	router.Get("/media/{mId:[0-9]+}/stream/", streamHandler)

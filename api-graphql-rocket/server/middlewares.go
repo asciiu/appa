@@ -2,15 +2,12 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
-	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	jwt "github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -39,7 +36,7 @@ func createJwtToken(userID string, duration time.Duration) (string, error) {
 }
 
 // Middleware decodes the share session cookie and packs the session into context
-func authenticated(db *sql.DB) func(http.Handler) http.Handler {
+func authorize(srv *graphQLServer) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := context.WithValue(r.Context(), userContextKey, nil)
@@ -60,7 +57,8 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 				// if valid token and no error
 				if tok != nil && err == nil {
 					userID := tok.Claims.(jwt.MapClaims)["jti"].(string)
-					loginUser, err := userRepo.FindUserByID(db, userID)
+
+					loginUser, err := srv.userController.FindUserByID(userID)
 					if loginUser != nil {
 						ctx = context.WithValue(r.Context(), userContextKey, loginUser)
 					}
@@ -77,7 +75,7 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 						if len(sa) == 2 {
 							selector := sa[0]
 							authenticator := sa[1]
-							refreshToken, err := tokenRepo.FindRefreshToken(db, selector)
+							refreshToken, err := srv.refreshController.FindRefreshToken(selector)
 							if err == nil {
 								if refreshToken.Valid(authenticator) {
 									accessToken, err := createJwtToken(refreshToken.UserID, jwtDuration)
@@ -87,13 +85,13 @@ func authenticated(db *sql.DB) func(http.Handler) http.Handler {
 
 										w.Header().Set("set-authorization", accessToken)
 										w.Header().Set("set-refresh", selectAuth)
-										if _, err := tokenRepo.UpdateRefreshToken(db, refreshToken); err != nil {
+										if _, err := srv.refreshController.UpdateRefreshToken(refreshToken); err != nil {
 											log.Println(err)
 										}
 									}
 								}
 								if refreshToken.ExpiresOn.Before(time.Now()) {
-									tokenRepo.DeleteRefreshToken(db, refreshToken)
+									srv.refreshController.DeleteRefreshToken(refreshToken)
 								}
 							}
 						}

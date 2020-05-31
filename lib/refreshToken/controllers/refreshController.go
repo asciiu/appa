@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"time"
+
 	"github.com/asciiu/appa/lib/refreshToken/models"
 )
 
@@ -23,4 +24,16 @@ func (controller *RefreshController) CreateRefreshToken(userID string, expiresOn
 	}
 
 	return token, selectAuth, nil
+}
+
+func (controller *RefreshController) FindRefreshToken(selector string) (*models.RefreshToken, error) {
+	return controller.tokenRepo.FindRefreshToken(selector)
+}
+
+func (controller *RefreshController) UpdateRefreshToken(token *models.RefreshToken) (*models.RefreshToken, error) {
+	return controller.tokenRepo.UpdateRefreshToken(token)
+}
+
+func (controller *RefreshController) DeleteRefreshToken(token *models.RefreshToken) (*models.RefreshToken, error) {
+	return controller.tokenRepo.DeleteRefreshToken(token)
 }

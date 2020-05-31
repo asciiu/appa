@@ -66,6 +66,10 @@ func (controller *UserController) FindUserByEmail(email string) (*models.User, e
 	return controller.userRepo.FindUserByEmail(email)
 }
 
+func (controller *UserController) FindUserByID(userID string) (*models.User, error) {
+	return controller.userRepo.FindUserByID(userID)
+}
+
 func (controller *UserController) UserEmailVerified(userID string) error {
 	_, err := controller.userRepo.UpdateEmailVerified(userID, true)
 	return err
