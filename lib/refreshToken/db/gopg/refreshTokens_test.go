@@ -1,7 +1,6 @@
 package gopg
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -42,9 +41,12 @@ func TestInsertUser(t *testing.T) {
 
 	defer db.Close()
 
+	tokenRepo := NewTokenRepo(db)
+
 	t.Run("Find token", func(t *testing.T) {
-		token, err := FindRefreshToken(db, "QuiQqp+CPmeKuhR7Sg6diQ==")
+		token, err := tokenRepo.FindRefreshToken("QuiQqp+CPmeKuhR7Sg6diQ==")
 		assert.Nil(t, err, "find should be nil")
-		fmt.Println(token)
+		assert.Equal(t, "QuiQqp+CPmeKuhR7Sg6diQ==", token.Selector, "selector incorrect")
+		assert.Equal(t, "fci0UvzlZVcFJvvAqonddYK4TSs6JUCT83ptIy6mvcY=", token.TokenHash, "token hash incorrect")
 	})
 }
