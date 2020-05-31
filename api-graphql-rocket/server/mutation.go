@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/asciiu/appa/api-graphql-rocket/graph/model"
@@ -61,6 +62,21 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 
 		return nil, fmt.Errorf("incorrect password/email")
 	}
+}
+
+func (srv *graphQLServer) Signout(ctx context.Context, refresh string) (bool, error) {
+	sa := strings.Split(refresh, ":")
+
+	if len(sa) == 2 {
+		sel := sa[0]
+		log.Info(fmt.Sprintf("Signout: %s", sel))
+		err := srv.refreshController.DeleteRefreshTokenBySelector(sel)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return true, nil
 }
 
 func (s *graphQLServer) PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error) {

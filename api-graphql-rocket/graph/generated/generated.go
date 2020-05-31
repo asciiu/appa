@@ -60,6 +60,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		PostMessage func(childComplexity int, input *model.MessageInput) int
 		Signin      func(childComplexity int, email string, password string, remember bool) int
+		Signout     func(childComplexity int, selector string) int
 		Signup      func(childComplexity int, email string, username string, password string) int
 	}
 
@@ -96,6 +97,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
 	Signin(ctx context.Context, email string, password string, remember bool) (*model.TokenUser, error)
+	Signout(ctx context.Context, selector string) (bool, error)
 	PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error)
 }
 type QueryResolver interface {
@@ -194,6 +196,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Signin(childComplexity, args["email"].(string), args["password"].(string), args["remember"].(bool)), true
+
+	case "Mutation.signout":
+		if e.complexity.Mutation.Signout == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_signout_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Signout(childComplexity, args["selector"].(string)), true
 
 	case "Mutation.signup":
 		if e.complexity.Mutation.Signup == nil {
@@ -444,6 +458,7 @@ type Query {
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
+  signout(selector: String!): Boolean!
   postMessage(input: MessageInput): Message
 }
 
@@ -499,6 +514,20 @@ func (ec *executionContext) field_Mutation_signin_args(ctx context.Context, rawA
 		}
 	}
 	args["remember"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_signout_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["selector"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["selector"] = arg0
 	return args, nil
 }
 
@@ -922,6 +951,47 @@ func (ec *executionContext) _Mutation_signin(ctx context.Context, field graphql.
 	res := resTmp.(*model.TokenUser)
 	fc.Result = res
 	return ec.marshalOTokenUser2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐTokenUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_signout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_signout_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Signout(rctx, args["selector"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_postMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2704,6 +2774,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_signup(ctx, field)
 		case "signin":
 			out.Values[i] = ec._Mutation_signin(ctx, field)
+		case "signout":
+			out.Values[i] = ec._Mutation_signout(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "postMessage":
 			out.Values[i] = ec._Mutation_postMessage(ctx, field)
 		default:

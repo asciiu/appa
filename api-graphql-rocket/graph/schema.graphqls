@@ -46,6 +46,7 @@ type Query {
 type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
+  signout(selector: String!): Boolean!
   postMessage(input: MessageInput): Message
 }
 

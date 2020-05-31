@@ -15,6 +15,7 @@ github.com/asciiu/appa v0.0.0-20200524192156-b82f52b6967a h1:U6Mq8TwLrZDxaKg9CUb
 github.com/asciiu/appa v0.0.0-20200524194206-78d3f10e806f h1:woknRfRoQJ3VmObuCurwSEwjSkPgngfH2fNf0KH9F2E=
 github.com/asciiu/appa v0.0.0-20200525215235-8b86e44eef94 h1:fgI1sHcAGc/phM2WYmntBekzsrlNDS0UJPt7YfAIwbA=
 github.com/asciiu/appa v0.0.0-20200525232813-6d9a2fc9f797 h1:SAK0ww9mfYXRqM+mCyM2QFV5vtBaAUioNMz2LCafdOk=
+github.com/asciiu/appa v0.0.0-20200531055648-97570ee8fd82 h1:1Tic5FThPQkr/Z18LzRvPHOmiw4ujBlj8wgA7OqURTU=
 github.com/benbjohnson/clock v1.0.0/go.mod h1:bGMdMPoPVvcYyt1gHDf4J2KE153Yf9BuiUKYMaxlTDM=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=

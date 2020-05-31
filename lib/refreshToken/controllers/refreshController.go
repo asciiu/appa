@@ -37,3 +37,7 @@ func (controller *RefreshController) UpdateRefreshToken(token *models.RefreshTok
 func (controller *RefreshController) DeleteRefreshToken(token *models.RefreshToken) (*models.RefreshToken, error) {
 	return controller.tokenRepo.DeleteRefreshToken(token)
 }
+
+func (controller *RefreshController) DeleteRefreshTokenBySelector(selector string) error {
+	return controller.tokenRepo.DeleteRefreshTokenBySelector(selector)
+}
