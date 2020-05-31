@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -21,8 +22,11 @@ type CreateUserRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func (controller *UserController) CreateUser(req *CreateUserRequest) (*models.User, error) {
-	user := models.NewUser(req.Username, req.Email, req.Password)
+func (controller *UserController) CreateUser(username, email, password string) (*models.User, error) {
+	if username == "" || email == "" || password == "" {
+		return nil, errors.New("cannot create user with empty value")
+	}
+	user := models.NewUser(username, email, password)
 	err := controller.userRepo.InsertUser(user)
 
 	switch {
@@ -56,6 +60,10 @@ func (controller *UserController) GetUser(userID string) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (controller *UserController) FindUserByEmail(email string) (*models.User, error) {
+	return controller.userRepo.FindUserByEmail(email)
 }
 
 func (controller *UserController) UserEmailVerified(userID string) error {

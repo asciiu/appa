@@ -21,6 +21,7 @@ import (
 	"github.com/asciiu/appa/lib/db/gopg"
 	tokenpg "github.com/asciiu/appa/lib/refreshToken/db/gopg"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
+	userctrl "github.com/asciiu/appa/lib/user/controllers"
 	userpg "github.com/asciiu/appa/lib/user/db/gopg"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/go-chi/chi"
@@ -45,10 +46,11 @@ func ForContext(ctx context.Context) *user.User {
 }
 
 type datastore struct {
-	userRepo  user.UserRepo
 	tokenRepo token.TokenRepo
 }
+
 type graphQLServer struct {
+	userController  *userctrl.UserController
 	datastore       *datastore
 	redisClient     *redis.Client
 	messageChannels map[string]chan *graph.Message
@@ -72,15 +74,18 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 	}
 
 	datastore := &datastore{
-		userRepo:  userpg.NewUserRepo(database),
 		tokenRepo: tokenpg.NewTokenRepo(database),
 	}
+
+	userRepo := userpg.NewUserRepo(database)
+	userController := userctrl.NewUserController(userRepo)
 
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
 		_, err := client.Ping().Result()
 		return err
 	})
 	return &graphQLServer{
+		userController:  userController,
 		redisClient:     client,
 		datastore:       datastore,
 		messageChannels: map[string]chan *graph.Message{},

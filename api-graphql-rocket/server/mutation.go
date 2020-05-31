@@ -19,8 +19,9 @@ import (
 
 func (srv *graphQLServer) Signup(ctx context.Context, email, username, password string) (*user.User, error) {
 	log.Info(fmt.Sprintf("Signup: %s", email))
-	newUser := user.NewUser(username, email, password)
-	if err := srv.datastore.userRepo.InsertUser(newUser); err != nil {
+	//newUser := user.NewUser(username, email, password)
+	newUser, err := srv.userController.CreateUser(username, email, password)
+	if err != nil {
 		return nil, err
 	}
 	return newUser, nil
@@ -29,7 +30,7 @@ func (srv *graphQLServer) Signup(ctx context.Context, email, username, password 
 func (srv *graphQLServer) Signin(ctx context.Context, email, password string, remember bool) (*roken.TokenUser, error) {
 	log.Info(fmt.Sprintf("Signin: %s", email))
 
-	loginUser, err := srv.datastore.userRepo.FindUserByEmail(email)
+	loginUser, err := srv.userController.FindUserByEmail(email)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, fmt.Errorf("incorrect password/email")
