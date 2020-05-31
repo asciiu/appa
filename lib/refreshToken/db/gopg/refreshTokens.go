@@ -15,42 +15,49 @@ import (
 //   InsertRefreshToken
 //   UpdateRefreshToken
 
-func FindRefreshToken(db *pg.DB, selector string) (*refresh.RefreshToken, error) {
+type TokenRepo struct {
+	db *pg.DB
+}
+
+func NewTokenRepo(db *pg.DB) *TokenRepo {
+	return &TokenRepo{db: db}
+}
+
+func (repo *TokenRepo) FindRefreshToken(selector string) (*refresh.RefreshToken, error) {
 	t := new(refresh.RefreshToken)
-	err := db.Model(t).Where("selector = ?", selector).Select()
+	err := repo.db.Model(t).Where("selector = ?", selector).Select()
 	return t, err
 }
 
-func InsertRefreshToken(db *pg.DB, token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
-	_, err := db.Model(token).Returning("*").Insert()
+func (repo *TokenRepo) InsertRefreshToken(token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
+	_, err := repo.db.Model(token).Returning("*").Insert()
 	return token, err
 }
 
-func DeleteRefreshToken(db *pg.DB, token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
-	err := db.Delete(token)
+func (repo *TokenRepo) DeleteRefreshToken(token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
+	err := repo.db.Delete(token)
 	return token, err
 }
 
-func DeleteRefreshTokenBySelector(db *pg.DB, selector string) error {
-
+func (repo *TokenRepo) DeleteRefreshTokenBySelector(selector string) error {
 	garbage := new(refresh.RefreshToken)
-	_, err := db.Model(garbage).Where("selector = ?", selector).Delete()
+	_, err := repo.db.Model(garbage).Where("selector = ?", selector).Delete()
 	return err
 }
 
-func DeleteStaleTokens(db *pg.DB, expiresOn time.Time) error {
+func (repo *TokenRepo) DeleteStaleTokens(expiresOn time.Time) error {
 	garbage := new(refresh.RefreshToken)
-	_, err := db.Model(garbage).Where("expires_on < ?", expiresOn).Delete()
+	_, err := repo.db.Model(garbage).Where("expires_on < ?", expiresOn).Delete()
 	return err
 }
 
-func UpdateRefreshToken(db *pg.DB, token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
+func (repo *TokenRepo) UpdateRefreshToken(token *refresh.RefreshToken) (*refresh.RefreshToken, error) {
 	sqlStatement := `update refresh_tokens 
 	set selector = ?, 
 	token_hash = ?, 
 	expires_on = ? 
 	where user_id = ? and id = ?`
-	_, err := db.Exec(sqlStatement,
+	_, err := repo.db.Exec(sqlStatement,
 		token.Selector,
 		token.TokenHash,
 		token.ExpiresOn,

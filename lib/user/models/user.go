@@ -104,6 +104,17 @@ type User struct {
 	DeletedOn     time.Time
 }
 
+type UserRepo interface {
+	DeleteUserHard(userID string) error
+	DeleteUserSoft(userID string) error
+	FindUserByEmail(email string) (*User, error)
+	FindUserByID(userID string) (*User, error)
+	InsertUser(user *User) error
+	UpdatePassword(userID, hash string) (*User, error)
+	UpdateUsername(userID, username string) (*User, error)
+	UpdateEmailVerified(userID, verified bool) (*User, error)
+}
+
 type UserSummary struct {
 	User    *User            `json:"user"`
 	Balance *balance.Balance `json:"balance"`

@@ -60,3 +60,12 @@ func NewRefreshToken(userID string) *RefreshToken {
 	}
 	return &token
 }
+
+type TokenRepo interface {
+	DeleteRefreshToken(token *RefreshToken) (*RefreshToken, error)
+	DeleteRefreshTokenBySelector(selector string) error
+	DeleteStaleTokens(expiresOn time.Time) error
+	FindRefreshToken(selector string) (*RefreshToken, error)
+	InsertRefreshToken(token *RefreshToken) (*RefreshToken, error)
+	UpdateRefreshToken(token *RefreshToken) (*RefreshToken, error)
+}

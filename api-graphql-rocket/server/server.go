@@ -12,7 +12,6 @@ import (
 	//handler2 "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/go-pg/pg/v10"
 	log "github.com/sirupsen/logrus"
 
 	//"github.com/99designs/gqlgen/handler"
@@ -20,6 +19,9 @@ import (
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	"github.com/asciiu/appa/lib/db/gopg"
+	tokenpg "github.com/asciiu/appa/lib/refreshToken/db/gopg"
+	token "github.com/asciiu/appa/lib/refreshToken/models"
+	userpg "github.com/asciiu/appa/lib/user/db/gopg"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/go-chi/chi"
 	"github.com/go-redis/redis"
@@ -42,8 +44,12 @@ func ForContext(ctx context.Context) *user.User {
 	return raw
 }
 
+type datastore struct {
+	userRepo  user.UserRepo
+	tokenRepo token.TokenRepo
+}
 type graphQLServer struct {
-	db              *pg.DB
+	datastore       *datastore
 	redisClient     *redis.Client
 	messageChannels map[string]chan *graph.Message
 	userChannels    map[string]chan string
@@ -65,13 +71,18 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		log.Fatal(err)
 	}
 
+	datastore := &datastore{
+		userRepo:  userpg.NewUserRepo(database),
+		tokenRepo: tokenpg.NewTokenRepo(database),
+	}
+
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
 		_, err := client.Ping().Result()
 		return err
 	})
 	return &graphQLServer{
 		redisClient:     client,
-		db:              database,
+		datastore:       datastore,
 		messageChannels: map[string]chan *graph.Message{},
 		userChannels:    map[string]chan string{},
 		mutex:           sync.Mutex{},
