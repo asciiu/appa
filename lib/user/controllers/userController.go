@@ -1,20 +1,18 @@
 package controllers
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 
-	queries "github.com/asciiu/appa/lib/user/db/sql"
 	"github.com/asciiu/appa/lib/user/models"
 )
 
 type UserController struct {
-	DB *sql.DB
+	userRepo models.UserRepo
 }
 
-func NewUserController(db *sql.DB) *UserController {
-	return &UserController{DB: db}
+func NewUserController(userRepo models.UserRepo) *UserController {
+	return &UserController{userRepo: userRepo}
 }
 
 type CreateUserRequest struct {
@@ -25,7 +23,7 @@ type CreateUserRequest struct {
 
 func (controller *UserController) CreateUser(req *CreateUserRequest) (*models.User, error) {
 	user := models.NewUser(req.Username, req.Email, req.Password)
-	err := queries.InsertUser(controller.DB, user)
+	err := controller.userRepo.InsertUser(user)
 
 	switch {
 	case err == nil:
@@ -46,13 +44,14 @@ type DeleteUserRequest struct {
 
 func (controller *UserController) DeleteUser(req *DeleteUserRequest) error {
 	if req.IsHard {
-		return queries.DeleteUserHard(controller.DB, req.UserID)
+		//return queries.DeleteUserHard(controller.DB, req.UserID)
+		return controller.userRepo.DeleteUserHard(req.UserID)
 	}
-	return queries.DeleteUserSoft(controller.DB, req.UserID)
+	return controller.userRepo.DeleteUserSoft(req.UserID)
 }
 
 func (controller *UserController) GetUser(userID string) (*models.User, error) {
-	user, err := queries.FindUserByID(controller.DB, userID)
+	user, err := controller.userRepo.FindUserByID(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,8 @@ func (controller *UserController) GetUser(userID string) (*models.User, error) {
 }
 
 func (controller *UserController) UserEmailVerified(userID string) error {
-	return queries.UpdateEmailVerified(controller.DB, userID, true)
+	_, err := controller.userRepo.UpdateEmailVerified(userID, true)
+	return err
 }
 
 type UpdateUserRequest struct {
@@ -69,5 +69,6 @@ type UpdateUserRequest struct {
 }
 
 func (controller *UserController) UpdateUser(req *UpdateUserRequest) error {
-	return queries.UpdateUsername(controller.DB, req.UserID, req.Username)
+	_, err := controller.userRepo.UpdateUsername(req.UserID, req.Username)
+	return err
 }

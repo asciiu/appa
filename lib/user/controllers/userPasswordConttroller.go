@@ -1,22 +1,20 @@
 package controllers
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
 
-	queries "github.com/asciiu/appa/lib/user/db/sql"
 	"github.com/asciiu/appa/lib/user/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserPasswordController struct {
-	DB *sql.DB
+	userRepo models.UserRepo
 }
 
-func NewUserPasswordController(db *sql.DB) *UserPasswordController {
-	return &UserPasswordController{DB: db}
+func NewUserPasswordController(userRepo models.UserRepo) *UserPasswordController {
+	return &UserPasswordController{userRepo: userRepo}
 }
 
 type ChangePasswordRequest struct {
@@ -28,13 +26,13 @@ type ChangePasswordRequest struct {
 // ChangePassword - Changes the user's password. Password is updated when the request's
 // old password matches the current user's password hash.
 func (controller *UserPasswordController) ChangePassword(req *ChangePasswordRequest) error {
-	user, err := queries.FindUserByID(controller.DB, req.UserID)
+	user, err := controller.userRepo.FindUserByID(req.UserID)
 
 	switch {
 	case err == nil:
 		if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.OldPassword)) == nil {
 
-			err := queries.UpdatePassword(controller.DB, req.UserID, models.HashAndSalt([]byte(req.NewPassword)))
+			_, err := controller.userRepo.UpdatePassword(req.UserID, models.HashAndSalt([]byte(req.NewPassword)))
 			if err != nil {
 				return err
 			}
