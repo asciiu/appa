@@ -112,7 +112,7 @@ type UserRepo interface {
 	InsertUser(user *User) error
 	UpdatePassword(userID, hash string) (*User, error)
 	UpdateUsername(userID, username string) (*User, error)
-	UpdateEmailVerified(userID, verified bool) (*User, error)
+	UpdateEmailVerified(userID string, verified bool) (*User, error)
 }
 
 type UserSummary struct {

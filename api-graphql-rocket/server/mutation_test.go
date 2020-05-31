@@ -7,7 +7,7 @@ import (
 
 	"github.com/asciiu/appa/api-graphql-rocket/server"
 	"github.com/asciiu/appa/lib/db/gopg"
-	userQuery "github.com/asciiu/appa/lib/user/db/gopg"
+	userpg "github.com/asciiu/appa/lib/user/db/gopg"
 	userModels "github.com/asciiu/appa/lib/user/models"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,6 +31,7 @@ func TestMutations(t *testing.T) {
 	email := "test.email"
 	username := "jerry"
 	user := &userModels.User{}
+	userRepo := userpg.NewUserRepo(db)
 
 	t.Run("Signup", func(t *testing.T) {
 
@@ -40,7 +41,7 @@ func TestMutations(t *testing.T) {
 		}
 
 		user.EmailVerified = true
-		userQuery.UpdateUser(db, user)
+		userRepo.UpdateEmailVerified(user.ID, true)
 
 		assert.Equal(t, email, user.Email, "email does not match")
 		assert.Equal(t, username, user.Username, "username does not match")
@@ -63,5 +64,5 @@ func TestMutations(t *testing.T) {
 		assert.Nil(t, token, "token should be nil")
 	})
 
-	userQuery.DeleteUserHard(db, user.ID)
+	userRepo.DeleteUserHard(user.ID)
 }

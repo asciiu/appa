@@ -59,7 +59,7 @@ func (r *UserRepo) UpdateUsername(userID, username string) (*models.User, error)
 	return user, err
 }
 
-func (r *UserRepo) UpdateEmailVerified(userID, verified bool) (*models.User, error) {
+func (r *UserRepo) UpdateEmailVerified(userID string, verified bool) (*models.User, error) {
 	user := new(models.User)
 	_, err := r.db.Model(user).Set("email_verified = ?", verified).Where("id = ?", userID).Update()
 	return user, err
