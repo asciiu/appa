@@ -5,7 +5,7 @@ import (
 
 	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
 	balance "github.com/asciiu/appa/lib/balance/models"
-	"github.com/asciiu/appa/lib/db"
+	db "github.com/asciiu/appa/lib/db/sql"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/asciiu/appa/lib/util"

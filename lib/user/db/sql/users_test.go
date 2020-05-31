@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/asciiu/appa/lib/db"
+	db "github.com/asciiu/appa/lib/db/sql"
 	"github.com/asciiu/appa/lib/user/db/sql"
 	userRepo "github.com/asciiu/appa/lib/user/db/sql"
 	user "github.com/asciiu/appa/lib/user/models"
