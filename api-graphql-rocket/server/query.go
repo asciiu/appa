@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
-	balanceRepo "github.com/asciiu/appa/lib/balance/db/sql"
 	balance "github.com/asciiu/appa/lib/balance/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -18,8 +17,8 @@ func (srv *graphQLServer) Balances(ctx context.Context) ([]*balance.Balance, err
 		return []*balance.Balance{}, fmt.Errorf("unauthorized")
 	}
 
-	balances, err := balanceRepo.FindUserBalances(srv.DB, loginUser.ID)
-	return balances, err
+	//balances, err := balanceRepo.FindUserBalances(srv.db, loginUser.ID)
+	return nil, nil
 }
 
 //func (srv *graphQLServer) Users(ctx context.Context) ([]*user.User, error) {

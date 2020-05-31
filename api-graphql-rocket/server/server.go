@@ -3,7 +3,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -13,13 +12,14 @@ import (
 	//handler2 "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-pg/pg/v10"
 	log "github.com/sirupsen/logrus"
 
 	//"github.com/99designs/gqlgen/handler"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/asciiu/appa/api-graphql-rocket/graph/generated"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
-	"github.com/asciiu/appa/lib/db"
+	"github.com/asciiu/appa/lib/db/gopg"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/go-chi/chi"
 	"github.com/go-redis/redis"
@@ -43,7 +43,7 @@ func ForContext(ctx context.Context) *user.User {
 }
 
 type graphQLServer struct {
-	DB              *sql.DB
+	db              *pg.DB
 	redisClient     *redis.Client
 	messageChannels map[string]chan *graph.Message
 	userChannels    map[string]chan string
@@ -60,7 +60,7 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		Addr: config.RedisURL,
 	})
 
-	database, _ := db.NewDB(config.DBURL)
+	database, _ := gopg.NewDB(config.DBURL)
 
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
 		_, err := client.Ping().Result()
@@ -68,7 +68,7 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 	})
 	return &graphQLServer{
 		redisClient:     client,
-		DB:              database,
+		db:              database,
 		messageChannels: map[string]chan *graph.Message{},
 		userChannels:    map[string]chan string{},
 		mutex:           sync.Mutex{},

@@ -10,9 +10,9 @@ import (
 	"github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	graph "github.com/asciiu/appa/api-graphql-rocket/graph/model"
 	roken "github.com/asciiu/appa/api-graphql-rocket/graph/model"
-	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/sql"
+	tokenRepo "github.com/asciiu/appa/lib/refreshToken/db/gopg"
 	token "github.com/asciiu/appa/lib/refreshToken/models"
-	userRepo "github.com/asciiu/appa/lib/user/db/sql"
+	userRepo "github.com/asciiu/appa/lib/user/db/gopg"
 	user "github.com/asciiu/appa/lib/user/models"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
@@ -22,7 +22,7 @@ import (
 func (srv *graphQLServer) Signup(ctx context.Context, email, username, password string) (*user.User, error) {
 	log.Info(fmt.Sprintf("Signup: %s", email))
 	newUser := user.NewUser(username, email, password)
-	if err := userRepo.InsertUser(srv.DB, newUser); err != nil {
+	if err := userRepo.InsertUser(srv.db, newUser); err != nil {
 		return nil, err
 	}
 	return newUser, nil
@@ -31,7 +31,7 @@ func (srv *graphQLServer) Signup(ctx context.Context, email, username, password 
 func (srv *graphQLServer) Signin(ctx context.Context, email, password string, remember bool) (*roken.TokenUser, error) {
 	log.Info(fmt.Sprintf("Signin: %s", email))
 
-	loginUser, err := userRepo.FindUserByEmail(srv.DB, email)
+	loginUser, err := userRepo.FindUserByEmail(srv.db, email)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, fmt.Errorf("incorrect password/email")
@@ -56,7 +56,7 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 				selectAuth := refreshToken.Renew(expiresOn)
 
 				// this needs to be checked
-				if _, err := tokenRepo.InsertRefreshToken(srv.DB, refreshToken); err != nil {
+				if _, err := tokenRepo.InsertRefreshToken(srv.db, refreshToken); err != nil {
 					log.Error(fmt.Sprintf("failed to insert refresh token: %s", err.Error()))
 				}
 				tok.Refresh = &selectAuth
