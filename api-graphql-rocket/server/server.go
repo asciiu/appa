@@ -60,7 +60,10 @@ func NewGraphQLServer(config Config) (*graphQLServer, error) {
 		Addr: config.RedisURL,
 	})
 
-	database, _ := gopg.NewDB(config.DBURL)
+	database, err := gopg.NewDB(config.DBURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	retry.ForeverSleep(2*time.Second, func(_ int) error {
 		_, err := client.Ping().Result()
