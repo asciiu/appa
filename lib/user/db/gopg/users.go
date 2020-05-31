@@ -5,6 +5,11 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
+func DeleteUserHard(db *pg.DB, userID string) error {
+	_, err := db.Exec("DELETE FROM users WHERE id = $1", userID)
+	return err
+}
+
 func FindUserByEmail(db *pg.DB, email string) (*models.User, error) {
 	u := new(models.User)
 

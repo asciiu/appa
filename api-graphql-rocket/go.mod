@@ -26,6 +26,7 @@ require (
 	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.5.1
+	github.com/tinrab/graphql-realtime-chat v0.0.0-20200314084614-3e34df8561b0
 	github.com/tinrab/retry v1.0.0
 	github.com/vektah/gqlparser/v2 v2.0.1
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37

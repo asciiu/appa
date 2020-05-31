@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	"github.com/asciiu/appa/api-graphql-rocket/server"
-	userQuery "github.com/asciiu/appa/lib/user/db/sql"
+	"github.com/asciiu/appa/lib/db/gopg"
+	userQuery "github.com/asciiu/appa/lib/user/db/gopg"
+	userModels "github.com/asciiu/appa/lib/user/models"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSignup(t *testing.T) {
+func TestMutations(t *testing.T) {
 	cfg := server.Config{
 		RedisURL: "localhost:6379",
 		DBURL:    "postgres://postgres@localhost:5432/appa_test?sslmode=disable",
@@ -21,75 +23,45 @@ func TestSignup(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	email := "test.email"
-	username := "jerry"
-
-	user, err := s.Signup(context.Background(), email, username, "password")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	assert.Equal(t, email, user.Email, "email does not match")
-	assert.Equal(t, username, user.Username, "username does not match")
-	assert.Equal(t, false, user.EmailVerified, "email verified should be false")
-
-	userQuery.DeleteUserHard(s.DB, user.ID)
-}
-
-func TestLogin(t *testing.T) {
-	cfg := server.Config{
-		RedisURL: "localhost:6379",
-		DBURL:    "postgres://postgres@localhost:5432/appa_test?sslmode=disable",
-	}
-
-	s, err := server.NewGraphQLServer(cfg)
+	db, err := gopg.NewDB(cfg.DBURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	email := "test.email"
 	username := "jerry"
+	user := &userModels.User{}
 
-	user, err := s.Signup(context.Background(), email, username, "password")
-	if err != nil {
-		log.Fatal(err)
-	}
-	userQuery.UpdateEmailVerified(s.DB, user.ID, true)
+	t.Run("Signup", func(t *testing.T) {
 
-	token, err := s.Signin(context.Background(), email, "password", true)
-	if err != nil {
-		log.Fatal(err)
-	}
+		user, err = s.Signup(context.Background(), email, username, "password")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	assert.NotEmpty(t, token.Jwt, "must contain jwt")
-	assert.NotEmpty(t, token.Refresh, "must contain refresh")
+		user.EmailVerified = true
+		userQuery.UpdateUser(db, user)
 
-	userQuery.DeleteUserHard(s.DB, user.ID)
-}
+		assert.Equal(t, email, user.Email, "email does not match")
+		assert.Equal(t, username, user.Username, "username does not match")
+		//assert.Equal(t, false, user.EmailVerified, "email verified should be false")
+	})
 
-func TestLoginIncorrectPassword(t *testing.T) {
-	cfg := server.Config{
-		RedisURL: "localhost:6379",
-		DBURL:    "postgres://postgres@localhost:5432/appa_test?sslmode=disable",
-	}
+	t.Run("Signin", func(t *testing.T) {
+		token, err := s.Signin(context.Background(), email, "password", true)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	s, err := server.NewGraphQLServer(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+		assert.NotEmpty(t, token.Token.Jwt, "must contain jwt")
+		assert.NotEmpty(t, token.Token.Refresh, "must contain refresh")
+	})
 
-	email := "test.email"
-	username := "jerry"
+	t.Run("Incorrect password", func(t *testing.T) {
+		token, err := s.Signin(context.Background(), email, "passwo", true)
+		assert.Equal(t, "incorrect password/email", err.Error())
+		assert.Nil(t, token, "token should be nil")
+	})
 
-	user, err := s.Signup(context.Background(), email, username, "password")
-	if err != nil {
-		log.Fatal(err)
-	}
-	userQuery.UpdateEmailVerified(s.DB, user.ID, true)
-
-	token, err := s.Signin(context.Background(), email, "passwo", true)
-	assert.Equal(t, "incorrect password/email", err.Error())
-	assert.Nil(t, token, "token should be nil")
-
-	userQuery.DeleteUserHard(s.DB, user.ID)
+	userQuery.DeleteUserHard(db, user.ID)
 }
