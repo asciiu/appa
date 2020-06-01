@@ -10,6 +10,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c
 	github.com/go-chi/chi v4.0.1+incompatible
+	github.com/go-pg/pg v8.0.6+incompatible
 	github.com/go-pg/pg/v10 v10.0.0-alpha.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/google/uuid v1.1.1

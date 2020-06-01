@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -32,7 +31,7 @@ func (srv *graphQLServer) Signin(ctx context.Context, email, password string, re
 
 	loginUser, err := srv.userController.FindUserByEmail(email)
 	switch {
-	case err == sql.ErrNoRows:
+	case err != nil && strings.Contains(err.Error(), "no rows"):
 		return nil, fmt.Errorf("incorrect password/email")
 	case err != nil:
 		return nil, err
