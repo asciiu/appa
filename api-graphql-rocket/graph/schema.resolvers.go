@@ -24,6 +24,10 @@ func (r *mutationResolver) Signout(ctx context.Context, selector string) (bool, 
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) PostBet(ctx context.Context, description string, amount int) (*model.Bet, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error) {
 	panic(fmt.Errorf("not implemented"))
 }

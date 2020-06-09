@@ -20,6 +20,13 @@ type TokenUser {
   token: Token
 }
 
+type Bet {
+  id: String!
+  userID: String!
+  username: String!
+  avatarURL: String!
+}
+
 input MessageInput {
   userID: String!
   username: String!
@@ -47,6 +54,7 @@ type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
   signout(selector: String!): Boolean!
+  postBet(description: String!, amount: Int!): Bet
   postMessage(input: MessageInput): Message
 }
 

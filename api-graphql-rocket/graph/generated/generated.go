@@ -47,6 +47,13 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Bet struct {
+		AvatarURL func(childComplexity int) int
+		ID        func(childComplexity int) int
+		UserID    func(childComplexity int) int
+		Username  func(childComplexity int) int
+	}
+
 	Message struct {
 		AvatarURL func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
@@ -58,6 +65,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		PostBet     func(childComplexity int, description string, amount int) int
 		PostMessage func(childComplexity int, input *model.MessageInput) int
 		Signin      func(childComplexity int, email string, password string, remember bool) int
 		Signout     func(childComplexity int, selector string) int
@@ -98,6 +106,7 @@ type MutationResolver interface {
 	Signup(ctx context.Context, email string, username string, password string) (*models.User, error)
 	Signin(ctx context.Context, email string, password string, remember bool) (*model.TokenUser, error)
 	Signout(ctx context.Context, selector string) (bool, error)
+	PostBet(ctx context.Context, description string, amount int) (*model.Bet, error)
 	PostMessage(ctx context.Context, input *model.MessageInput) (*model.Message, error)
 }
 type QueryResolver interface {
@@ -123,6 +132,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Bet.avatarURL":
+		if e.complexity.Bet.AvatarURL == nil {
+			break
+		}
+
+		return e.complexity.Bet.AvatarURL(childComplexity), true
+
+	case "Bet.id":
+		if e.complexity.Bet.ID == nil {
+			break
+		}
+
+		return e.complexity.Bet.ID(childComplexity), true
+
+	case "Bet.userID":
+		if e.complexity.Bet.UserID == nil {
+			break
+		}
+
+		return e.complexity.Bet.UserID(childComplexity), true
+
+	case "Bet.username":
+		if e.complexity.Bet.Username == nil {
+			break
+		}
+
+		return e.complexity.Bet.Username(childComplexity), true
 
 	case "Message.avatarURL":
 		if e.complexity.Message.AvatarURL == nil {
@@ -172,6 +209,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Message.Username(childComplexity), true
+
+	case "Mutation.postBet":
+		if e.complexity.Mutation.PostBet == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_postBet_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PostBet(childComplexity, args["description"].(string), args["amount"].(int)), true
 
 	case "Mutation.postMessage":
 		if e.complexity.Mutation.PostMessage == nil {
@@ -432,6 +481,13 @@ type TokenUser {
   token: Token
 }
 
+type Bet {
+  id: String!
+  userID: String!
+  username: String!
+  avatarURL: String!
+}
+
 input MessageInput {
   userID: String!
   username: String!
@@ -459,6 +515,7 @@ type Mutation {
   signup(email: String!, username: String!, password: String!): User
   signin(email: String!, password: String!, remember: Boolean!): TokenUser
   signout(selector: String!): Boolean!
+  postBet(description: String!, amount: Int!): Bet
   postMessage(input: MessageInput): Message
 }
 
@@ -472,6 +529,28 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_postBet_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["description"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["description"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["amount"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["amount"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_postMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -638,6 +717,142 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Bet_id(ctx context.Context, field graphql.CollectedField, obj *model.Bet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Bet",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Bet_userID(ctx context.Context, field graphql.CollectedField, obj *model.Bet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Bet",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Bet_username(ctx context.Context, field graphql.CollectedField, obj *model.Bet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Bet",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Bet_avatarURL(ctx context.Context, field graphql.CollectedField, obj *model.Bet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Bet",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AvatarURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Message_id(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
 	defer func() {
@@ -992,6 +1207,44 @@ func (ec *executionContext) _Mutation_signout(ctx context.Context, field graphql
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_postBet(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_postBet_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PostBet(rctx, args["description"].(string), args["amount"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Bet)
+	fc.Result = res
+	return ec.marshalOBet2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐBet(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_postMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2698,6 +2951,48 @@ func (ec *executionContext) unmarshalInputMessageInput(ctx context.Context, obj 
 
 // region    **************************** object.gotpl ****************************
 
+var betImplementors = []string{"Bet"}
+
+func (ec *executionContext) _Bet(ctx context.Context, sel ast.SelectionSet, obj *model.Bet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, betImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Bet")
+		case "id":
+			out.Values[i] = ec._Bet_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._Bet_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "username":
+			out.Values[i] = ec._Bet_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "avatarURL":
+			out.Values[i] = ec._Bet_avatarURL(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var messageImplementors = []string{"Message"}
 
 func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, obj *model.Message) graphql.Marshaler {
@@ -2779,6 +3074,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "postBet":
+			out.Values[i] = ec._Mutation_postBet(ctx, field)
 		case "postMessage":
 			out.Values[i] = ec._Mutation_postMessage(ctx, field)
 		default:
@@ -3249,6 +3546,20 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNMessage2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v model.Message) graphql.Marshaler {
 	return ec._Message(ctx, sel, &v)
 }
@@ -3581,6 +3892,17 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOBet2githubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐBet(ctx context.Context, sel ast.SelectionSet, v model.Bet) graphql.Marshaler {
+	return ec._Bet(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOBet2ᚖgithubᚗcomᚋasciiuᚋappaᚋapiᚑgraphqlᚑrocketᚋgraphᚋmodelᚐBet(ctx context.Context, sel ast.SelectionSet, v *model.Bet) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Bet(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

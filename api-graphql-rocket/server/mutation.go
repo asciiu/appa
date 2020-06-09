@@ -110,3 +110,8 @@ func (s *graphQLServer) PostMessage(ctx context.Context, input *model.MessageInp
 	s.mutex.Unlock()
 	return m, nil
 }
+
+func (r *graphQLServer) PostBet(ctx context.Context, description string, amount int) (*model.Bet, error) {
+	log.Info(fmt.Sprintf("PostBet: %s %d", description, amount))
+	return nil, nil
+}

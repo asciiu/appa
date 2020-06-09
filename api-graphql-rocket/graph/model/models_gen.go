@@ -8,6 +8,13 @@ import (
 	"github.com/asciiu/appa/lib/user/models"
 )
 
+type Bet struct {
+	ID        string `json:"id"`
+	UserID    string `json:"userID"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatarURL"`
+}
+
 type Message struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"userID"`
