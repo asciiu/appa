@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/asciiu/appa/lib/config"
 	"github.com/kelseyhightower/envconfig"
@@ -49,11 +50,17 @@ func main() {
 	envfile := argsWithoutProg[0]
 	config.LoadEnv(envfile)
 
+	printFills := coinbaseFills()
+	printFills("BTC-USD")
+	printFills("ETH-USD")
+	printFills("LTC-USD")
+}
+
+func coinbaseFills() func(string) {
 	var cfg CoinbaseConfig
 	err := envconfig.Process("myapp", &cfg)
 	check(err)
 
-	// coinbase test
 	client := coinbasepro.NewClient()
 
 	// optional, configuration can be updated with ClientConfig
@@ -64,12 +71,32 @@ func main() {
 		Secret:     cfg.Secret,
 	})
 
-	accounts, err := client.GetAccounts()
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	return func(productID string) {
+		fmt.Println(productID)
 
-	for _, a := range accounts {
-		fmt.Printf("%s %s\n", a.Currency, a.Balance)
+		btcSearch := coinbasepro.ListFillsParams{
+			ProductID: productID,
+		}
+
+		dateFormat := "2006-Jan-02"
+
+		var fills []coinbasepro.Fill
+		cursor := client.ListFills(btcSearch)
+		for cursor.HasMore {
+			if err := cursor.NextPage(&fills); err != nil {
+				fmt.Println(err.Error())
+			}
+
+			for _, f := range fills {
+
+				transactionTime := f.CreatedAt.Time()
+				jan2019, _ := time.Parse(dateFormat, "2019-Jan-01")
+				jan2020, _ := time.Parse(dateFormat, "2020-Jan-01")
+
+				if transactionTime.After(jan2019) && transactionTime.Before(jan2020) {
+					fmt.Printf("\t%s price:%s size:%s date: %s\n", f.Side, f.Price, f.Size, f.CreatedAt.Time().Format(dateFormat))
+				}
+			}
+		}
 	}
 }
