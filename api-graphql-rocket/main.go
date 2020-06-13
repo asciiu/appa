@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/asciiu/appa/api-graphql-rocket/server"
-	"github.com/joho/godotenv"
+	"github.com/asciiu/appa/lib/config"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kelseyhightower/envconfig"
 )
@@ -16,8 +17,13 @@ func check(err error) {
 }
 
 func main() {
-	// TODO read env from command arg
-	_ = godotenv.Load("config/dev.env")
+	argsWithoutProg := os.Args[1:]
+	if len(argsWithoutProg) == 0 {
+		log.Fatal("command line env file not found in command args")
+	}
+
+	envfile := argsWithoutProg[0]
+	config.LoadEnv(envfile)
 
 	var cfg server.Config
 	err := envconfig.Process("", &cfg)
