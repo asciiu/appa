@@ -14,5 +14,5 @@ trash
 build/
 config-map.yaml
 assets/
-config/dev.env
+dev.env
 
