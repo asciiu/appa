@@ -7,6 +7,7 @@ import (
 
 	"github.com/asciiu/appa/lib/config"
 	"github.com/kelseyhightower/envconfig"
+	coinbasepro "github.com/preichenberger/go-coinbasepro/v2"
 )
 
 //type Bet struct {
@@ -34,8 +35,9 @@ func check(err error) {
 }
 
 type CoinbaseConfig struct {
-	Key    string `envconfig:"COINBASE_KEY" required:"true"`
-	Secret string `envconfig:"COINBASE_SECRET" required:"true"`
+	Key        string `envconfig:"COINBASE_KEY" required:"true"`
+	Secret     string `envconfig:"COINBASE_SECRET" required:"true"`
+	Passphrase string `envconfig:"COINBASE_PASSPHRASE" required:"true"`
 }
 
 func main() {
@@ -51,5 +53,23 @@ func main() {
 	err := envconfig.Process("myapp", &cfg)
 	check(err)
 
-	fmt.Printf("%+v\n", cfg)
+	// coinbase test
+	client := coinbasepro.NewClient()
+
+	// optional, configuration can be updated with ClientConfig
+	client.UpdateConfig(&coinbasepro.ClientConfig{
+		BaseURL:    "https://api.pro.coinbase.com",
+		Key:        cfg.Key,
+		Passphrase: cfg.Passphrase,
+		Secret:     cfg.Secret,
+	})
+
+	accounts, err := client.GetAccounts()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	for _, a := range accounts {
+		fmt.Printf("%s %s\n", a.Currency, a.Balance)
+	}
 }
