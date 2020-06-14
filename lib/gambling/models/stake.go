@@ -1,19 +1,26 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+	"time"
+)
 
 type Stake struct {
-	ID     int
-	Odds   float32
-	Amount float32
-	Side   string
+	ID        int
+	Odds      float64
+	Amount    float64
+	Side      string
+	CreatedAt time.Time
 }
 
 func (stake Stake) String() string {
-	return fmt.Sprintf("play: %.2f to win: %.2f odds@%.2f", stake.payout(), stake.Amount, stake.Odds)
+	return fmt.Sprintf("play: %.2f to win: %.2f odds@%.2f", stake.Payout(), stake.Amount, stake.Odds)
 }
 
-func (stake Stake) payout() float32 {
+func (stake Stake) Payout() float64 {
 	// payout amount using odds and wagered amount
-	return stake.Amount / stake.Odds
+	payout := stake.Amount / stake.Odds
+
+	return math.Floor(payout*100) / 100
 }

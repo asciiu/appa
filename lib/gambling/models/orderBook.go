@@ -1,19 +1,19 @@
 package models
 
-// type OrderBook struct {
-// 	MarketName string
+type OrderBook struct {
+	MarketName string
 
-// 	BuyOrders  []Wager
-// 	SellOrders []Wager
-// }
+	buys  []Stake
+	sells []Stake
+}
 
-// func NewOrderBook(marketName string) *OrderBook {
-// 	return &OrderBook{
-// 		MarketName: marketName,
-// 		BuyOrders:  make([]Wager, 0),
-// 		SellOrders: make([]Wager, 0),
-// 	}
-// }
+func NewOrderBook(marketName string) *OrderBook {
+	return &OrderBook{
+		MarketName: marketName,
+		buys:       make([]Stake, 0),
+		sells:      make([]Stake, 0),
+	}
+}
 
 // func (book *OrderBook) AddOrder(order *protoOrder.Order) {
 // 	switch {

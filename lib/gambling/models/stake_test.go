@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -16,7 +15,7 @@ func checkError(err error) {
 
 func TestStake(t *testing.T) {
 	t.Run("Wager basic", func(t *testing.T) {
-		sells := []Stake{
+		stakes := []Stake{
 			Stake{
 				ID:     1,
 				Odds:   2.35,
@@ -31,10 +30,7 @@ func TestStake(t *testing.T) {
 			},
 		}
 
-		//size := bet.Amount / bet.Odds
-		fmt.Println(sells[0])
-		fmt.Println(sells[1])
-
-		assert.Equal(t, true, true)
+		assert.Equal(t, float64(17.02), stakes[0].Payout(), "payout wrong")
+		assert.Equal(t, float64(6), stakes[1].Payout(), "payout wrong")
 	})
 }
