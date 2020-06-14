@@ -50,13 +50,25 @@ func main() {
 	envfile := argsWithoutProg[0]
 	config.LoadEnv(envfile)
 
-	printFills := coinbaseFills()
-	printFills("BTC-USD")
-	printFills("ETH-USD")
-	printFills("LTC-USD")
+	getFills := coinbaseFills()
+	btcFills := getFills("BTC-USD")
+	ethFills := getFiles("ETH-USD")
+	ltcFills := getFiles("LTC-USD")
+
+	allFills := append(btcFills, ethFills...)
+	allFills = append(allFills, ltcFills...)
+	//util.WriteCsvFile("coinbase.csv", allFills)
 }
 
-func coinbaseFills() func(string) {
+type CoinbaseFill struct {
+	Market string
+	Side   string
+	Price  string
+	Size   string
+	Date   string
+}
+
+func coinbaseFills() func(string) []CoinbaseFill {
 	var cfg CoinbaseConfig
 	err := envconfig.Process("myapp", &cfg)
 	check(err)
@@ -71,7 +83,7 @@ func coinbaseFills() func(string) {
 		Secret:     cfg.Secret,
 	})
 
-	return func(productID string) {
+	return func(productID string) []CoinbaseFill {
 		fmt.Println(productID)
 
 		btcSearch := coinbasepro.ListFillsParams{
@@ -80,9 +92,11 @@ func coinbaseFills() func(string) {
 
 		dateFormat := "2006-Jan-02"
 
-		var fills []coinbasepro.Fill
+		allFills := make([]CoinbaseFill, 0)
 		cursor := client.ListFills(btcSearch)
+
 		for cursor.HasMore {
+			fills := make([]coinbasepro.Fill, 0)
 			if err := cursor.NextPage(&fills); err != nil {
 				fmt.Println(err.Error())
 			}
@@ -95,8 +109,21 @@ func coinbaseFills() func(string) {
 
 				if transactionTime.After(jan2019) && transactionTime.Before(jan2020) {
 					fmt.Printf("\t%s price:%s size:%s date: %s\n", f.Side, f.Price, f.Size, f.CreatedAt.Time().Format(dateFormat))
+
+					myFill := CoinbaseFill{
+						Market: productID,
+						Side:   f.Side,
+						Price:  f.Price,
+						Size:   f.Size,
+						Date:   f.CreatedAt.Time().Format(dateFormat),
+					}
+
+					allFills = append(allFills, myFill)
 				}
 			}
 		}
+
+		return allFills
+		//util.WriteCsvFile("coinbase.csv", allFills)
 	}
 }
