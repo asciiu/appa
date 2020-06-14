@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -19,13 +18,13 @@ func TestMergeSort(t *testing.T) {
 	}
 	o2 := Stake{
 		ID:        2,
-		Odds:      1.1,
+		Odds:      1.17,
 		Amount:    0.2,
 		CreatedAt: now.Add(1 * time.Minute),
 	}
 	o3 := Stake{
 		ID:        3,
-		Odds:      0.7,
+		Odds:      1.1,
 		Amount:    2.7,
 		CreatedAt: now.Add(2 * time.Minute),
 	}
@@ -45,9 +44,9 @@ func TestMergeSort(t *testing.T) {
 	orders := []Stake{o1, o2, o3, o4, o5}
 	sorted := MergeSort(orders)
 
-	for _, order := range sorted {
-		fmt.Printf("%+v\n", order)
-	}
+	// for _, order := range sorted {
+	// 	fmt.Printf("%+v\n", order)
+	// }
 
 	t.Run("sort order", func(t *testing.T) {
 		assert.Equal(t, 5, len(sorted), "should be 5 sorted orders")
@@ -86,9 +85,9 @@ func TestMergeSort(t *testing.T) {
 	})
 
 	t.Run("binary search", func(t *testing.T) {
-		searchOdds := 1.1
+		searchOdds := 1.08
 		index := binarySearch(sorted, searchOdds)
-		assert.Equal(t, 1, index, "should return 2nd index")
+		assert.Equal(t, 0, index, "should return 1st index")
 	})
 
 	t.Run("binary search", func(t *testing.T) {
@@ -98,8 +97,8 @@ func TestMergeSort(t *testing.T) {
 	})
 
 	t.Run("binary search", func(t *testing.T) {
-		searchOdds := 0.3
+		searchOdds := 2.3
 		index := binarySearch(sorted, searchOdds)
-		assert.Equal(t, 0, index, "should return 1st index")
+		assert.Equal(t, 4, index, "should be last index")
 	})
 }

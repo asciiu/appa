@@ -7,44 +7,38 @@ type OrderBook struct {
 	sells []Stake
 }
 
-func NewOrderBook(marketName string) *OrderBook {
+func NewOrderBook(eventName string) *OrderBook {
 	return &OrderBook{
-		MarketName: marketName,
+		MarketName: eventName,
 		buys:       make([]Stake, 0),
 		sells:      make([]Stake, 0),
 	}
 }
 
-// func (book *OrderBook) AddOrder(order *protoOrder.Order) {
-// 	switch {
-// 	case order.Side == constOrder.Buy:
-// 		book.AddBuyOrder(order)
-// 	case order.Side == constOrder.Sell:
-// 		book.AddSellOrder(order)
-// 	}
-// }
+func (book *OrderBook) AddStake(stake Stake) {
+	switch {
+	case stake.Side == "buy":
+		book.addBuyOrder(stake)
+	case stake.Side == "sell":
+		book.addSellOrder(stake)
+	}
+}
 
-// func (book *OrderBook) AddBuyOrder(order *protoOrder.Order) {
-// 	if order.Side != constOrder.Buy || order.MarketName != book.MarketName {
-// 		return
-// 	}
-// 	book.BuyOrders = append(book.BuyOrders, order)
+func (book *OrderBook) addBuyOrder(stake Stake) {
+	if stake.Side != "buy" {
+		return
+	}
+	book.buys = append(book.buys, stake)
+	book.buys = MergeSort(book.buys)
+}
 
-// 	if len(book.BuyOrders) > 1 {
-// 		book.BuyOrders = MergeSort(book.BuyOrders)
-// 	}
-// }
-
-// func (book *OrderBook) AddSellOrder(order *protoOrder.Order) {
-// 	if order.Side != constOrder.Sell || order.MarketName != book.MarketName {
-// 		return
-// 	}
-// 	book.SellOrders = append(book.SellOrders, order)
-
-// 	if len(book.SellOrders) > 1 {
-// 		book.SellOrders = MergeSort(book.SellOrders)
-// 	}
-// }
+func (book *OrderBook) addSellOrder(stake Stake) {
+	if stake.Side != "sell" {
+		return
+	}
+	book.sells = append(book.sells, stake)
+	book.sells = MergeSort(book.sells)
+}
 
 // func (book *OrderBook) FillOrders(order *protoOrder.Order) (filledOrders []*protoOrder.Order) {
 // 	filledOrders = make([]*protoOrder.Order, 0)
