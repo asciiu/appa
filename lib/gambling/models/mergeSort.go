@@ -49,7 +49,7 @@ func binarySearch(a []Stake, odds float64) (index int) {
 	mid := len(a) / 2
 	switch {
 	case len(a) == 0:
-		index = -1 // not found
+		index = 0 // not found
 	case a[mid].Odds > odds:
 		index = binarySearch(a[:mid], odds)
 	case a[mid].Odds < odds:

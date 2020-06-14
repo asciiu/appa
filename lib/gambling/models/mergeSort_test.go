@@ -82,6 +82,24 @@ func TestMergeSort(t *testing.T) {
 	t.Run("binary search", func(t *testing.T) {
 		searchOdds := 3.3
 		index := binarySearch(sorted, searchOdds)
-		assert.Equal(t, 4, index, "should return index of last item")
+		assert.Equal(t, 5, index, "should return 5th index")
+	})
+
+	t.Run("binary search", func(t *testing.T) {
+		searchOdds := 1.1
+		index := binarySearch(sorted, searchOdds)
+		assert.Equal(t, 1, index, "should return 2nd index")
+	})
+
+	t.Run("binary search", func(t *testing.T) {
+		searchOdds := 1.2
+		index := binarySearch(sorted, searchOdds)
+		assert.Equal(t, 2, index, "should return 3rd index")
+	})
+
+	t.Run("binary search", func(t *testing.T) {
+		searchOdds := 0.3
+		index := binarySearch(sorted, searchOdds)
+		assert.Equal(t, 0, index, "should return 1st index")
 	})
 }
