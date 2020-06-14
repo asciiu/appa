@@ -73,7 +73,7 @@ func searchLessThan(sorted []Stake, odds float64) (index int) {
 	index = idx
 	for i := len(slice) - 1; i >= 0; i-- {
 		if slice[i].Odds < odds {
-			index += i
+			index += i + 1
 			break
 		}
 	}

@@ -49,258 +49,39 @@ func TestMergeSort(t *testing.T) {
 		fmt.Printf("%+v\n", order)
 	}
 
-	assert.Equal(t, 5, len(sorted), "should be 5 sorted orders")
-	assert.Equal(t, float64(0.2), sorted[1].Amount, "order 2 size did not match")
-	assert.Equal(t, 5, sorted[3].ID, "order 3 order ID did not match")
-	assert.Equal(t, float64(2.7), sorted[0].Amount, "order 1 size did not match")
+	t.Run("sort order", func(t *testing.T) {
+		assert.Equal(t, 5, len(sorted), "should be 5 sorted orders")
+		assert.Equal(t, float64(0.2), sorted[1].Amount, "order 2 size did not match")
+		assert.Equal(t, 5, sorted[3].ID, "order 3 order ID did not match")
+		assert.Equal(t, float64(2.7), sorted[0].Amount, "order 1 size did not match")
+	})
+
+	t.Run("search less than", func(t *testing.T) {
+		odds := 2.01
+		index := searchLessThan(sorted, odds)
+		assert.Equal(t, 2, index, "less than should be index 1")
+	})
+
+	t.Run("search greater than", func(t *testing.T) {
+		odds := 2.01
+		index := searchGreaterThan(sorted, odds)
+		assert.Equal(t, 2, index, "greater than should be index 2")
+	})
+
+	t.Run("find order", func(t *testing.T) {
+		index := FindOrder(sorted, o4)
+		assert.Equal(t, 2, index, "found index should be 2")
+	})
+
+	t.Run("not find order", func(t *testing.T) {
+		o6 := Stake{ID: 6}
+		index := FindOrder(sorted, o6)
+		assert.Equal(t, -1, index, "index should be -1")
+	})
+
+	t.Run("binary search", func(t *testing.T) {
+		searchOdds := 3.3
+		index := binarySearch(sorted, searchOdds)
+		assert.Equal(t, 4, index, "should return index of last item")
+	})
 }
-
-// func TestSearchLessThan(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	order1 := Stake{
-// 		OrderID:   "#1",
-// 		Price:     0.01,
-// 		Size:      1.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.String(),
-// 	}
-// 	order2 := Stake{
-// 		OrderID:   "#2",
-// 		Price:     0.0081,
-// 		Size:      0.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := Stake{
-// 		OrderID:   "#4",
-// 		Price:     0.0073,
-// 		Size:      2.7,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := Stake{
-// 		OrderID:   "#3",
-// 		Price:     0.0072,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := Stake{
-// 		OrderID:   "#0",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-
-// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-// 	sorted := MergeSort(orders)
-
-// 	buyPrice := 0.00735
-// 	// find index where Order.Price <= searchPrice
-// 	index := searchLessThan(sorted, buyPrice)
-// 	for _, o := range sorted {
-// 		fmt.Printf("%+v\n", o)
-// 	}
-// 	fmt.Println(index)
-// 	assert.Equal(t, 2, index, "less than should be index 2")
-// }
-
-// func TestSearchIndexGreaterThan(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	order1 := Stake{
-// 		OrderID:   "#1",
-// 		Price:     0.01,
-// 		Size:      1.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.String(),
-// 	}
-// 	order2 := Stake{
-// 		OrderID:   "#2",
-// 		Price:     0.0081,
-// 		Size:      0.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := Stake{
-// 		OrderID:   "#4",
-// 		Price:     0.0073,
-// 		Size:      2.7,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := Stake{
-// 		OrderID:   "#3",
-// 		Price:     0.0072,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := Stake{
-// 		OrderID:   "#0",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-
-// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-// 	sorted := MergeSort(orders)
-
-// 	sellPrice := 0.00735
-// 	// find index where Order.Price > searchPrice
-// 	index := searchGreaterThan(sorted, sellPrice)
-// 	for _, o := range sorted {
-// 		fmt.Printf("%+v\n", o)
-// 	}
-// 	fmt.Println(index)
-// 	assert.Equal(t, 3, index, "index 3 should be greater than price")
-// }
-
-// func TestFindOrder(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	order1 := Stake{
-// 		OrderID:   "#1",
-// 		Price:     0.01,
-// 		Size:      1.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.String(),
-// 	}
-// 	order2 := Stake{
-// 		OrderID:   "#2",
-// 		Price:     0.007,
-// 		Size:      0.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := Stake{
-// 		OrderID:   "#4",
-// 		Price:     0.007,
-// 		Size:      2.7,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := Stake{
-// 		OrderID:   "#3",
-// 		Price:     0.007,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := Stake{
-// 		OrderID:   "#0",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-
-// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-// 	sorted := MergeSort(orders)
-
-// 	index := FindOrder(sorted, order4)
-// 	assert.Equal(t, 2, index, "index should be 2")
-// }
-
-// func TestFindOrderNotFound(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	order1 := Stake{
-// 		OrderID:   "#1",
-// 		Price:     0.01,
-// 		Size:      1.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.String(),
-// 	}
-// 	order2 := Stake{
-// 		OrderID:   "#2",
-// 		Price:     0.007,
-// 		Size:      0.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := Stake{
-// 		OrderID:   "#4",
-// 		Price:     0.007,
-// 		Size:      2.7,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := Stake{
-// 		OrderID:   "#3",
-// 		Price:     0.007,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := Stake{
-// 		OrderID:   "#0",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-
-// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-// 	sorted := MergeSort(orders)
-
-// 	order6 := Stake{
-// 		OrderID:   "#6",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-// 	index := FindOrder(sorted, order6)
-// 	assert.Equal(t, -1, index, "index should be -1")
-// }
-
-// func TestBinarySearch(t *testing.T) {
-// 	now := time.Now().UTC()
-// 	order1 := Stake{
-// 		OrderID:   "#1",
-// 		Price:     0.01,
-// 		Size:      1.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.String(),
-// 	}
-// 	order2 := Stake{
-// 		OrderID:   "#2",
-// 		Price:     0.007,
-// 		Size:      0.2,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 1).String(),
-// 	}
-// 	order3 := Stake{
-// 		OrderID:   "#4",
-// 		Price:     0.007,
-// 		Size:      2.7,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 20).String(),
-// 	}
-// 	order4 := Stake{
-// 		OrderID:   "#3",
-// 		Price:     0.007,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 2).String(),
-// 	}
-// 	order5 := Stake{
-// 		OrderID:   "#0",
-// 		Price:     0.00034,
-// 		Size:      0.9,
-// 		Side:      "buy",
-// 		CreatedOn: now.Add(time.Second * 100).String(),
-// 	}
-
-// 	orders := []*protoOrder.Order{order1, order2, order3, order4, order5}
-// 	sorted := MergeSort(orders)
-
-// 	searchPrice := 0.011
-// 	// index of order where Order.Price <= searchPrice
-// 	index := binarySearch(sorted, searchPrice)
-// 	//for _, o := range sorted {
-// 	//	fmt.Printf("%+v\n", o)
-// 	//}
-// 	//fmt.Println(index)
-// 	assert.Equal(t, 4, index, "should return index of last item")
-// }

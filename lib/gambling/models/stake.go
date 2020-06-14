@@ -15,7 +15,7 @@ type Stake struct {
 }
 
 func (stake Stake) String() string {
-	return fmt.Sprintf("play: %.2f to win: %.2f odds@%.2f", stake.Payout(), stake.Amount, stake.Odds)
+	return fmt.Sprintf("id: %d play: %.2f to win: %.2f odds@%.2f", stake.ID, stake.Payout(), stake.Amount, stake.Odds)
 }
 
 func (stake Stake) Payout() float64 {
