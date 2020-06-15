@@ -10,5 +10,4 @@ require (
 	github.com/jszwec/csvutil v1.3.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/preichenberger/go-coinbasepro/v2 v2.0.5 // indirect
-	github.com/ybbus/jsonrpc v2.1.2+incompatible // indirect
 )
