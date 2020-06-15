@@ -13,10 +13,7 @@
 			"path": "migrations"
 		},
 		{
-			"path": "api-graphql"
-		},
-		{
-			"path": "api-graphql-rocket"
+			"path": "graphql-grinkwondo"
 		},
 		{
 			"path": "api-rest"
