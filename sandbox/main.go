@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -17,17 +18,6 @@ func check(err error) {
 	}
 }
 
-type WalletInfo struct {
-	AmountAwaitingConfirmation int64 `json:"amount_awaiting_confirmation"`
-	AmountAwaitingFinalization int64 `json:"amount_awaiting_finalization"`
-	AmountCurrentSpendable     int64 `json:"amount_currently_spendable"`
-	AmountImmature             int64 `json:"amount_immature"`
-	AmountLocked               int64 `json:"amount_locked"`
-	LastConfirmedHeight        int64 `json:"last_confirmed_height"`
-	MinimumConfirmations       int64 `json:"minimum_confirmations"`
-	Total                      int64 `json:"total"`
-}
-
 type GrinConfig struct {
 	URL string `envconfig:"GRIN_API_URL" required:"true"`
 }
@@ -36,7 +26,7 @@ type OkJson struct {
 	Ok []json.RawMessage
 }
 
-type Details struct {
+type SummaryInfo struct {
 	AmountAwaitingConfirmation string `json:"amount_awaiting_confirmation"`
 	AmountAwaitingFinalization string `json:"amount_awaiting_finalization"`
 	AmountCurrentlySpendable   string `json:"amount_currently_spendable"`
@@ -47,12 +37,11 @@ type Details struct {
 	Total                      string `json:"total"`
 }
 
-func RPCSummary(conf GrinConfig) Details {
+func GrinSummary(conf GrinConfig) (*SummaryInfo, error) {
 	rpcClient := jsonrpc.NewClient(conf.URL)
 	response, err := rpcClient.Call("retrieve_summary_info", true, 10)
-	//printResult(*response, err)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var okj OkJson
@@ -62,83 +51,69 @@ func RPCSummary(conf GrinConfig) Details {
 	//_ = json.Unmarshal(okj.Ok[0], &aBool)
 	//fmt.Println(aBool)
 
-	var details Details
-	_ = json.Unmarshal(okj.Ok[1], &details)
-	return details
+	var info SummaryInfo
+	_ = json.Unmarshal(okj.Ok[1], &info)
+	return &info, nil
 }
 
-func printResult(response jsonrpc.RPCResponse, err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-	if response.Error != nil {
-		log.Println(response.Error.Message)
-		return
-	}
-
-	j, _ := json.Marshal(response.Result)
+func printResult(response jsonrpc.RPCResponse) {
+	j, _ := json.Marshal(response)
 	log.Printf("%s\n", j)
 }
 
+type ErrAccountExists struct {
+	Err struct {
+		AccountLabelAlreadyExists string
+	}
+}
+
 type CreateAccountPathResult struct {
-	Path string `json:"ok"`
+	Ok string
 }
 
 type AccountsResult struct {
-	Accounts []Account `json:"Ok"`
+	Ok []struct {
+		Label string `json:"label"`
+		Path  string `json:"path"`
+	}
 }
 
-type Account struct {
-	label string `json:"label"`
-	path  string `json:"path"`
+func GrinAccounts(conf GrinConfig) (*AccountsResult, error) {
+	rpcClient := jsonrpc.NewClient(conf.URL)
+	responseAccounts, err := rpcClient.Call("accounts")
+	var okAccounts AccountsResult
+	err = responseAccounts.GetObject(&okAccounts)
+	return &okAccounts, err
 }
 
-func RPCAccount(conf GrinConfig) {
+func GrinCreateAccount(conf GrinConfig, name string) (string, error) {
 	rpcClient := jsonrpc.NewClient(conf.URL)
 
-	//responseCreateAccount, err := rpcClient.Call("create_account_path", "grinclan5")
-	//result1 := new(CreateAccountPathResult)
-	//err = responseCreateAccount.GetObject(result1)
-	//check(err)
-	//fmt.Println(result1)
-	//printResult(*responseCreateAccount, err)
+	response, err := rpcClient.Call("create_account_path", name)
+	if err != nil {
+		return "", err
 
-	responseAccounts, err := rpcClient.Call("accounts")
-	result2 := new(AccountsResult)
-	err = responseAccounts.GetObject(result2)
-	check(err)
-	fmt.Printf("%+v\n", result2)
-	printResult(*responseAccounts, err)
+	}
+	if response.Error != nil {
+		return "", errors.New(response.Error.Message)
+	}
 
-	//response.GetObject(&resMap)
+	var errExists ErrAccountExists
+	err1 := response.GetObject(&errExists)
 
-	//if val, ok := resMap["Ok"]; ok {
-	//tup := val.([]interface{})
-	//wMap := tup[1].(map[string]interface{})
+	var path CreateAccountPathResult
+	err2 := response.GetObject(&path)
 
-	//amountAwaitingConfirmation, _ := strconv.ParseInt(wMap["amount_awaiting_confirmation"].(string), 10, 64)
-	//amountAwaitingFinalization, _ := strconv.ParseInt(wMap["amount_awaiting_finalization"].(string), 10, 64)
-	//amountCurrentSpendable, _ := strconv.ParseInt(wMap["amount_currently_spendable"].(string), 10, 64)
-	//amountImmature, _ := strconv.ParseInt(wMap["amount_immature"].(string), 10, 64)
-	//amountLocked, _ := strconv.ParseInt(wMap["amount_locked"].(string), 10, 64)
-	//lastConfirmedHeight, _ := strconv.ParseInt(wMap["last_confirmed_height"].(string), 10, 64)
-	//minimumConfirmations, _ := strconv.ParseInt(wMap["minimum_confirmations"].(string), 10, 64)
-	//total, _ := strconv.ParseInt(wMap["total"].(string), 10, 64)
+	switch {
+	case err1 != nil:
+		return "", err1
+	case err2 != nil:
+		return "", err2
+	case errExists.Err.AccountLabelAlreadyExists == name:
+		return "", errors.New("account already exists with that name")
+	}
 
-	//walletInfo := WalletInfo{
-	//AmountAwaitingConfirmation: amountAwaitingConfirmation,
-	//AmountAwaitingFinalization: amountAwaitingFinalization,
-	//AmountCurrentSpendable:     amountCurrentSpendable,
-	//AmountImmature:             amountImmature,
-	//AmountLocked:               amountLocked,
-	//LastConfirmedHeight:        lastConfirmedHeight,
-	//MinimumConfirmations:       minimumConfirmations,
-	//Total:                      total,
-	//}
-
-	//jsn, _ := json.Marshal(walletInfo)
-	//fmt.Printf("%s\n", jsn)
-	//}
+	return path.Ok, nil
 }
 
 func main() {
@@ -154,26 +129,16 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	check(err)
 
-	summary := RPCSummary(cfg)
-	fmt.Println(summary)
+	//summary, _ := GrinSummary(cfg)
+	//fmt.Println(summary)
 
-	//RPCAccount(cfg)
-	//results := AccountsResult{
-	//	Accounts: []Account{
-	//		{
-	//			label: "darkstar",
-	//			path:  "1234",
-	//		},
-	//		{
-	//			label: "player",
-	//			path:  "12345",
-	//		},
-	//		{
-	//			label: "player3",
-	//			path:  "12345",
-	//		},
-	//	},
-	//}
-	//b, _ := json.Marshal(results)
-	//fmt.Printf("%s", b)
+	path, err := GrinCreateAccount(cfg, "darkstar2")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(path)
+	}
+
+	accounts, _ := GrinAccounts(cfg)
+	fmt.Println(accounts)
 }
