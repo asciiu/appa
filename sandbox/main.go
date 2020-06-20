@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/asciiu/appa/lib/config"
 	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 	"github.com/ybbus/jsonrpc"
 )
 
@@ -81,9 +81,28 @@ type AccountsResult struct {
 func GrinAccounts(conf GrinConfig) (*AccountsResult, error) {
 	rpcClient := jsonrpc.NewClient(conf.URL)
 	responseAccounts, err := rpcClient.Call("accounts")
+	if err != nil {
+		return nil, err
+	}
 	var okAccounts AccountsResult
 	err = responseAccounts.GetObject(&okAccounts)
 	return &okAccounts, err
+}
+
+func GrinTransactions(conf GrinConfig) error {
+	rpcClient := jsonrpc.NewClient(conf.URL)
+
+	response, err := rpcClient.Call("retrieve_txs", true, nil, nil)
+	if err != nil {
+		return err
+
+	}
+	if response.Error != nil {
+		return errors.New(response.Error.Message)
+	}
+	printResult(*response)
+
+	return nil
 }
 
 func GrinCreateAccount(conf GrinConfig, name string) (string, error) {
@@ -129,16 +148,31 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	check(err)
 
-	//summary, _ := GrinSummary(cfg)
-	//fmt.Println(summary)
-
-	path, err := GrinCreateAccount(cfg, "darkstar2")
+	summary, err := GrinSummary(cfg)
 	if err != nil {
-		fmt.Println(err)
+		log.WithFields(log.Fields{
+			"function": "GrinSummary",
+		}).Error(err)
 	} else {
-		fmt.Println(path)
+		fmt.Println(summary)
 	}
 
-	accounts, _ := GrinAccounts(cfg)
-	fmt.Println(accounts)
+	// path, err := GrinCreateAccount(cfg, "darkstar2")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println(path)
+	// }
+
+	accounts, err := GrinAccounts(cfg)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function": "GrinAccount",
+		}).Error(err)
+	} else {
+		fmt.Println(accounts)
+	}
+
+	err = GrinTransactions(cfg)
+	check(err)
 }
