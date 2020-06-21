@@ -33,9 +33,6 @@ func main() {
 	sharedKey, err := grin.InitSecureApi(cfg)
 	checkErr("init secure api", err)
 
-	nonce, err := grin.GenerateNonce()
-	checkErr("gen 12 byte nonce", err)
-
 	pass := "I am a warrior"
-	grin.OpenWallet(cfg, sharedKey, nonce, nil, &pass)
+	grin.OpenWallet(cfg, sharedKey, nil, &pass)
 }

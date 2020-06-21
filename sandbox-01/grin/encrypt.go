@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-func GenerateNonce() ([]byte, error) {
+func generateNonce() ([]byte, error) {
 	// Never use more than 2^32 random nonces with a given key because of
 	// the risk of a repeat.
 	nonce := make([]byte, 12)

@@ -52,6 +52,9 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 		Public: privateKey.PublicKey.Hex(true),
 	}
 
+	p, _ := json.Marshal(params)
+	log.Infof("init_secure_api request %s", p)
+
 	rpcClient := jsonrpc.NewClient(conf.URL)
 	response, err := rpcClient.Call("init_secure_api", &params)
 	if err != nil {
@@ -64,7 +67,7 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 		return []byte{}, fmt.Errorf("get reponse object failed: %s", err)
 	}
 
-	log.Infof("received public key result: %s", result.PublicKey)
+	log.Infof("init_secure_api response: %s", result.PublicKey)
 
 	remotePublicKey, err := ecies.NewPublicKeyFromHex(result.PublicKey)
 	if err != nil {
@@ -139,7 +142,7 @@ func EncryptedRquest(conf GrinConfig, nonce []byte, body string) {
 	printResult(*response)
 }
 
-func OpenWallet(conf GrinConfig, key []byte, nonce []byte, name, password *string) error {
+func OpenWallet(conf GrinConfig, key []byte, name, password *string) error {
 	body := Body{
 		Jsonrpc: "2.0",
 		ID:      1,
@@ -154,8 +157,11 @@ func OpenWallet(conf GrinConfig, key []byte, nonce []byte, name, password *strin
 	}
 
 	req, err := json.Marshal(body)
-	log.Infof("new request: %s", req)
+	log.Infof("open_wallet request: %s", req)
 	checkErr("marshall json", err)
+
+	nonce, err := generateNonce()
+	checkErr("failed generate nonce", err)
 
 	base64Str, err := Encrypt(key, nonce, req)
 	checkErr("encrypt message", err)
