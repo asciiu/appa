@@ -21,6 +21,13 @@ type GrinConfig struct {
 	URL string `envconfig:"GRIN_API_URL" required:"true"`
 }
 
+type Body struct {
+	Jsonrpc string      `json:"jsonrpc"`
+	ID      uint        `json:"id"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params"`
+}
+
 // type OkJson struct {
 // 	Ok []json.RawMessage
 // }
@@ -51,7 +58,6 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 	}{
 		Public: privateKey.PublicKey.Hex(true),
 	}
-
 	p, _ := json.Marshal(params)
 	log.Infof("init_secure_api request %s", p)
 
@@ -64,7 +70,7 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 	var result Ok
 	err = response.GetObject(&result)
 	if err != nil {
-		return []byte{}, fmt.Errorf("get reponse object failed: %s", err)
+		return []byte{}, fmt.Errorf("get response object failed: %s", err)
 	}
 
 	log.Infof("init_secure_api response: %s", result.PublicKey)
@@ -123,7 +129,7 @@ func printResult(response jsonrpc.RPCResponse) {
 // 	}
 // }
 
-func EncryptedRquest(conf GrinConfig, nonce []byte, body string) {
+func encryptedRquest(conf GrinConfig, nonce []byte, body string) {
 	params := struct {
 		Nonce   string `json:"nonce"`
 		BodyEnc string `json:"body_enc"`
@@ -133,7 +139,7 @@ func EncryptedRquest(conf GrinConfig, nonce []byte, body string) {
 	}
 
 	j, _ := json.Marshal(params)
-	log.Infof("encrypted_request_v3 %s", j)
+	log.Infof("encrypted_request_v3 request: %s", j)
 
 	rpcClient := jsonrpc.NewClient(conf.URL)
 	response, err := rpcClient.Call("encrypted_request_v3", &params)
@@ -142,17 +148,19 @@ func EncryptedRquest(conf GrinConfig, nonce []byte, body string) {
 	printResult(*response)
 }
 
+type openWalletParams struct {
+	Name     *string `json:"name"`
+	Password *string `json:"password"`
+}
+
 func OpenWallet(conf GrinConfig, key []byte, name, password *string) error {
 	body := Body{
 		Jsonrpc: "2.0",
 		ID:      1,
 		Method:  "open_wallet",
-		Params: struct {
-			Name     *string `json:"name"`
-			Password string  `json:"password"`
-		}{
+		Params: openWalletParams{
 			Name:     name,
-			Password: *password,
+			Password: password,
 		},
 	}
 
@@ -166,7 +174,7 @@ func OpenWallet(conf GrinConfig, key []byte, name, password *string) error {
 	base64Str, err := Encrypt(key, nonce, req)
 	checkErr("encrypt message", err)
 
-	EncryptedRquest(conf, nonce, base64Str)
+	encryptedRquest(conf, nonce, base64Str)
 
 	return nil
 }
@@ -227,10 +235,3 @@ func OpenWallet(conf GrinConfig, key []byte, name, password *string) error {
 
 // 	return path.Ok, nil
 // }
-
-type Body struct {
-	Jsonrpc string      `json:"jsonrpc"`
-	ID      uint        `json:"id"`
-	Method  string      `json:"method"`
-	Params  interface{} `json:"params"`
-}

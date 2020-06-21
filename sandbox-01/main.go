@@ -30,9 +30,9 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	checkErr("process config", err)
 
-	sharedKey, err := grin.InitSecureApi(cfg)
+	key, err := grin.InitSecureApi(cfg)
 	checkErr("init secure api", err)
 
 	pass := "I am a warrior"
-	grin.OpenWallet(cfg, sharedKey, nil, &pass)
+	grin.OpenWallet(cfg, key, nil, &pass)
 }
