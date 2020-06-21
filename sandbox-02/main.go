@@ -39,6 +39,18 @@ func GenerateKeyAndNonce() (string, string, error) {
 
 }
 
+func GenerateNonce() (string, error) {
+	// Never use more than 2^32 random nonces with a given key because of
+	// the risk of a repeat.
+	nonce := make([]byte, 12)
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", nonce), nil
+
+}
+
 func ValidateKeyAndNonce(keyHexStr, nonceHexStr string) ([]byte, []byte, error) {
 	key, err := hex.DecodeString(keyHexStr)
 	if err != nil {

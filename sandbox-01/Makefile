@@ -1,2 +1,2 @@
 run-dev:
-	go run main.go config/dev.env
+	go run main.go encrypt.go config/dev.env
