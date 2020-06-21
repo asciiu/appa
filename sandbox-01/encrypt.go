@@ -18,15 +18,15 @@ func CheckErr(str string, err error) {
 	}
 }
 
-func GenerateNonce() ([]byte, string, error) {
+func GenerateNonce() ([]byte, error) {
 	// Never use more than 2^32 random nonces with a given key because of
 	// the risk of a repeat.
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return []byte{}, "", err
+		return []byte{}, err
 	}
 
-	return nonce, fmt.Sprintf("%x", nonce), nil
+	return nonce, nil
 
 }
 
@@ -50,12 +50,12 @@ func Encrypt(key, nonce, body []byte) (string, error) {
 		return "", err
 	}
 
-	aesgcm, err := cipher.NewGCMWithNonceSize(block, 12)
+	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
 
-	cipherText := aesgcm.Seal(nil, nonce, body, nil)
+	cipherText := aesgcm.Seal(nonce, nonce, body, nil)
 
 	return base64.StdEncoding.EncodeToString(cipherText), nil
 }

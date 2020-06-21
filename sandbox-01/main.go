@@ -23,21 +23,6 @@ type GrinConfig struct {
 	URL string `envconfig:"GRIN_API_URL" required:"true"`
 }
 
-// type OkJson struct {
-// 	Ok []json.RawMessage
-// }
-
-// type SummaryInfo struct {
-// 	AmountAwaitingConfirmation string `json:"amount_awaiting_confirmation"`
-// 	AmountAwaitingFinalization string `json:"amount_awaiting_finalization"`
-// 	AmountCurrentlySpendable   string `json:"amount_currently_spendable"`
-// 	AmountImmature             string `json:"amount_immature"`
-// 	AmountLocked               string `json:"amount_locked"`
-// 	LastConfirmedHeight        string `json:"last_confirmed_height"`
-// 	MinimumConfirmations       string `json:"minimum_confirmations"`
-// 	Total                      string `json:"total"`
-// }
-
 func InitSecureApi(conf GrinConfig) ([]byte, error) {
 	type Ok struct {
 		PublicKey string `json:"Ok"`
@@ -74,62 +59,25 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 	return sharedKey, nil
 }
 
-// func GrinSummary(conf GrinConfig) (*SummaryInfo, error) {
-// 	rpcClient := jsonrpc.NewClient(conf.URL)
-// 	response, err := rpcClient.Call("retrieve_summary_info", true, 10)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	var okj OkJson
-// 	response.GetObject(&okj)
-
-// 	//var aBool bool
-// 	//_ = json.Unmarshal(okj.Ok[0], &aBool)
-// 	//fmt.Println(aBool)
-
-// 	var info SummaryInfo
-// 	_ = json.Unmarshal(okj.Ok[1], &info)
-// 	return &info, nil
-// }
-
 func printResult(response jsonrpc.RPCResponse) {
 	j, _ := json.Marshal(response)
 	log.Printf("%s\n", j)
 }
 
-// type ErrAccountExists struct {
-// 	Err struct {
-// 		AccountLabelAlreadyExists string
-// 	}
-// }
-
-// type CreateAccountPathResult struct {
-// 	Ok string
-// }
-
-// type AccountsResult struct {
-// 	Ok []struct {
-// 		Label string `json:"label"`
-// 		Path  string `json:"path"`
-// 	}
-// }
-
-func EncryptedRquest(conf GrinConfig, nonce, base64Str string) error {
-	type params struct {
+func EncryptedRquest(conf GrinConfig, nonce []byte, base64Str string) error {
+	params := struct {
 		Nonce   string `json:"nonce"`
 		BodyEnc string `json:"body_enc"`
-	}
-
-	p := &params{
-		Nonce:   nonce,
+	}{
+		Nonce:   fmt.Sprintf("%x", nonce),
 		BodyEnc: base64Str,
 	}
-	j, _ := json.Marshal(p)
+
+	j, _ := json.Marshal(params)
 	log.Infof("encrypted_request_v3 %s", j)
 
 	rpcClient := jsonrpc.NewClient(conf.URL)
-	response, err := rpcClient.Call("encrypted_request_v3", p)
+	response, err := rpcClient.Call("encrypted_request_v3", &params)
 	if err != nil {
 		return err
 	}
@@ -138,62 +86,32 @@ func EncryptedRquest(conf GrinConfig, nonce, base64Str string) error {
 	return nil
 }
 
-// func GrinAccounts(conf GrinConfig) (*AccountsResult, error) {
-// 	rpcClient := jsonrpc.NewClient(conf.URL)
-// 	responseAccounts, err := rpcClient.Call("accounts")
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var okAccounts AccountsResult
-// 	err = responseAccounts.GetObject(&okAccounts)
-// 	return &okAccounts, err
-// }
+func OpenWallet(conf GrinConfig, key []byte, nonce []byte, name, password *string) error {
+	body := Body{
+		Jsonrpc: "2.0",
+		ID:      1,
+		Method:  "open_wallet",
+		Params: struct {
+			Name     *string `json:"name"`
+			Password *string `json:"password"`
+		}{
+			Name:     name,
+			Password: password,
+		},
+	}
 
-// func GrinTransactions(conf GrinConfig) error {
-// 	rpcClient := jsonrpc.NewClient(conf.URL)
+	req, err := json.Marshal(body)
+	log.Infof("open wallet request: %s", req)
+	checkErr("marshall json", err)
 
-// 	response, err := rpcClient.Call("retrieve_txs", true, nil, nil)
-// 	if err != nil {
-// 		return err
+	base64Str, err := Encrypt(key, nonce, req)
+	checkErr("encrypt message", err)
 
-// 	}
-// 	if response.Error != nil {
-// 		return errors.New(response.Error.Message)
-// 	}
-// 	printResult(*response)
+	err = EncryptedRquest(conf, nonce, base64Str)
+	checkErr("encrypted request failed", err)
 
-// 	return nil
-// }
-
-// func GrinCreateAccount(conf GrinConfig, name string) (string, error) {
-// 	rpcClient := jsonrpc.NewClient(conf.URL)
-
-// 	response, err := rpcClient.Call("create_account_path", name)
-// 	if err != nil {
-// 		return "", err
-
-// 	}
-// 	if response.Error != nil {
-// 		return "", errors.New(response.Error.Message)
-// 	}
-
-// 	var errExists ErrAccountExists
-// 	err1 := response.GetObject(&errExists)
-
-// 	var path CreateAccountPathResult
-// 	err2 := response.GetObject(&path)
-
-// 	switch {
-// 	case err1 != nil:
-// 		return "", err1
-// 	case err2 != nil:
-// 		return "", err2
-// 	case errExists.Err.AccountLabelAlreadyExists == name:
-// 		return "", errors.New("account already exists with that name")
-// 	}
-
-// 	return path.Ok, nil
-// }
+	return nil
+}
 
 type Body struct {
 	Jsonrpc string      `json:"jsonrpc"`
@@ -218,51 +136,9 @@ func main() {
 	sharedKey, err := InitSecureApi(cfg)
 	checkErr("init secure api", err)
 
-	nonce, nonceHex, err := GenerateNonce()
-	checkErr("gen nonce", err)
+	nonce, err := GenerateNonce()
+	checkErr("gen 12 byte nonce", err)
 
-	body := Body{
-		Jsonrpc: "2.0",
-		ID:      1,
-		Method:  "retrieve_summary_info",
-		Params:  []interface{}{true, 10},
-	}
-
-	req, err := json.Marshal(body)
-	log.Infof("new request: %s", req)
-	checkErr("marshall json", err)
-
-	base64Str, err := Encrypt(sharedKey, nonce, req)
-	checkErr("encrypt message", err)
-
-	err = EncryptedRquest(cfg, nonceHex, base64Str)
-	checkErr("what is this?", err)
-
-	//summary, err := GrinSummary(cfg)
-	//if err != nil {
-	//	log.WithFields(log.Fields{
-	//		"function": "GrinSummary",
-	//	}).Error(err)
-	//} else {
-	//	fmt.Println(summary)
-	//}
-
-	// path, err := GrinCreateAccount(cfg, "darkstar2")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println(path)
-	// }
-
-	//accounts, err := GrinAccounts(cfg)
-	//if err != nil {
-	//	log.WithFields(log.Fields{
-	//		"function": "GrinAccount",
-	//	}).Error(err)
-	//} else {
-	//	fmt.Println(accounts)
-	//}
-
-	//err = GrinTransactions(cfg)
-	//check(err)
+	pass := "I am a warrior"
+	OpenWallet(cfg, sharedKey, nonce, nil, &pass)
 }
