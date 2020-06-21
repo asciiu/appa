@@ -43,7 +43,10 @@
 			"path": "util-tensor"
 		},
 		{
-			"path": "sandbox"
+			"path": "sandbox-01"
+		},
+		{
+			"path": "sandbox-02"
 		},
 		{
 			"path": "sandbox-coinbase"

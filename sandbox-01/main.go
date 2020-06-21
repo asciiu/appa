@@ -1,9 +1,15 @@
 package main
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/asciiu/appa/lib/config"
@@ -44,13 +50,12 @@ func InitSecureApi(conf GrinConfig) (string, error) {
 	}
 
 	rpcClient := jsonrpc.NewClient(conf.URL)
-	key, err := ecies.GenerateKey()
+	secp256k1, err := ecies.GenerateKey()
 	if err != nil {
 		return "", fmt.Errorf("generate key failed: %s", err)
 	}
 
-	publicKey := key.PublicKey.Hex(true)
-	response, err := rpcClient.Call("init_secure_api", publicKey)
+	response, err := rpcClient.Call("init_secure_api", secp256k1.PublicKey.Hex(true))
 	if err != nil {
 		return "", fmt.Errorf("init_secure_api failed: %s", err)
 	}
@@ -65,11 +70,33 @@ func InitSecureApi(conf GrinConfig) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed remote public key %s", err)
 	}
-	sharedKey, err := key.ECDH(remotePublicKey)
+	sharedKey, err := secp256k1.ECDH(remotePublicKey)
 
 	pk := ecies.NewPrivateKeyFromBytes(sharedKey)
+	ecies.Encrypt(pk.PublicKey)
 
 	return pk.Hex(), nil
+}
+
+func createHash(key string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func encrypt(sharedKey []byte, jsonBody string) []byte {
+	block, _ := aes.NewCipher([]byte(createHash(jsonBody)))
+	gcm, err := cipher.NewGCMWithNonceSize(block, 12)
+	//gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		panic(err.Error())
+	}
+	ciphertext := gcm.Seal(nonce, nonce, data, nil)
+	return ciphertext
 }
 
 func GrinSummary(conf GrinConfig) (*SummaryInfo, error) {
