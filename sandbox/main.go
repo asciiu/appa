@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/asciiu/appa/lib/config"
+	ecies "github.com/ecies/go"
 	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 	"github.com/ybbus/jsonrpc"
@@ -35,6 +36,40 @@ type SummaryInfo struct {
 	LastConfirmedHeight        string `json:"last_confirmed_height"`
 	MinimumConfirmations       string `json:"minimum_confirmations"`
 	Total                      string `json:"total"`
+}
+
+func InitSecureApi(conf GrinConfig) (string, error) {
+	type Ok struct {
+		PublicKey string `json:"Ok"`
+	}
+
+	rpcClient := jsonrpc.NewClient(conf.URL)
+	key, err := ecies.GenerateKey()
+	if err != nil {
+		return "", fmt.Errorf("generate key failed: %s", err)
+	}
+
+	publicKey := key.PublicKey.Hex(true)
+	response, err := rpcClient.Call("init_secure_api", publicKey)
+	if err != nil {
+		return "", fmt.Errorf("init_secure_api failed: %s", err)
+	}
+
+	var result Ok
+	err = response.GetObject(&result)
+	if err != nil {
+		return "", fmt.Errorf("get reponse object failed: %s", err)
+	}
+
+	remotePublicKey, err := ecies.NewPublicKeyFromHex(result.PublicKey)
+	if err != nil {
+		return "", fmt.Errorf("failed remote public key %s", err)
+	}
+	sharedKey, err := key.ECDH(remotePublicKey)
+
+	pk := ecies.NewPrivateKeyFromBytes(sharedKey)
+
+	return pk.Hex(), nil
 }
 
 func GrinSummary(conf GrinConfig) (*SummaryInfo, error) {
@@ -148,6 +183,11 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	check(err)
 
+	shared, err := InitSecureApi(cfg)
+	check(err)
+
+	log.Println(shared)
+
 	summary, err := GrinSummary(cfg)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -164,15 +204,15 @@ func main() {
 	// 	fmt.Println(path)
 	// }
 
-	accounts, err := GrinAccounts(cfg)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"function": "GrinAccount",
-		}).Error(err)
-	} else {
-		fmt.Println(accounts)
-	}
+	//accounts, err := GrinAccounts(cfg)
+	//if err != nil {
+	//	log.WithFields(log.Fields{
+	//		"function": "GrinAccount",
+	//	}).Error(err)
+	//} else {
+	//	fmt.Println(accounts)
+	//}
 
-	err = GrinTransactions(cfg)
-	check(err)
+	//err = GrinTransactions(cfg)
+	//check(err)
 }
