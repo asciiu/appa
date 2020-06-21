@@ -43,13 +43,13 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 		PublicKey string `json:"Ok"`
 	}
 
-	rpcClient := jsonrpc.NewClient(conf.URL)
-	secp256k1, err := ecies.GenerateKey()
+	privateKey, err := ecies.GenerateKey()
 	if err != nil {
 		return []byte{}, fmt.Errorf("generate key failed: %s", err)
 	}
 
-	response, err := rpcClient.Call("init_secure_api", secp256k1.PublicKey.Hex(true))
+	rpcClient := jsonrpc.NewClient(conf.URL)
+	response, err := rpcClient.Call("init_secure_api", privateKey.PublicKey.Hex(true))
 	if err != nil {
 		return []byte{}, fmt.Errorf("init_secure_api failed: %s", err)
 	}
@@ -60,11 +60,16 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 		return []byte{}, fmt.Errorf("get reponse object failed: %s", err)
 	}
 
+	log.Infof("received public key result: %s", result.PublicKey)
+
 	remotePublicKey, err := ecies.NewPublicKeyFromHex(result.PublicKey)
 	if err != nil {
 		return []byte{}, fmt.Errorf("failed remote public key %s", err)
 	}
-	sharedKey, err := secp256k1.ECDH(remotePublicKey)
+	sharedKey, err := privateKey.ECDH(remotePublicKey)
+	if err != nil {
+		return []byte{}, fmt.Errorf("failed ecdh %s", err)
+	}
 
 	return sharedKey, nil
 }
@@ -110,14 +115,21 @@ func printResult(response jsonrpc.RPCResponse) {
 // 	}
 // }
 
-func EncryptedResponseV3(conf GrinConfig, nonce, base64Str string) error {
+func EncryptedRquest(conf GrinConfig, nonce, base64Str string) error {
 	type params struct {
 		Nonce   string `json:"nonce"`
 		BodyEnc string `json:"body_enc"`
 	}
 
+	p := &params{
+		Nonce:   nonce,
+		BodyEnc: base64Str,
+	}
+	j, _ := json.Marshal(p)
+	log.Infof("encrypted_request_v3 %s", j)
+
 	rpcClient := jsonrpc.NewClient(conf.URL)
-	response, err := rpcClient.Call("encrypted_request_v3", &params{Nonce: nonce, BodyEnc: base64Str})
+	response, err := rpcClient.Call("encrypted_request_v3", p)
 	if err != nil {
 		return err
 	}
@@ -186,7 +198,7 @@ func EncryptedResponseV3(conf GrinConfig, nonce, base64Str string) error {
 type Body struct {
 	Jsonrpc string      `json:"jsonrpc"`
 	ID      uint        `json:"id"`
-	Method  string      `json:"string"`
+	Method  string      `json:"method"`
 	Params  interface{} `json:"params"`
 }
 
@@ -203,6 +215,12 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	checkErr("process config", err)
 
+	sharedKey, err := InitSecureApi(cfg)
+	checkErr("init secure api", err)
+
+	nonce, nonceHex, err := GenerateNonce()
+	checkErr("gen nonce", err)
+
 	body := Body{
 		Jsonrpc: "2.0",
 		ID:      1,
@@ -210,19 +228,14 @@ func main() {
 		Params:  []interface{}{true, 10},
 	}
 
-	j, err := json.Marshal(body)
+	req, err := json.Marshal(body)
+	log.Infof("new request: %s", req)
 	checkErr("marshall json", err)
 
-	sharedKey, err := InitSecureApi(cfg)
-	checkErr("init secure api", err)
-
-	nonce, nonceHex, err := GenerateNonce()
-	checkErr("gen nonce", err)
-
-	base64Str, err := Encrypt(sharedKey, []byte(nonce), j)
+	base64Str, err := Encrypt(sharedKey, nonce, req)
 	checkErr("encrypt message", err)
 
-	err = EncryptedResponseV3(cfg, nonceHex, base64Str)
+	err = EncryptedRquest(cfg, nonceHex, base64Str)
 	checkErr("what is this?", err)
 
 	//summary, err := GrinSummary(cfg)

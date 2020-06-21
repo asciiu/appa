@@ -44,18 +44,18 @@ func ValidateKeyAndNonce(keyHexStr, nonceHexStr string) ([]byte, []byte, error) 
 	return key, nonce, nil
 }
 
-func Encrypt(key []byte, nonce []byte, payload []byte) (string, error) {
+func Encrypt(key, nonce, body []byte) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
+	aesgcm, err := cipher.NewGCMWithNonceSize(block, 12)
 	if err != nil {
 		return "", err
 	}
 
-	cipherText := aesgcm.Seal(nil, nonce, payload, nil)
+	cipherText := aesgcm.Seal(nil, nonce, body, nil)
 
 	return base64.StdEncoding.EncodeToString(cipherText), nil
 }
