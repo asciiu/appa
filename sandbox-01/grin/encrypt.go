@@ -1,4 +1,4 @@
-package main
+package grin
 
 import (
 	"crypto/aes"
@@ -6,17 +6,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"io"
-	"os"
 )
-
-func CheckErr(str string, err error) {
-	if err != nil {
-		fmt.Printf("%s: %s\n", str, err.Error())
-		os.Exit(1)
-	}
-}
 
 func GenerateNonce() ([]byte, error) {
 	// Never use more than 2^32 random nonces with a given key because of
@@ -27,7 +18,6 @@ func GenerateNonce() ([]byte, error) {
 	}
 
 	return nonce, nil
-
 }
 
 func ValidateKeyAndNonce(keyHexStr, nonceHexStr string) ([]byte, []byte, error) {

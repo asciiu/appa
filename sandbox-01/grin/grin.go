@@ -12,7 +12,7 @@ import (
 
 func checkErr(label string, err error) {
 	if err != nil {
-		fmt.Printf("%s: %s\n", label, err.Error())
+		log.Errorf("%s: %s\n", label, err.Error())
 		os.Exit(1)
 	}
 }
@@ -43,11 +43,17 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 
 	privateKey, err := ecies.GenerateKey()
 	if err != nil {
-		return []byte{}, fmt.Errorf("generate key failed: %s", err)
+		return []byte{}, fmt.Errorf("generate key pair failed: %s", err)
+	}
+
+	params := struct {
+		Public string `json:"ecdh_pubkey"`
+	}{
+		Public: privateKey.PublicKey.Hex(true),
 	}
 
 	rpcClient := jsonrpc.NewClient(conf.URL)
-	response, err := rpcClient.Call("init_secure_api", privateKey.PublicKey.Hex(true))
+	response, err := rpcClient.Call("init_secure_api", &params)
 	if err != nil {
 		return []byte{}, fmt.Errorf("init_secure_api failed: %s", err)
 	}
@@ -64,6 +70,7 @@ func InitSecureApi(conf GrinConfig) ([]byte, error) {
 	if err != nil {
 		return []byte{}, fmt.Errorf("failed remote public key %s", err)
 	}
+
 	sharedKey, err := privateKey.ECDH(remotePublicKey)
 	if err != nil {
 		return []byte{}, fmt.Errorf("failed ecdh %s", err)
@@ -113,13 +120,13 @@ func printResult(response jsonrpc.RPCResponse) {
 // 	}
 // }
 
-func EncryptedRquest(conf GrinConfig, nonce []byte, base64Str string) error {
+func EncryptedRquest(conf GrinConfig, nonce []byte, body string) {
 	params := struct {
 		Nonce   string `json:"nonce"`
 		BodyEnc string `json:"body_enc"`
 	}{
 		Nonce:   fmt.Sprintf("%x", nonce),
-		BodyEnc: base64Str,
+		BodyEnc: body,
 	}
 
 	j, _ := json.Marshal(params)
@@ -127,12 +134,9 @@ func EncryptedRquest(conf GrinConfig, nonce []byte, base64Str string) error {
 
 	rpcClient := jsonrpc.NewClient(conf.URL)
 	response, err := rpcClient.Call("encrypted_request_v3", &params)
-	if err != nil {
-		return err
-	}
-	printResult(*response)
+	checkErr("encrypted_request_v3 failed", err)
 
-	return nil
+	printResult(*response)
 }
 
 func OpenWallet(conf GrinConfig, key []byte, nonce []byte, name, password *string) error {
@@ -156,8 +160,7 @@ func OpenWallet(conf GrinConfig, key []byte, nonce []byte, name, password *strin
 	base64Str, err := Encrypt(key, nonce, req)
 	checkErr("encrypt message", err)
 
-	err = EncryptedRquest(conf, nonce, base64Str)
-	checkErr("encrypted request failed", err)
+	EncryptedRquest(conf, nonce, base64Str)
 
 	return nil
 }

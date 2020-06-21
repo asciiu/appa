@@ -1,4 +1,4 @@
-module github.com/asciiu/appa/sandbox
+module github.com/asciiu/appa/sandbox-01
 
 go 1.14
 
