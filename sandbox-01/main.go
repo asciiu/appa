@@ -30,9 +30,13 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	checkErr("process config", err)
 
-	key, err := grin.InitSecureApi(cfg)
-	checkErr("init secure api", err)
+	api := rin.NewSecureOwnerAPI(cfg.URL)
 
-	pass := "I am a warrior"
-	grin.OpenWallet(cfg, key, nil, &pass)
+	err := api.Init()
+	checkErr("failed to init api", err)
+
+	err := api.Open(nil, "I am a warrior")
+	checkErr("failed to open wallet", err)
+
+	log.Infof("success: %s", api)
 }

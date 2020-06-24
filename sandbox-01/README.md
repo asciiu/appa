@@ -12,6 +12,6 @@ $ grin-wallet --floonet owner_api
 
 Do you curl bro?
 ```
-curl -0 -XPOST -u grin:`cat /Users/bishop/Workspace/Rust/grin-wallet/target/release/.owner_api_secret` --data '{"jsonrpc":"2.0","method":"encrypted_request_v3","params":{"nonce":"4a8147a78657cdd109f7fda4","body_enc":"SoFHp4ZXzdEJ9/2kwWj7CT3FcEoaBMry2Pr7FxKA1p463SUN65PSwr1trwP3lBwC4K0JlUqQvS80mNvuKjHwCiWzQvbVixWcecvMMsNYSc9ijVD/eS58WICBnEx7+MS3DJ8Pf/co32cNDbChiOzb9Bq1LtQeiLRqIcLsA785"}, "id":1}' http://127.0.0.1:3420/v3/owner
+curl -0 -XPOST -u grin:`cat /Users/bishop/Workspace/Rust/grin-wallet/target/release/.owner_api_secret` --data '{"jsonrpc":"2.0","id":1,"method":"encrypted_request_v3","params":{"nonce":"ed09086dee4eb419832f6e75","body_enc":"eYFCvN4hhIYH+5PjH/gBewDZBs+CskIALBFkB76XLG98aJ5oC69F0kBsM2ITFX8tbt6wO4dBQYsfwKiNB5TZEKe/61l4oWokO7y3oZTLetMIrvpQH9nsOdUkXzPJoxqv7MdJanxsGougOJcmb6D3W9kM"}}' http://127.0.0.1:3420/v3/owner
 
 ```
