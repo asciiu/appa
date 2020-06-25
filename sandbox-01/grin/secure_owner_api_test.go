@@ -67,6 +67,20 @@ func TestReal(t *testing.T) {
 
 	log.Infof("%+v\n", summary)
 
+	_, txLogEntries, err := ownerAPI.RetrieveTxs(true, nil, nil)
+	for _, txn := range *txLogEntries {
+
+		log.Info("slate ID: ", txn.TxSlateID)
+		log.Info("stored tx: ", txn.StoredTx)
+		log.Info("type: ", txn.TxType)
+		log.Info("confirmed: ", txn.Confirmed)
+		log.Infof("credited: %d", txn.AmountCredited)
+		log.Infof("debited: %d", txn.AmountDebited)
+		log.Infof("fee: %d", txn.Fee)
+		log.Infof("confirm at: %s", txn.ConfirmationTs)
+		log.Info("-------------------")
+	}
+
 	if err := ownerAPI.Close(nil); err != nil {
 		assert.Error(t, err)
 	}
