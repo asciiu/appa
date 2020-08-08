@@ -65,11 +65,14 @@ func TestReal(t *testing.T) {
 
 	assert.True(t, fresh, "refresh from node should be true")
 
-	log.Infof("%+v\n", summary)
+	//log.Infof("%+v\n", summary)
+	log.Info("height: ", summary.LastConfirmedHeight)
+	log.Info("balance: ", summary.AmountCurrentlySpendable)
 
 	_, txLogEntries, err := ownerAPI.RetrieveTxs(true, nil, nil)
 	for _, txn := range *txLogEntries {
 
+		log.Info("--------------------------")
 		log.Info("slate ID: ", txn.TxSlateID)
 		log.Info("stored tx: ", txn.StoredTx)
 		log.Info("type: ", txn.TxType)
@@ -78,7 +81,6 @@ func TestReal(t *testing.T) {
 		log.Infof("debited: %d", txn.AmountDebited)
 		log.Infof("fee: %d", txn.Fee)
 		log.Infof("confirm at: %s", txn.ConfirmationTs)
-		log.Info("-------------------")
 	}
 
 	if err := ownerAPI.Close(nil); err != nil {

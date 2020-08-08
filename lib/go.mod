@@ -6,6 +6,7 @@ require (
 	github.com/go-pg/pg/v10 v10.0.0-alpha.0
 	github.com/go-testfixtures/testfixtures/v3 v3.2.0
 	github.com/google/uuid v1.1.1
+	github.com/jszwec/csvutil v1.4.0
 	github.com/kkdai/youtube v1.2.1
 	github.com/lib/pq v1.5.2
 	github.com/stretchr/testify v1.5.1

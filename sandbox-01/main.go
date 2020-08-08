@@ -30,7 +30,7 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	checkErr("process config", err)
 
-	api := rin.NewSecureOwnerAPI(cfg.URL)
+	api := grin.NewSecureOwnerAPI(cfg.URL)
 
 	err := api.Init()
 	checkErr("failed to init api", err)

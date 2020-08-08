@@ -72,6 +72,8 @@ github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
 github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
+github.com/jszwec/csvutil v1.4.0 h1:ro7gZN8PRsyNUEX8qE/eYPE5/kffEXMs+4eRcOd1oUk=
+github.com/jszwec/csvutil v1.4.0/go.mod h1:Rpu7Uu9giO9subDyMCIQfHVDuLrcaC36UA4YcJjGBkg=
 github.com/kkdai/youtube v1.2.1 h1:2HBlGR4LoDud/i9aRI66AnuEQ2n7YIVgEc48Gwq5Q/0=
 github.com/kkdai/youtube v1.2.1/go.mod h1:vMBo9pO0Kbzqft0eo0apOm12mx/jsJyuDTK2GsLoTwM=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
