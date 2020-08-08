@@ -3,6 +3,7 @@ package util
 import (
 	"archive/zip"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -39,10 +40,15 @@ func ZipFiles(filename string, files []string) error {
 	if err != nil {
 		return err
 	}
-	defer newZipFile.Close()
 
 	zipWriter := zip.NewWriter(newZipFile)
-	defer zipWriter.Close()
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Trapped panic: %s (%T)\n", err, err)
+		}
+		newZipFile.Close()
+		zipWriter.Close()
+	}()
 
 	// Add files to zip
 	for _, file := range files {
