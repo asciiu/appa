@@ -49,6 +49,9 @@
 			"path": "sandbox-02"
 		},
 		{
+			"path": "sandbox-btc"
+		},
+		{
 			"path": "sandbox-coinbase"
 		}
 	],
