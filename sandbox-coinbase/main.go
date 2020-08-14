@@ -52,8 +52,8 @@ func main() {
 
 	getFills := coinbaseFills()
 	btcFills := getFills("BTC-USD")
-	ethFills := getFiles("ETH-USD")
-	ltcFills := getFiles("LTC-USD")
+	ethFills := getFills("ETH-USD")
+	ltcFills := getFills("LTC-USD")
 
 	allFills := append(btcFills, ethFills...)
 	allFills = append(allFills, ltcFills...)

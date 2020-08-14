@@ -6,6 +6,7 @@ import (
 
 	"github.com/asciiu/appa/lib/config"
 	"github.com/asciiu/appa/sandbox-01/grin"
+	"github.com/blockcypher/libgrin/owner"
 	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,12 +31,12 @@ func main() {
 	err := envconfig.Process("", &cfg)
 	checkErr("process config", err)
 
-	api := grin.NewSecureOwnerAPI(cfg.URL)
+	api := owner.NewSecureOwnerAPI(cfg.URL)
 
-	err := api.Init()
+	err = api.Init()
 	checkErr("failed to init api", err)
 
-	err := api.Open(nil, "I am a warrior")
+	err = api.Open(nil, "I am a warrior")
 	checkErr("failed to open wallet", err)
 
 	log.Infof("success: %s", api)
