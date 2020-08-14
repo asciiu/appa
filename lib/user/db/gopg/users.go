@@ -25,8 +25,10 @@ func (r *UserRepo) DeleteUserSoft(userID string) error {
 
 func (r *UserRepo) FindUserByEmail(email string) (*models.User, error) {
 	u := new(models.User)
-
 	err := r.db.Model(u).Where("email = ?", email).Select()
+	if err == pg.ErrNoRows || err == pg.ErrMultiRows {
+		return nil, err
+	}
 
 	return u, err
 }

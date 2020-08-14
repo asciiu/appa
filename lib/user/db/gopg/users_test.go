@@ -6,6 +6,7 @@ import (
 
 	"github.com/asciiu/appa/lib/db/gopg"
 	"github.com/asciiu/appa/lib/db/sql"
+	"github.com/go-pg/pg/v10"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +17,7 @@ func checkError(err error) {
 	}
 }
 
-func TestInsertUser(t *testing.T) {
+func TestUser(t *testing.T) {
 	testDB := "postgres://postgres@localhost/appa_test?&sslmode=disable"
 
 	sqldb, err := sql.NewDB(testDB)
@@ -48,5 +49,11 @@ func TestInsertUser(t *testing.T) {
 
 		assert.Equal(t, "test@email", foundUser.Email, "email incorrect")
 		assert.Equal(t, "tester", foundUser.Username, "email incorrect")
+	})
+
+	t.Run("Not Found User", func(t *testing.T) {
+		foundUser, err := userRepo.FindUserByEmail("tester@testy")
+		assert.Nil(t, foundUser, "this should be nil")
+		assert.Equal(t, pg.ErrNoRows, err)
 	})
 }
