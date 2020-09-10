@@ -17,16 +17,16 @@ func checkError(err error) {
 func TestBets(t *testing.T) {
 	t.Run("Test WIF", func(t *testing.T) {
 
-		btcWIF, _ := BTC.CreateWIF()
-		btcAddress, _ := BTC.GetAddress(btcWIF)
-		fmt.Printf("%s - public: %s\n", btcWIF.String(), btcAddress.EncodeAddress())
+		btcWIF, _ := Bitcoin.CreateWIF()
+		btcAddress, _ := Bitcoin.GetAddress(btcWIF)
+		fmt.Printf("Key: %s - Pub addr: %s\n", btcWIF.String(), btcAddress.EncodeAddress())
 
-		ltcWIF, _ := LTC.CreateWIF()
-		ltcAddress, _ := LTC.GetAddress(ltcWIF)
-		fmt.Printf("%s - public: %s\n", ltcWIF.String(), ltcAddress.EncodeAddress())
+		ltcWIF, _ := Litecoin.CreateWIF()
+		ltcAddress, _ := Litecoin.GetAddress(ltcWIF)
+		fmt.Printf("Key: %s - Pub addr: %s\n", ltcWIF.String(), ltcAddress.EncodeAddress())
 
 		// test that you cannot import a litcoin wif in bitcoin network
-		_, err := BTC.ImportWIF(ltcWIF.String())
+		_, err := Bitcoin.ImportWIF(ltcWIF.String())
 		assert.Error(t, err, "what is this?")
 	})
 }

@@ -16,11 +16,11 @@ type Network struct {
 	xprivatekey byte
 }
 
-// BTC represents pub hash and priv hash for bitcoin network
-var BTC = Network{name: "Bitcoin", symbol: "BTC", xpubkey: 0x00, xprivatekey: 0x80}
+// Bitcoin network
+var Bitcoin = Network{name: "Bitcoin", symbol: "BTC", xpubkey: 0x00, xprivatekey: 0x80}
 
-// LTC represents pub hash and priv hash for litcoin network
-var LTC = Network{name: "Litecoin", symbol: "LTC", xpubkey: 0x30, xprivatekey: 0xb0}
+// Litecoin network
+var Litecoin = Network{name: "Litecoin", symbol: "LTC", xpubkey: 0x30, xprivatekey: 0xb0}
 
 // GetNetworkParams returns the chaincfg params
 func (network Network) GetNetworkParams() *chaincfg.Params {
