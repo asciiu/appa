@@ -1,9 +1,7 @@
 # appa
-We have to go back. Back, ...to the Future!!
+A mythical animal transporting children on a journey of self discovery. 
 ```
-(•_•)
-( •_•)>⌐■-■
-(⌐■_■)
+[̲̅$̲̅(̲̅ιο̲̅̅)̲̅$̲̅]
 ```
 
 ### Prerequisites
