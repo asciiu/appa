@@ -1,4 +1,4 @@
-# GraphQL chat example. 
+# This is Bit-ki-do. It is a disciple, an art, a gamble. 
 
 The base project was generated via:
 ```

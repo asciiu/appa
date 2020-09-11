@@ -13,7 +13,7 @@
 			"path": "migrations"
 		},
 		{
-			"path": "graphql-grinkwondo"
+			"path": "graphql-bitkido"
 		},
 		{
 			"path": "api-rest"
