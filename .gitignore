@@ -15,4 +15,4 @@ build/
 config-map.yaml
 assets/
 dev.env
-
+btcd
