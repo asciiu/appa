@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math/rand"
 	"net"
-	"time"
 
 	"github.com/asciiu/appa/sandbox-btc/binary"
 	"github.com/asciiu/appa/sandbox-btc/protocol"
@@ -17,6 +15,9 @@ import (
 type Node struct {
 	Network      string
 	NetworkMagic protocol.Magic
+	Peers        map[string]*Peer
+	PingCh       chan peerPing
+	PongCh       chan uint64
 	UserAgent    string
 }
 
@@ -30,6 +31,9 @@ func New(network, userAgent string) (*Node, error) {
 	return &Node{
 		Network:      network,
 		NetworkMagic: networkMagic,
+		Peers:        make(map[string]*Peer),
+		PingCh:       make(chan peerPing),
+		PongCh:       make(chan uint64),
 		UserAgent:    userAgent,
 	}, nil
 }
@@ -41,46 +45,33 @@ func (no Node) Run(nodeAddr string) error {
 		return err
 	}
 
-	version := protocol.MsgVersion{
-		Version:   protocol.Version,
-		Services:  protocol.SrvNodeNetwork,
-		Timestamp: time.Now().UTC().Unix(),
-		AddrRecv: protocol.VersionNetAddr{
-			Services: protocol.SrvNodeNetwork,
-			IP:       peerAddr.IP,
-			Port:     peerAddr.Port,
-		},
-		AddrFrom: protocol.VersionNetAddr{
-			Services: protocol.SrvNodeNetwork,
-			IP:       protocol.NewIPv4(127, 0, 0, 1),
-			Port:     9334,
-		},
-		Nonce:       nonce(),
-		UserAgent:   protocol.NewUserAgent(no.UserAgent),
-		StartHeight: -1,
-		Relay:       true,
+	version, err := protocol.NewVersionMsg(
+		no.Network,
+		no.UserAgent,
+		peerAddr.IP,
+		peerAddr.Port,
+	)
+	if err != nil {
+		return err
 	}
 
-	msg, err := protocol.NewMessage("version", no.Network, version)
+	msgSerialized, err := binary.Marshal(version)
 	if err != nil {
-		logrus.Fatalln(err)
-	}
-
-	msgSerialized, err := binary.Marshal(msg)
-	if err != nil {
-		logrus.Fatalln(err)
+		return err
 	}
 
 	conn, err := net.Dial("tcp", nodeAddr)
 	if err != nil {
-		logrus.Fatalln(err)
+		return err
 	}
 	defer conn.Close()
 
 	_, err = conn.Write(msgSerialized)
 	if err != nil {
-		logrus.Fatalln(err)
+		return err
 	}
+
+	go no.monitorPeers()
 
 	tmp := make([]byte, protocol.MsgHeaderLength)
 
@@ -94,7 +85,6 @@ Loop:
 			break Loop
 		}
 
-		logrus.Debugf("received header: %x", tmp[:n])
 		var msgHeader protocol.MessageHeader
 		if err := binary.NewDecoder(bytes.NewReader(tmp[:n])).Decode(&msgHeader); err != nil {
 			logrus.Errorf("invalid header: %+v", err)
@@ -114,12 +104,44 @@ Loop:
 				logrus.Errorf("failed to handle 'version': %+v", err)
 				continue
 			}
+		case "verack":
+			if err := no.handleVerack(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'verack': %+v", err)
+				continue
+			}
+		case "ping":
+			if err := no.handlePing(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'ping': %+v", err)
+				continue
+			}
+		case "pong":
+			if err := no.handlePong(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'pong': %+v", err)
+				continue
+			}
+		case "inv":
+			if err := no.handleInv(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'inv': %+v", err)
+				continue
+			}
+		case "tx":
+			if err := no.handleTx(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'tx': %+v", err)
+				continue
+			}
 		}
 	}
 
 	return nil
 }
 
-func nonce() uint64 {
-	return rand.Uint64()
+func (no Node) disconnectPeer(peerID string) {
+	logrus.Debugf("disconnecting peer %s", peerID)
+
+	peer := no.Peers[peerID]
+	if peer == nil {
+		return
+	}
+
+	peer.Connection.Close()
 }

@@ -2,13 +2,14 @@ package node
 
 import (
 	"io"
+	"net"
 
 	"github.com/asciiu/appa/sandbox-btc/binary"
 	"github.com/asciiu/appa/sandbox-btc/protocol"
 	"github.com/sirupsen/logrus"
 )
 
-func (n Node) handleVersion(header *protocol.MessageHeader, conn io.ReadWriter) error {
+func (n Node) handleVersion(header *protocol.MessageHeader, conn net.Conn) error {
 	var version protocol.MsgVersion
 
 	lr := io.LimitReader(conn, int64(header.Length))
@@ -16,7 +17,19 @@ func (n Node) handleVersion(header *protocol.MessageHeader, conn io.ReadWriter) 
 		return err
 	}
 
-	logrus.Infof("VERSION: %+v", version.UserAgent.String)
+	peer := Peer{
+		Address:    conn.RemoteAddr(),
+		Connection: conn,
+		PongCh:     make(chan uint64),
+		Services:   version.Services,
+		UserAgent:  version.UserAgent.String,
+		Version:    version.Version,
+	}
+
+	n.Peers[peer.ID()] = &peer
+	go n.monitorPeer(&peer)
+
+	logrus.Debugf("new peer %s", peer)
 
 	verack, err := protocol.NewVerackMsg(n.Network)
 	if err != nil {
