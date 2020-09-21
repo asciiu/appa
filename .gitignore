@@ -16,3 +16,4 @@ config-map.yaml
 assets/
 dev.env
 btcd
+btcwallet
