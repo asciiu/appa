@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/asciiu/appa/sandbox-btc/binary"
@@ -16,7 +17,18 @@ func (no Node) handleTx(header *protocol.MessageHeader, conn io.ReadWriter) erro
 		return err
 	}
 
-	logrus.Debugf("transaction: %+v", tx)
+	hash, err := tx.Hash()
+	if err != nil {
+		return fmt.Errorf("tx.Hash: %+v", err)
+	}
+
+	logrus.Debugf("transaction: %x", hash)
+
+	if err := tx.Verify(); err != nil {
+		return fmt.Errorf("rejected invalid transaction %x", hash)
+	}
+
+	no.mempool.NewTxCh <- tx
 
 	return nil
 }

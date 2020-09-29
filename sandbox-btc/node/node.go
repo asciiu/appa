@@ -11,14 +11,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// PeerID is peer IP address.
+type PeerID string
+
 // Node implements a Bitcoin node.
 type Node struct {
 	Network      string
 	NetworkMagic protocol.Magic
-	Peers        map[string]*Peer
+	Peers        map[PeerID]*Peer
 	PingCh       chan peerPing
 	PongCh       chan uint64
+	DisconCh     chan PeerID
 	UserAgent    string
+
+	mempool *Mempool
 }
 
 // New returns a new Node.
@@ -31,10 +37,13 @@ func New(network, userAgent string) (*Node, error) {
 	return &Node{
 		Network:      network,
 		NetworkMagic: networkMagic,
-		Peers:        make(map[string]*Peer),
+		Peers:        make(map[PeerID]*Peer),
 		PingCh:       make(chan peerPing),
+		DisconCh:     make(chan PeerID),
 		PongCh:       make(chan uint64),
 		UserAgent:    userAgent,
+
+		mempool: NewMempool(),
 	}, nil
 }
 
@@ -72,6 +81,7 @@ func (no Node) Run(nodeAddr string) error {
 	}
 
 	go no.monitorPeers()
+	go no.mempool.Run()
 
 	tmp := make([]byte, protocol.MsgHeaderLength)
 
@@ -129,13 +139,18 @@ Loop:
 				logrus.Errorf("failed to handle 'tx': %+v", err)
 				continue
 			}
+		case "block":
+			if err := no.handleBlock(&msgHeader, conn); err != nil {
+				logrus.Errorf("failed to handle 'block': %+v", err)
+				continue
+			}
 		}
 	}
 
 	return nil
 }
 
-func (no Node) disconnectPeer(peerID string) {
+func (no Node) disconnectPeer(peerID PeerID) {
 	logrus.Debugf("disconnecting peer %s", peerID)
 
 	peer := no.Peers[peerID]
@@ -144,4 +159,5 @@ func (no Node) disconnectPeer(peerID string) {
 	}
 
 	peer.Connection.Close()
+	delete(no.Peers, peerID)
 }
