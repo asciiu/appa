@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/pkg/errors"
 )
@@ -37,6 +38,38 @@ func (fe FieldElement) Add(element FieldElement) (*FieldElement, error) {
 	}
 
 	r := (fe.num + element.num) % fe.prime
+	return &FieldElement{
+		num:   r,
+		prime: fe.prime,
+	}, nil
+}
+
+// Subtract finite fields
+func (fe FieldElement) Subtract(element FieldElement) (*FieldElement, error) {
+	if fe.prime != element.prime {
+		return nil, ErrPrime
+	}
+
+	r := (fe.num - element.num) % fe.prime
+	return &FieldElement{
+		num:   r,
+		prime: fe.prime,
+	}, nil
+}
+
+// Multiply finite fields
+func (fe FieldElement) Multiply(factor uint) (*FieldElement, error) {
+
+	r := (fe.num * factor) % fe.prime
+	return &FieldElement{
+		num:   r,
+		prime: fe.prime,
+	}, nil
+}
+
+// Pow finite fields
+func (fe FieldElement) Pow(exponent uint) (*FieldElement, error) {
+	r := uint(math.Pow(float64(fe.num), float64(exponent))) % fe.prime
 	return &FieldElement{
 		num:   r,
 		prime: fe.prime,
