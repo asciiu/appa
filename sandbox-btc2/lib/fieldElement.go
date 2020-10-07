@@ -75,3 +75,17 @@ func (fe FieldElement) Pow(exponent uint) (*FieldElement, error) {
 		prime: fe.prime,
 	}, nil
 }
+
+// Div finite fields
+func (fe FieldElement) Div(element FieldElement) (*FieldElement, error) {
+	if fe.prime != element.prime {
+		return nil, ErrPrime
+	}
+
+	r := fe.num * uint(math.Pow(float64(element.num), float64(fe.prime-2))) % fe.prime
+
+	return &FieldElement{
+		num:   r,
+		prime: fe.prime,
+	}, nil
+}

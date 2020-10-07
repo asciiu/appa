@@ -32,3 +32,12 @@ func TestFiniteFieldAddError(t *testing.T) {
 	assert.Equal(t, ErrPrime, err, "should be prime error")
 	assert.Nil(t, d, "value should be nil")
 }
+
+func TestFiniteFieldDivError(t *testing.T) {
+	a := NewFieldElement(7, 19)
+	b := NewFieldElement(5, 19)
+
+	d, err := a.Div(b)
+	assert.Nil(t, err, "err should be nil")
+	assert.Equal(t, uint(9), d.num, "incorrect num")
+}
