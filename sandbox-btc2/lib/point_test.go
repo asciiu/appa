@@ -7,10 +7,16 @@ import (
 )
 
 func TestPoint(t *testing.T) {
-	_, err := NewPoint(-1, -1, 5, 7)
+	x := -1
+	y := -1
+
+	_, err := NewPoint(&x, &y, 5, 7)
 
 	assert.Nil(t, err, "err not nil")
 
-	_, err = NewPoint(-1, -2, 5, 7)
-	assert.Equal(t, ErrPoint, err, "should be point error")
+	x2 := -1
+	y2 := -2
+
+	_, err = NewPoint(&x2, &y2, 5, 7)
+	assert.Equal(t, ErrPointNotOnCurve, err, "should be point error")
 }
